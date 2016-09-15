@@ -19,7 +19,7 @@ namespace Test
 					frm.Left = "50px";
 					frm.Top = "50px";
 					frm.Text = "Bing";
-                    frm.Navigate("http://bing.com");                    
+                    frm.Navigate("https://bing.com");                    
                     frm.Show();
 				}
 			};

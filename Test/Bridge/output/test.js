@@ -113,6 +113,8 @@
                 input.style.textIndent = "13px";
                 input.style.color = "black";
 
+                input.placeholder = "Search the web and Windows";
+
                 //	Heading.Style.FontFamily = "Segoe UI";		
                 input.addEventListener("keyup", function (ev) {
                     var kev = ev;
@@ -169,7 +171,7 @@
                     if (InputFocused) {
                         input.style.backgroundColor = "#F3F3F3";
                     } else {
-                        input.style.backgroundColor = "#575757";
+                        input.style.backgroundColor = "#3F3F3F";
                     }
                 };
 

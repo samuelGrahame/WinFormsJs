@@ -149,8 +149,10 @@ namespace Test
 			input.Style.TextIndent = "13px";
 			input.Style.Color = "black";
 
-            //	Heading.Style.FontFamily = "Segoe UI";		
-            input.AddEventListener(EventType.KeyUp, (ev) => {
+			input.Placeholder = "Search the web and Windows";
+
+			//	Heading.Style.FontFamily = "Segoe UI";		
+			input.AddEventListener(EventType.KeyUp, (ev) => {
                 var kev = ev.As<KeyboardEvent>();
 
                 if(kev.KeyCode == 13)
@@ -228,7 +230,7 @@ namespace Test
 				}
 				else
 				{
-					input.Style.BackgroundColor = "#575757";
+					input.Style.BackgroundColor = "#3F3F3F";					
 				}
 			};
 
