@@ -11,49 +11,42 @@ namespace Test
 {
 	public class Form
 	{
-		private HTMLDivElement Base { get; set; }
-		private HTMLDivElement Heading { get; set; }
-		public HTMLDivElement Body { get; set; }
-        public HTMLDivElement BodyOverLay { get; set; }
-
-        private HTMLDivElement ButtonClose { get; set; }
-		private HTMLDivElement ButtonExpand { get; set; }
-		private HTMLDivElement ButtonMinimize { get; set; }
-
 		public static HTMLDivElement TaskBar { get; set; }
 		public static HTMLDivElement WindowHolder { get; set; }
-
 		public static HTMLDivElement ButtonStart { get; set; }
-
 		public static HTMLInputElement InputStartSearch { get; set; }
-
-		public HTMLElement Owner { get; set; } = null;
-
-		public int MinWidth { get; set; } = 200;
-		public int MinHeight { get; set; } = 50;
-
-		public static int ResizeCorners = 3;
-
-		private HTMLSpanElement HeadingTitle { get; set; }
-
-		public int prev_px;
-		public int prev_py;
-
+		public static int ResizeCorners { get; set; } = 3;
 		public static Form MovingForm = null;
-
 		public static HTMLElement Parent = null;
-		
+		public static bool Mouse_Down { get; set; } = false;
+
 		private static Form _ActiveForm;
 		private static Form _PrevActiveForm;
-
-		public static bool Mouse_Down = false;
-
-		private static MouseMoveAction MoveAction = MouseMoveAction.Move;        
+		private static MouseMoveAction MoveAction = MouseMoveAction.Move;
 
 		private const string WinIcon = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')";
 		private const string WinIconHover = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')";
 		private const string WinIconDown = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACnSURBVFhHY5AZZGDUQYTAqIMIgVEHEQKjDiIERh1ECAxfBynrGGvbehv6JFnGVrmUznWvXRE27zoQQaWJBuQ4SN3UHmg30GLHvIlAi4EiELuxIogW4gHJDkKzD4iwCsIRRBfxYNRBhMCogwgBkh1EazAaZYTAqIMIgVEHEQIkOwgIBlfligsMZPODpmDUQYTAqIMIgVEHEQKjDiIERh1ECAwyB8nIAADHEJbDMY47rQAAAABJRU5ErkJggg==')";
 
+		private HTMLDivElement Base { get; set; }
+		private HTMLDivElement Heading { get; set; }
+		private HTMLDivElement ButtonClose { get; set; }
+		private HTMLDivElement ButtonExpand { get; set; }
+		private HTMLDivElement ButtonMinimize { get; set; }
+		private HTMLSpanElement HeadingTitle { get; set; }
+
+		public HTMLDivElement Body { get; set; }
+        public HTMLDivElement BodyOverLay { get; set; }		
+		public HTMLElement Owner { get; set; } = null;
+
+		public int prev_px;
+		public int prev_py;
+
+		public int MinWidth { get; set; } = 200;
+		public int MinHeight { get; set; } = 50;
+
+		public WindowState windowState { get; set; }
+		
         public bool IsVisible()
         {
             return Base != null && Base.Style.Visibility == Visibility.Visible;
@@ -78,6 +71,13 @@ namespace Test
         {
 
         }
+
+		public enum WindowState
+		{
+			Normal,
+			Minimized,
+			Maximized
+		}
 
 		private enum MouseMoveAction
 		{			
