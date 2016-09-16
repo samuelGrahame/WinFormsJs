@@ -19,6 +19,7 @@ namespace Test
 		public static Form MovingForm = null;
 		public static HTMLElement Parent = null;
 		public static bool Mouse_Down { get; set; } = false;
+		public static int FadeLength { get; set; } = 100;
 
 		private static Form _ActiveForm;
 		private static Form _PrevActiveForm;
@@ -331,7 +332,7 @@ namespace Test
 			
 			WindowHolder = new HTMLDivElement();
 			WindowHolder.Style.Position = Position.Absolute;
-			//TaskBar.Style.VerticalAlign = VerticalAlign.Bottom;
+			
 			WindowHolder.Style.Width = "100%";
 			WindowHolder.Style.Height = "-webkit-calc(100% - 40px)";
 			WindowHolder.Style.Top = "0";
@@ -360,22 +361,13 @@ namespace Test
 				WindowHolderSelectionBox.Style.ZIndex = "0";
 
 				Mouse_Down = true;
-			});
-
-			WindowHolder.AddEventListener(EventType.MouseMove, (ev) =>
-			{
-				var mev = ev.As<MouseEvent>();
-
-				
-			});
-
-			//user-select: none;
-
+			});			
+			
 			jQuery.Select(WindowHolder).Css("user-select", "none");
 
 			TaskBar = new HTMLDivElement();
 			TaskBar.Style.Position = Position.Absolute;
-			//TaskBar.Style.VerticalAlign = VerticalAlign.Bottom;
+			
 			TaskBar.Style.Width = "100%";
 			TaskBar.Style.Height = "40px";
 			TaskBar.Style.Top = "-webkit-calc(100% - 40px)";
@@ -405,8 +397,8 @@ namespace Test
 					
 					var obj = jQuery.Select(MovingForm.Base);
 
-					var Y = (mev.ClientY + MovingForm.prev_py); // MovingForm.prev_py  Global.ParseInt(obj.Css("top")) + 
-					var X = (mev.ClientX + MovingForm.prev_px); // - MovingForm.prev_px // Global.ParseInt(obj.Css("left")) + 
+					var Y = (mev.ClientY + MovingForm.prev_py);
+					var X = (mev.ClientX + MovingForm.prev_px);
 
 					if(MovingForm.windowState == WindowState.Maximized && MoveAction == MouseMoveAction.Move)
 					{
@@ -650,7 +642,7 @@ namespace Test
 						WindowHolderSelectionBox.Style.Width = width + "px";
 						WindowHolderSelectionBox.Style.Height = height + "px";
 
-						mev.StopPropagation();
+						mev.StopImmediatePropagation();
 						mev.PreventDefault();
 					}
 				}
@@ -667,8 +659,11 @@ namespace Test
                 MovingForm = null;
 				Mouse_Down = false;				
 				MoveAction = MouseMoveAction.Move;
-
-				jQuery.Select(WindowHolderSelectionBox).FadeOut(100);// WindowHolderSelectionBox.Style.Visibility = Visibility.Collapse;				
+				if(WindowHolderSelectionBox != null)
+				{
+					jQuery.Select(WindowHolderSelectionBox).FadeOut(FadeLength, () => { WindowHolderSelectionBox.Remove(); WindowHolderSelectionBox = null; });
+				}
+				
 			});
 
 			Window.AddEventListener(EventType.MouseMove, mouseMove);
@@ -710,8 +705,8 @@ namespace Test
 
 				windowState = WindowState.Maximized;
 
-				Width = "-webkit-calc(100% - 4px)"; // "100%";
-				Height = "-webkit-calc(100% - 4px)"; //"100%";
+				Width = "-webkit-calc(100% - 5px)";
+				Height = "-webkit-calc(100% - 5px)";
 
 				Top = "0";
 				Left = "0";
@@ -928,10 +923,7 @@ namespace Test
 		public void SetCursor(Cursor cur)
 		{
 			Base.Style.Cursor = cur;
-			Heading.Style.Cursor = cur;
-			//ButtonClose.Style.Cursor = cur;
-			//ButtonExpand.Style.Cursor = cur;
-			//ButtonMinimize.Style.Cursor = cur;
+			Heading.Style.Cursor = cur;		
 		}        
 
         public void ChangeSelectionState(bool TurnOff = true)
@@ -946,8 +938,10 @@ namespace Test
             
             foreach (var item in Children)
             {
-                if(item.TagName.ToLower() == "input" || item.TagName.ToLower() == "span" || item.TagName.ToLower() == "textarea")
-                {
+                if((item.TagName.ToLower() == "input" ||
+					item.TagName.ToLower() == "span" ||
+					item.TagName.ToLower() == "textarea") && item.GetAttribute("IL") != "1")
+                {					
                     if(TurnOff)
                     {                        
                         jQuery.Select(item).Css("user-select", "none");
@@ -979,7 +973,7 @@ namespace Test
 
             BodyOverLay.Style.Visibility = Visibility.Collapse;
 
-            Base.AppendChild(Heading);
+			Base.AppendChild(Heading);
 			Base.AppendChild(Body);
             Base.AppendChild(BodyOverLay);
 
@@ -1144,9 +1138,9 @@ namespace Test
 			Heading.Style.PaddingBottom = "1px";
 
             HeadingTitle.Style.TextIndent = "3px";
+			HeadingTitle.SetAttribute("IL", "1"); // Internal Label
 
-
-            Heading.AddEventListener(EventType.MouseDown, (ev) => {
+			Heading.AddEventListener(EventType.MouseDown, (ev) => {
 				if(windowState == WindowState.Maximized)
 				{					
 					MovingForm = this;
@@ -1211,7 +1205,9 @@ namespace Test
             });
 
             Base.Style.BorderStyle = BorderStyle.Solid;
-			Base.Style.BorderWidthString = "2px";
+			Base.Style.BorderWidthString = "1px";
+			Base.Style.BackgroundColor = "white";
+			Base.Style.Padding = "1px";
 			Base.Style.BorderColor = "#FBFBFB";
 			jQuery.Select(Base).Css("box-shadow", "0px 0px 63px -17px rgba(0,0,0,0.75)");
 			
@@ -1280,7 +1276,7 @@ namespace Test
 					owner.AppendChild(Base);
 
 				Owner = owner;
-
+				
 				Base.Style.Visibility = Visibility.Visible;
 
                 Body.Focus();
@@ -1291,6 +1287,7 @@ namespace Test
 
                 OnShowed();
             }
+
 			ActiveForm = this;
 		}
 
@@ -1326,13 +1323,11 @@ namespace Test
 
             ActiveForm = _PrevActiveForm;
 
-			VisibleForm.Remove(this);
-                        
+			VisibleForm.Remove(this);           
+			        
 			if(Base != null)
 			{
-				jQuery.Select(Base).Empty();
-				Base.Remove();
-				Base = null;
+				jQuery.Select(Base).FadeOut(FadeLength, () => { jQuery.Select(Base).Empty(); Base.Remove(); Base = null; });				
 			}
 
 			CalculateZOrder();			
