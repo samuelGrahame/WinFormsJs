@@ -29,7 +29,7 @@
             frm.setLeft("50px");
             frm.setTop("50px");
             frm.setText("Bing");
-            frm.navigate("http://bing.com");
+            frm.navigate("https://bing.com");
             frm.show();
         },
         f2: function (ev) {
@@ -43,12 +43,10 @@
 
     Bridge.define("Test.Form", {
         statics: {
-            resizeCorners: 3,
             movingForm: null,
             parent: null,
             _ActiveForm: null,
             _PrevActiveForm: null,
-            mouse_Down: false,
             moveAction: 0,
             WinIcon: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')",
             WinIconHover: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')",
@@ -59,7 +57,9 @@
                     TaskBar: null,
                     WindowHolder: null,
                     ButtonStart: null,
-                    InputStartSearch: null
+                    InputStartSearch: null,
+                    ResizeCorners: 3,
+                    Mouse_Down: false
                 },
                 init: function () {
                     this.visibleForm = new (System.Collections.Generic.List$1(Test.Form))();
@@ -202,7 +202,7 @@
                         return;
                     }
 
-                    Test.Form.mouse_Down = true;
+                    Test.Form.setMouse_Down(true);
 
                     ev.stopPropagation();
                     ev.preventDefault();
@@ -217,7 +217,7 @@
                         return;
                     }
 
-                    if (Test.Form.mouse_Down) {
+                    if (Test.Form.getMouse_Down()) {
                         butt.style.background = Test.Form.WinIconDown;
                     } else {
                         butt.style.background = Test.Form.WinIconHover;
@@ -310,19 +310,24 @@
         },
         prev_px: 0,
         prev_py: 0,
+        prev_width: 0,
+        prev_height: 0,
+        prev_top: 0,
+        prev_left: 0,
         config: {
             properties: {
                 Base: null,
                 Heading: null,
-                Body: null,
-                BodyOverLay: null,
                 ButtonClose: null,
                 ButtonExpand: null,
                 ButtonMinimize: null,
+                HeadingTitle: null,
+                Body: null,
+                BodyOverLay: null,
                 Owner: null,
                 MinWidth: 200,
                 MinHeight: 50,
-                HeadingTitle: null
+                windowState: 0
             }
         },
         ctor: function () {
@@ -346,7 +351,9 @@
 
             this.getBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f5));
 
-            this.getBase().addEventListener("mousemove", Bridge.fn.bind(this, $_.Test.Form.f6));
+            this.getHeading().addEventListener("dblclick", Bridge.fn.bind(this, $_.Test.Form.f6));
+
+            this.getBase().addEventListener("mousemove", Bridge.fn.bind(this, $_.Test.Form.f7));
 
             this.getBase().style.position = "absolute";
 
@@ -365,7 +372,7 @@
             this.getHeadingTitle().style.textIndent = "3px";
 
 
-            this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f7));
+            this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f8));
 
             this.getHeading().style.fontFamily = "Segoe UI";
             this.getHeading().style.textAlign = 7;
@@ -374,7 +381,7 @@
             this.setButtonExpand(this.createFormButton(Test.Form.FormButtonType.Maximize));
             this.setButtonMinimize(this.createFormButton(Test.Form.FormButtonType.Minimize));
 
-            this.getBody().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f8));
+            this.getBody().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f9));
 
             $(this.getHeading()).css("user-select", "none").css("user-drag:", "none");
 
@@ -402,7 +409,7 @@
             this.getBodyOverLay().style.zIndex = (2147483647).toString();
             this.getBodyOverLay().style.opacity = "0";
 
-            this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f9));
+            this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f10));
 
             this.getBase().style.borderStyle = "solid";
             this.getBase().style.borderWidth = "2px";
@@ -415,7 +422,6 @@
             this.getHeading().appendChild(this.getButtonMinimize());
 
             this.initialise();
-
         },
         getHeight: function () {
             return this.getBase().style.height;
@@ -474,6 +480,31 @@
         onClosing: function () {
 
         },
+        changeWindowState: function () {
+            if (this.getwindowState() === Test.Form.WindowState.Maximized) {
+                this.setWidth(System.String.concat(this.prev_width, "px"));
+                this.setHeight(System.String.concat(this.prev_height, "px"));
+
+                this.setTop(System.String.concat(this.prev_top, "px"));
+                this.setLeft(System.String.concat(this.prev_left, "px"));
+
+                this.setwindowState(Test.Form.WindowState.Normal);
+            } else {
+                this.prev_height = parseInt(this.getHeight());
+                this.prev_width = parseInt(this.getWidth());
+
+                this.prev_left = parseInt(this.getLeft());
+                this.prev_top = parseInt(this.getTop());
+
+                this.setwindowState(Test.Form.WindowState.Maximized);
+
+                this.setWidth("-webkit-calc(100% - 4px)"); // "100%";
+                this.setHeight("-webkit-calc(100% - 4px)"); //"100%";
+
+                this.setTop("0");
+                this.setLeft("0");
+            }
+        },
         createFormButton: function (Type) {
             var butt = document.createElement('div');
 
@@ -493,7 +524,7 @@
                         if (Test.Form.movingForm != null) {
                             return;
                         }
-                        Test.Form.mouse_Down = true;
+                        Test.Form.setMouse_Down(true);
 
                         ev.stopPropagation();
                         ev.preventDefault();
@@ -503,7 +534,7 @@
 
                         Test.Form.setActiveForm(this);
                     });
-                    butt.onmouseup = Bridge.fn.bind(this, $_.Test.Form.f10);
+                    butt.onmouseup = Bridge.fn.bind(this, $_.Test.Form.f11);
                     butt.onmouseenter = Bridge.fn.bind(this, function (ev) {
                         if (Test.Form.movingForm != null) {
                             return;
@@ -511,7 +542,7 @@
 
                         this.setCursor("default");
 
-                        if (Test.Form.mouse_Down) {
+                        if (Test.Form.getMouse_Down()) {
                             butt.style.backgroundColor = "#F1707A";
                         } else {
                             butt.style.backgroundColor = "#E81123";
@@ -534,7 +565,7 @@
                     butt.id = "Maximize";
                     butt.innerHTML = "&#9633;";
                     butt.style.fontSize = "14pt";
-                    butt.onmouseup = function (ev) {
+                    butt.onmouseup = Bridge.fn.bind(this, function (ev) {
                         if (Test.Form.movingForm != null) {
                             return;
                         }
@@ -542,11 +573,13 @@
                         ev.stopPropagation();
                         ev.preventDefault();
 
-                        Test.Form.mouse_Down = false;
+                        Test.Form.setMouse_Down(false);
 
                         butt.style.backgroundColor = "white";
                         butt.style.color = "black";
-                    };
+
+                        this.changeWindowState();
+                    });
                     break;
                 case Test.Form.FormButtonType.Minimize: 
                     butt.style.backgroundColor = "white";
@@ -554,7 +587,7 @@
                     butt.style.color = "black";
                     butt.id = "Minimize";
                     butt.innerHTML = "&#8213;";
-                    butt.onmouseup = function (ev) {
+                    butt.onmouseup = Bridge.fn.bind(this, function (ev) {
                         if (Test.Form.movingForm != null) {
                             return;
                         }
@@ -562,22 +595,24 @@
                         ev.stopPropagation();
                         ev.preventDefault();
 
-                        Test.Form.mouse_Down = false;
+                        Test.Form.setMouse_Down(false);
 
                         butt.style.backgroundColor = "white";
                         butt.style.color = "black";
-                    };
+
+                        this.setwindowState(Test.Form.WindowState.Minimized);
+                    });
                     break;
                 case Test.Form.FormButtonType.Restore: 
                     break;
                 case Test.Form.FormButtonType.Help: 
                     break;
                 default: 
-                    butt.onmouseup = $_.Test.Form.f11;
+                    butt.onmouseup = $_.Test.Form.f12;
                     break;
             }
 
-            butt.onmousemove = $_.Test.Form.f12;
+            butt.onmousemove = $_.Test.Form.f13;
 
             if (Type !== Test.Form.FormButtonType.Close) {
                 butt.onmousedown = Bridge.fn.bind(this, function (ev) {
@@ -585,7 +620,7 @@
                         return;
                     }
 
-                    Test.Form.mouse_Down = true;
+                    Test.Form.setMouse_Down(true);
 
                     ev.stopPropagation();
                     ev.preventDefault();
@@ -602,7 +637,7 @@
                     }
                     this.setCursor("default");
 
-                    if (Test.Form.mouse_Down) {
+                    if (Test.Form.getMouse_Down()) {
                         butt.style.backgroundColor = "#CACACA";
                     } else {
                         butt.style.backgroundColor = "#E5E5E5";
@@ -731,7 +766,7 @@
                 return;
             }
 
-            Test.Form.mouse_Down = true;
+            Test.Form.setMouse_Down(true);
 
             ev.stopPropagation();
 
@@ -752,6 +787,13 @@
                 var Y = (((mev.clientY + Test.Form.movingForm.prev_py) | 0)); // MovingForm.prev_py  Global.ParseInt(obj.Css("top")) + 
                 var X = (((mev.clientX + Test.Form.movingForm.prev_px) | 0)); // - MovingForm.prev_px // Global.ParseInt(obj.Css("left")) + 
 
+                if (Test.Form.movingForm.getwindowState() === Test.Form.WindowState.Maximized && Test.Form.moveAction === Test.Form.MouseMoveAction.Move) {
+                    Test.Form.movingForm.changeWindowState();
+                    X = (mev.clientX - (((Bridge.Int.div(Test.Form.movingForm.prev_width, 2)) | 0))) | 0;
+
+                    Test.Form.movingForm.prev_px = (X - mev.clientX) | 0;
+                }
+
                 var X1;
                 var Y1;
 
@@ -760,6 +802,9 @@
 
                 if (Y < 0) {
                     Y = 1;
+                }
+                if (X < 0) {
+                    X = 1;
                 }
 
                 ev.stopPropagation();
@@ -893,49 +938,65 @@
             }
 
             Test.Form.movingForm = null;
-            Test.Form.mouse_Down = false;
+            Test.Form.setMouse_Down(false);
             Test.Form.moveAction = Test.Form.MouseMoveAction.Move;
 
         },
         f5: function (ev) {
             var mev = ev;
-            Test.Form.mouse_Down = true;
+            Test.Form.setMouse_Down(true);
 
             var obj = $(this.getBase());
 
-            this.prev_px = (parseInt(obj.css("left")) - mev.clientX) | 0;
-            this.prev_py = (parseInt(obj.css("top")) - mev.clientY) | 0;
 
-            if (mev.layerX <= Test.Form.resizeCorners && mev.layerY <= Test.Form.resizeCorners) {
+
+            if (this.getwindowState() === Test.Form.WindowState.Maximized) {
+                this.setCursor("default");
+
+                Test.Form.moveAction = Test.Form.MouseMoveAction.Move;
+
+                //prev_px = prev_left - mev.ClientX;
+                //prev_py = prev_top - mev.ClientY;
+
+                this.prev_px = (parseInt(obj.css("left")) - mev.clientX) | 0;
+                this.prev_py = (parseInt(obj.css("top")) - mev.clientY) | 0;
+
+                return;
+            } else {
+                this.prev_px = (parseInt(obj.css("left")) - mev.clientX) | 0;
+                this.prev_py = (parseInt(obj.css("top")) - mev.clientY) | 0;
+            }
+
+            if (mev.layerX <= Test.Form.getResizeCorners() && mev.layerY <= Test.Form.getResizeCorners()) {
                 this.setCursor("nwse-resize");
 
                 Test.Form.moveAction = Test.Form.MouseMoveAction.TopLeftResize;
-            } else if (mev.layerY <= Test.Form.resizeCorners && mev.layerX >= ((parseInt(this.getWidth()) - Test.Form.resizeCorners) | 0)) {
+            } else if (mev.layerY <= Test.Form.getResizeCorners() && mev.layerX >= ((parseInt(this.getWidth()) - Test.Form.getResizeCorners()) | 0)) {
                 this.setCursor("nesw-resize");
 
                 Test.Form.moveAction = Test.Form.MouseMoveAction.TopRightResize;
-            } else if (mev.layerY <= Test.Form.resizeCorners) {
+            } else if (mev.layerY <= Test.Form.getResizeCorners()) {
                 this.setCursor("n-resize");
 
                 Test.Form.moveAction = Test.Form.MouseMoveAction.TopResize;
-            } else if (mev.layerX <= Test.Form.resizeCorners && mev.layerY >= ((parseInt(this.getHeight()) - Test.Form.resizeCorners) | 0)) {
+            } else if (mev.layerX <= Test.Form.getResizeCorners() && mev.layerY >= ((parseInt(this.getHeight()) - Test.Form.getResizeCorners()) | 0)) {
                 this.setCursor("nesw-resize");
 
                 Test.Form.moveAction = Test.Form.MouseMoveAction.BottomLeftResize;
-            } else if (mev.layerY >= ((parseInt(this.getHeight()) - Test.Form.resizeCorners) | 0) && mev.layerX >= ((parseInt(this.getWidth()) - Test.Form.resizeCorners) | 0)) {
+            } else if (mev.layerY >= ((parseInt(this.getHeight()) - Test.Form.getResizeCorners()) | 0) && mev.layerX >= ((parseInt(this.getWidth()) - Test.Form.getResizeCorners()) | 0)) {
                 this.setCursor("nwse-resize");
 
                 Test.Form.moveAction = Test.Form.MouseMoveAction.BottomRightResize;
-            } else if (mev.layerY >= ((parseInt(this.getHeight()) - Test.Form.resizeCorners) | 0)) {
+            } else if (mev.layerY >= ((parseInt(this.getHeight()) - Test.Form.getResizeCorners()) | 0)) {
                 this.setCursor("s-resize");
 
                 Test.Form.moveAction = Test.Form.MouseMoveAction.BottomResize;
-            } else if (mev.layerX <= Test.Form.resizeCorners) {
+            } else if (mev.layerX <= Test.Form.getResizeCorners()) {
                 this.setCursor("w-resize");
 
                 Test.Form.moveAction = Test.Form.MouseMoveAction.LeftResize;
 
-            } else if (mev.layerX >= ((parseInt(this.getWidth()) - Test.Form.resizeCorners) | 0)) {
+            } else if (mev.layerX >= ((parseInt(this.getWidth()) - Test.Form.getResizeCorners()) | 0)) {
                 this.setCursor("e-resize");
 
                 Test.Form.moveAction = Test.Form.MouseMoveAction.RightResize;
@@ -952,68 +1013,58 @@
             mev.stopPropagation();
         },
         f6: function (ev) {
+            this.changeWindowState();
+            ev.preventDefault();
+            ev.stopPropagation();
+        },
+        f7: function (ev) {
             var mev = ev;
             if (Test.Form.movingForm != null && Test.Form.moveAction === Test.Form.MouseMoveAction.Move) {
-                this.getBase().style.cursor = "default";
-                this.getHeading().style.cursor = "default";
+                this.setCursor("default");
+                return;
+            } else if (this.getwindowState() === Test.Form.WindowState.Maximized) {
+                this.setCursor("default");
                 return;
             }
 
-            if (Test.Form.moveAction === Test.Form.MouseMoveAction.TopLeftResize || mev.layerX <= Test.Form.resizeCorners && mev.layerY <= Test.Form.resizeCorners) {
-                this.getBase().style.cursor = "nwse-resize";
-                this.getHeading().style.cursor = "nwse-resize";
-            } else if (Test.Form.moveAction === Test.Form.MouseMoveAction.TopRightResize || mev.layerY <= Test.Form.resizeCorners && mev.layerX >= ((parseInt(this.getWidth()) - Test.Form.resizeCorners) | 0)) {
-                this.getBase().style.cursor = "nesw-resize";
-                this.getHeading().style.cursor = "nesw-resize";
-            } else if (mev.layerY <= Test.Form.resizeCorners || Test.Form.moveAction === Test.Form.MouseMoveAction.TopResize) {
-                this.getBase().style.cursor = "n-resize";
-                this.getHeading().style.cursor = "n-resize";
-            } else if (Test.Form.moveAction === Test.Form.MouseMoveAction.BottomLeftResize || mev.layerX <= Test.Form.resizeCorners && mev.layerY >= ((parseInt(this.getHeight()) - Test.Form.resizeCorners) | 0)) {
-                this.getBase().style.cursor = "nesw-resize";
-                this.getHeading().style.cursor = "nesw-resize";
-            } else if (Test.Form.moveAction === Test.Form.MouseMoveAction.BottomRightResize || mev.layerY >= ((parseInt(this.getHeight()) - Test.Form.resizeCorners) | 0) && mev.layerX >= ((parseInt(this.getWidth()) - Test.Form.resizeCorners) | 0)) {
-                this.getBase().style.cursor = "nwse-resize";
-                this.getHeading().style.cursor = "nwse-resize";
-            } else if (Test.Form.moveAction === Test.Form.MouseMoveAction.BottomResize || mev.layerY >= ((parseInt(this.getHeight()) - Test.Form.resizeCorners) | 0)) {
-                this.getBase().style.cursor = "s-resize";
-                this.getHeading().style.cursor = "s-resize";
-            } else if (Test.Form.moveAction === Test.Form.MouseMoveAction.LeftResize || mev.layerX <= Test.Form.resizeCorners) {
-                this.getBase().style.cursor = "w-resize";
-                this.getHeading().style.cursor = "w-resize";
-            } else if (Test.Form.moveAction === Test.Form.MouseMoveAction.RightResize || mev.layerX >= ((parseInt(this.getWidth()) - Test.Form.resizeCorners) | 0)) {
-                this.getBase().style.cursor = "e-resize";
-                this.getHeading().style.cursor = "e-resize";
+            if (Test.Form.moveAction === Test.Form.MouseMoveAction.TopLeftResize || mev.layerX <= Test.Form.getResizeCorners() && mev.layerY <= Test.Form.getResizeCorners()) {
+                this.setCursor("nwse-resize");
+            } else if (Test.Form.moveAction === Test.Form.MouseMoveAction.TopRightResize || mev.layerY <= Test.Form.getResizeCorners() && mev.layerX >= ((parseInt(this.getWidth()) - Test.Form.getResizeCorners()) | 0)) {
+                this.setCursor("nesw-resize");
+            } else if (mev.layerY <= Test.Form.getResizeCorners() || Test.Form.moveAction === Test.Form.MouseMoveAction.TopResize) {
+                this.setCursor("n-resize");
+            } else if (Test.Form.moveAction === Test.Form.MouseMoveAction.BottomLeftResize || mev.layerX <= Test.Form.getResizeCorners() && mev.layerY >= ((parseInt(this.getHeight()) - Test.Form.getResizeCorners()) | 0)) {
+                this.setCursor("nesw-resize");
+            } else if (Test.Form.moveAction === Test.Form.MouseMoveAction.BottomRightResize || mev.layerY >= ((parseInt(this.getHeight()) - Test.Form.getResizeCorners()) | 0) && mev.layerX >= ((parseInt(this.getWidth()) - Test.Form.getResizeCorners()) | 0)) {
+                this.setCursor("nwse-resize");
+            } else if (Test.Form.moveAction === Test.Form.MouseMoveAction.BottomResize || mev.layerY >= ((parseInt(this.getHeight()) - Test.Form.getResizeCorners()) | 0)) {
+                this.setCursor("s-resize");
+            } else if (Test.Form.moveAction === Test.Form.MouseMoveAction.LeftResize || mev.layerX <= Test.Form.getResizeCorners()) {
+                this.setCursor("w-resize");
+            } else if (Test.Form.moveAction === Test.Form.MouseMoveAction.RightResize || mev.layerX >= ((parseInt(this.getWidth()) - Test.Form.getResizeCorners()) | 0)) {
+                this.setCursor("e-resize");
             } else {
-                this.getBase().style.cursor = "default";
-                this.getHeading().style.cursor = "default";
+                this.setCursor("default");
             }
-
-        },
-        f7: function (ev) {
-            if (Test.Form.moveAction !== Test.Form.MouseMoveAction.Move) {
-                Test.Form.setActiveForm(this);
-                Test.Form.movingForm = null;
-            }
-            Test.Form.movingForm = this;
-
-            Test.Form.setActiveForm(this);
         },
         f8: function (ev) {
+            if (this.getwindowState() === Test.Form.WindowState.Maximized) {
+                Test.Form.movingForm = this;
+                this.setCursor("default");
+
+                Test.Form.moveAction = Test.Form.MouseMoveAction.Move;
+            } else {
+                Test.Form.movingForm = this;
+            }
+
             Test.Form.setActiveForm(this);
         },
         f9: function (ev) {
-            this.getBodyOverLay().style.visibility = "collapse";
             Test.Form.setActiveForm(this);
         },
         f10: function (ev) {
-            if (Test.Form.movingForm != null) {
-                return;
-            }
-
-            ev.stopPropagation();
-            ev.preventDefault();
-
-            this.close();
+            this.getBodyOverLay().style.visibility = "collapse";
+            Test.Form.setActiveForm(this);
         },
         f11: function (ev) {
             if (Test.Form.movingForm != null) {
@@ -1023,9 +1074,19 @@
             ev.stopPropagation();
             ev.preventDefault();
 
-            Test.Form.mouse_Down = false;
+            this.close();
         },
         f12: function (ev) {
+            if (Test.Form.movingForm != null) {
+                return;
+            }
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            Test.Form.setMouse_Down(false);
+        },
+        f13: function (ev) {
             if (Test.Form.movingForm != null) {
                 return;
             }
@@ -1058,6 +1119,15 @@
             RightResize: 6,
             TopResize: 7,
             TopRightResize: 8
+        }
+    });
+
+    Bridge.define("Test.Form.WindowState", {
+        $kind: "enum",
+        statics: {
+            Normal: 0,
+            Minimized: 1,
+            Maximized: 2
         }
     });
 

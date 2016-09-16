@@ -42,6 +42,12 @@ namespace Test
 		public int prev_px;
 		public int prev_py;
 
+		private int prev_width;
+		private int prev_height;
+
+		private int prev_top;
+		private int prev_left;
+
 		public int MinWidth { get; set; } = 200;
 		public int MinHeight { get; set; } = 50;
 
@@ -369,6 +375,14 @@ namespace Test
 					var Y = (mev.ClientY + MovingForm.prev_py); // MovingForm.prev_py  Global.ParseInt(obj.Css("top")) + 
 					var X = (mev.ClientX + MovingForm.prev_px); // - MovingForm.prev_px // Global.ParseInt(obj.Css("left")) + 
 
+					if(MovingForm.windowState == WindowState.Maximized && MoveAction == MouseMoveAction.Move)
+					{
+						MovingForm.changeWindowState();
+						X = mev.ClientX - (MovingForm.prev_width / 2);
+
+						MovingForm.prev_px = X - mev.ClientX;
+					}
+
 					int X1;
 					int Y1;
 
@@ -377,12 +391,14 @@ namespace Test
 
 					if(Y < 0)
 						Y = 1;
+					if(X < 0)
+						X = 1;
 
 					ev.StopPropagation();
 
 					switch(MoveAction)
 					{
-						case MouseMoveAction.Move:
+						case MouseMoveAction.Move:							
 							obj.Css("top", Y);
 							obj.Css("left", X);
 
@@ -594,6 +610,37 @@ namespace Test
 			Restore,
 			Help
 		}
+
+		private void changeWindowState()
+		{
+			if(windowState == WindowState.Maximized)
+			{
+				Width = prev_width + "px";
+				Height = prev_height + "px";
+
+				Top = prev_top + "px";
+				Left = prev_left + "px";
+
+				windowState = WindowState.Normal;
+			}
+			else
+			{
+				prev_height = Global.ParseInt(Height);
+				prev_width = Global.ParseInt(Width);
+
+				prev_left = Global.ParseInt(Left);
+				prev_top = Global.ParseInt(Top);
+
+				windowState = WindowState.Maximized;
+
+				Width = "-webkit-calc(100% - 4px)"; // "100%";
+				Height = "-webkit-calc(100% - 4px)"; //"100%";
+
+				Top = "0";
+				Left = "0";
+			}
+		}
+
 		private HTMLDivElement CreateFormButton(FormButtonType Type)
 		{
 			var butt = new HTMLDivElement();
@@ -687,6 +734,8 @@ namespace Test
 
 						butt.Style.BackgroundColor = "white";
 						butt.Style.Color = "black";
+
+						changeWindowState();					
 					};
 
 					break;
@@ -709,6 +758,8 @@ namespace Test
 
 						butt.Style.BackgroundColor = "white";
 						butt.Style.Color = "black";
+
+						windowState = WindowState.Minimized;
 					};
 
 					break;					
@@ -858,11 +909,30 @@ namespace Test
             Base.AddEventListener(EventType.MouseDown, (ev) => {
 				var mev = ev.As<MouseEvent>();
 				Mouse_Down = true;
-				
+
 				var obj = jQuery.Select(Base);
 
-				prev_px = Global.ParseInt(obj.Css("left")) - mev.ClientX;
-				prev_py = Global.ParseInt(obj.Css("top")) - mev.ClientY;
+				
+
+				if(windowState == WindowState.Maximized)
+				{
+					SetCursor(Cursor.Default);
+
+					MoveAction = MouseMoveAction.Move;
+
+					//prev_px = prev_left - mev.ClientX;
+					//prev_py = prev_top - mev.ClientY;
+
+					prev_px = Global.ParseInt(obj.Css("left")) - mev.ClientX;
+					prev_py = Global.ParseInt(obj.Css("top")) - mev.ClientY;
+
+					return;
+				}
+				else
+				{
+					prev_px = Global.ParseInt(obj.Css("left")) - mev.ClientX;
+					prev_py = Global.ParseInt(obj.Css("top")) - mev.ClientY;
+				}				
 
 				if(mev.LayerX <= ResizeCorners && mev.LayerY <= ResizeCorners)
 				{					
@@ -927,60 +997,59 @@ namespace Test
 				mev.StopPropagation();
 			});
 
+			Heading.AddEventListener(EventType.DblClick, (ev) => {
+				changeWindowState();
+				ev.PreventDefault();
+				ev.StopPropagation();
+			});
+
 			Base.AddEventListener(EventType.MouseMove, (ev) => {
 				var mev = ev.As<MouseEvent>();
 				if(MovingForm != null && MoveAction == MouseMoveAction.Move)
+				{					
+					SetCursor(Cursor.Default);
+					return;
+				}else if(windowState == WindowState.Maximized)
 				{
-					Base.Style.Cursor = Cursor.Default;
-					Heading.Style.Cursor = Cursor.Default;
+					SetCursor(Cursor.Default);
 					return;
 				}
 
 				if(MoveAction == MouseMoveAction.TopLeftResize || mev.LayerX <= ResizeCorners && mev.LayerY <= ResizeCorners)
-				{
-					Base.Style.Cursor = Cursor.NorthWestSouthEastResize;
-					Heading.Style.Cursor = Cursor.NorthWestSouthEastResize;								
+				{					
+					SetCursor(Cursor.NorthWestSouthEastResize);
 				}
 				else if(MoveAction == MouseMoveAction.TopRightResize || mev.LayerY <= ResizeCorners && mev.LayerX >= Global.ParseInt(this.Width) - ResizeCorners)
-				{
-					Base.Style.Cursor = Cursor.NorthEastSouthWestResize;
-					Heading.Style.Cursor = Cursor.NorthEastSouthWestResize;
+				{					
+					SetCursor(Cursor.NorthEastSouthWestResize);
 				}
 				else if(mev.LayerY <= ResizeCorners || MoveAction == MouseMoveAction.TopResize)
 				{
-					Base.Style.Cursor = Cursor.NorthResize;
-					Heading.Style.Cursor = Cursor.NorthResize;
+					SetCursor(Cursor.NorthResize);					
 				}
 				else if(MoveAction == MouseMoveAction.BottomLeftResize || mev.LayerX <= ResizeCorners && mev.LayerY >= Global.ParseInt(this.Height) - ResizeCorners)
 				{
-					Base.Style.Cursor = Cursor.NorthEastSouthWestResize;
-					Heading.Style.Cursor = Cursor.NorthEastSouthWestResize;
+					SetCursor(Cursor.NorthEastSouthWestResize);					
 				}
 				else if(MoveAction == MouseMoveAction.BottomRightResize || mev.LayerY >= Global.ParseInt(this.Height) - ResizeCorners && mev.LayerX >= Global.ParseInt(this.Width) - ResizeCorners)
 				{
-					Base.Style.Cursor = Cursor.NorthWestSouthEastResize;
-					Heading.Style.Cursor = Cursor.NorthWestSouthEastResize;
+					SetCursor(Cursor.NorthWestSouthEastResize);					
 				}
 				else if(MoveAction == MouseMoveAction.BottomResize || mev.LayerY >= Global.ParseInt(this.Height) - ResizeCorners)
 				{
-					Base.Style.Cursor = Cursor.SouthResize;
-					Heading.Style.Cursor = Cursor.SouthResize;
+					SetCursor(Cursor.SouthResize);					
 				}
 				else if(MoveAction == MouseMoveAction.LeftResize || mev.LayerX <= ResizeCorners)
 				{
-					Base.Style.Cursor = Cursor.WestResize;
-					Heading.Style.Cursor = Cursor.WestResize;										
+					SetCursor(Cursor.WestResize);									
 				}
 				else if(MoveAction == MouseMoveAction.RightResize || mev.LayerX >= Global.ParseInt(this.Width) - ResizeCorners)
 				{
-					Base.Style.Cursor = Cursor.EastResize;
-					Heading.Style.Cursor = Cursor.EastResize;
+					SetCursor(Cursor.EastResize);	
 				}else
 				{
-					Base.Style.Cursor = Cursor.Default;
-					Heading.Style.Cursor = Cursor.Default;
-				}
-								
+					SetCursor(Cursor.Default);					
+				}								
 			});
 
 			Base.Style.Position = Position.Absolute;			
@@ -1001,12 +1070,16 @@ namespace Test
 
 
             Heading.AddEventListener(EventType.MouseDown, (ev) => {
-				if(MoveAction != MouseMoveAction.Move)
+				if(windowState == WindowState.Maximized)
+				{					
+					MovingForm = this;
+					SetCursor(Cursor.Default);
+
+					MoveAction = MouseMoveAction.Move;
+				}else
 				{
-					ActiveForm = this;
-					MovingForm = null;
-				}
-				MovingForm = this;				
+					MovingForm = this;
+				}				
 
 				ActiveForm = this;
 			});
@@ -1057,7 +1130,7 @@ namespace Test
             BodyOverLay.AddEventListener(EventType.MouseDown, (ev) =>
             {
                 BodyOverLay.Style.Visibility = Visibility.Collapse;
-                ActiveForm = this;
+                ActiveForm = this;				
             });
 
             Base.Style.BorderStyle = BorderStyle.Solid;
@@ -1071,7 +1144,6 @@ namespace Test
 			Heading.AppendChild(ButtonMinimize);
 
             Initialise();
-
         }
 
 		public string Height
