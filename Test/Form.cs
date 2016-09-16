@@ -23,6 +23,9 @@ namespace Test
 		private static Form _ActiveForm;
 		private static Form _PrevActiveForm;
 		private static MouseMoveAction MoveAction = MouseMoveAction.Move;
+		private static HTMLDivElement WindowHolderSelectionBox { get; set; }
+		private static int WindowHolderSelectionBoxX;
+		private static int WindowHolderSelectionBoxY;
 
 		private const string WinIcon = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')";
 		private const string WinIconHover = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')";
@@ -335,7 +338,37 @@ namespace Test
 			WindowHolder.Style.Left = "0";
 			WindowHolder.Style.BackgroundColor = "cornflowerblue";
 			WindowHolder.Style.ZIndex = "0";
-			WindowHolder.Style.Overflow = Overflow.Auto;
+			WindowHolder.Style.Overflow = Overflow.Auto;						
+
+			WindowHolder.AddEventListener(EventType.MouseDown, (ev) =>
+			{
+				WindowHolderSelectionBox = new HTMLDivElement();
+				WindowHolderSelectionBox.Style.Position = Position.Absolute;
+				WindowHolderSelectionBox.Style.Visibility = Visibility.Visible;
+				WindowHolderSelectionBox.Style.BorderWidth = BorderWidth.Thin;
+				WindowHolderSelectionBox.Style.BorderStyle = BorderStyle.Solid;
+				WindowHolderSelectionBox.Style.BorderColor = "black";
+				WindowHolderSelectionBox.Style.BackgroundColor = "grey";
+				WindowHolderSelectionBox.Style.Opacity = "0.35";
+
+				WindowHolder.AppendChild(WindowHolderSelectionBox);
+
+				var mev = ev.As<MouseEvent>();
+				WindowHolderSelectionBoxX = mev.ClientX;
+				WindowHolderSelectionBoxY = mev.ClientY;				
+				
+				WindowHolderSelectionBox.Style.ZIndex = "0";
+
+				Mouse_Down = true;
+			});
+
+			WindowHolder.AddEventListener(EventType.MouseMove, (ev) =>
+			{
+				var mev = ev.As<MouseEvent>();
+
+				
+			});
+
 			//user-select: none;
 
 			jQuery.Select(WindowHolder).Css("user-select", "none");
@@ -359,6 +392,8 @@ namespace Test
 			
 			Action<Event> mouseMove = (ev) =>
 			{
+				var mev = ev.As<MouseEvent>();
+
 				if(MovingForm != null)
 				{
                     if (MovingForm.BodyOverLay.Style.Visibility == Visibility.Collapse)
@@ -367,9 +402,7 @@ namespace Test
                         MovingForm.ChangeSelectionState(true);
                         MovingForm.Heading.Focus();
                     }
-
-					var mev = ev.As<MouseEvent>();
-
+					
 					var obj = jQuery.Select(MovingForm.Base);
 
 					var Y = (mev.ClientY + MovingForm.prev_py); // MovingForm.prev_py  Global.ParseInt(obj.Css("top")) + 
@@ -577,7 +610,51 @@ namespace Test
 						default:
 							break;
 					}					
-				}				
+				}else if(WindowHolderSelectionBox != null && WindowHolderSelectionBox.Style.Visibility == Visibility.Visible)
+				{
+					if(Mouse_Down)
+					{
+						WindowHolderSelectionBox.Style.Visibility = Visibility.Visible;
+						WindowHolderSelectionBox.Style.Cursor = Cursor.Default;
+						WindowHolder.Style.Cursor = Cursor.Default;
+
+						int left;
+						int top;
+						int width;
+						int height;
+
+						if(WindowHolderSelectionBoxX > mev.ClientX)
+						{
+							left = mev.ClientX;
+							width = WindowHolderSelectionBoxX - mev.ClientX;
+						}
+						else
+						{
+							left = WindowHolderSelectionBoxX;
+							width = mev.ClientX - WindowHolderSelectionBoxX;
+						}
+
+						if(WindowHolderSelectionBoxY > mev.ClientY)
+						{
+							top = mev.ClientY;
+							height = WindowHolderSelectionBoxY - mev.ClientY;
+						}
+						else
+						{
+							top = WindowHolderSelectionBoxY;
+							height = mev.ClientY - WindowHolderSelectionBoxY;
+						}
+
+						WindowHolderSelectionBox.Style.Left = left + "px";
+						WindowHolderSelectionBox.Style.Top = top + "px";
+
+						WindowHolderSelectionBox.Style.Width = width + "px";
+						WindowHolderSelectionBox.Style.Height = height + "px";
+
+						mev.StopPropagation();
+						mev.PreventDefault();
+					}
+				}
 			};
 
 			Window.AddEventListener(EventType.MouseUp, (ev) =>
@@ -591,8 +668,9 @@ namespace Test
                 MovingForm = null;
 				Mouse_Down = false;				
 				MoveAction = MouseMoveAction.Move;
-                
-            });
+
+				jQuery.Select(WindowHolderSelectionBox).FadeOut(100);// WindowHolderSelectionBox.Style.Visibility = Visibility.Collapse;				
+			});
 
 			Window.AddEventListener(EventType.MouseMove, mouseMove);
 
@@ -1220,7 +1298,7 @@ namespace Test
 		public void BringToFront()
 		{
 			if(VisibleForm.Count > 1 &&
-				VisibleForm.LastOrDefault() != this)
+				VisibleForm[VisibleForm.Count - 1] != this)
 			{
 				VisibleForm.Remove(this);
 				VisibleForm.Add(this);				

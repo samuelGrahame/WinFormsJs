@@ -48,6 +48,8 @@
             _ActiveForm: null,
             _PrevActiveForm: null,
             moveAction: 0,
+            windowHolderSelectionBoxX: 0,
+            windowHolderSelectionBoxY: 0,
             WinIcon: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')",
             WinIconHover: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')",
             WinIconDown: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACnSURBVFhHY5AZZGDUQYTAqIMIgVEHEQKjDiIERh1ECAxfBynrGGvbehv6JFnGVrmUznWvXRE27zoQQaWJBuQ4SN3UHmg30GLHvIlAi4EiELuxIogW4gHJDkKzD4iwCsIRRBfxYNRBhMCogwgBkh1EazAaZYTAqIMIgVEHEQIkOwgIBlfligsMZPODpmDUQYTAqIMIgVEHEQKjDiIERh1ECAwyB8nIAADHEJbDMY47rQAAAABJRU5ErkJggg==')",
@@ -59,7 +61,8 @@
                     ButtonStart: null,
                     InputStartSearch: null,
                     ResizeCorners: 3,
-                    Mouse_Down: false
+                    Mouse_Down: false,
+                    WindowHolderSelectionBox: null
                 },
                 init: function () {
                     this.visibleForm = new (System.Collections.Generic.List$1(Test.Form))();
@@ -264,6 +267,11 @@
                 Test.Form.getWindowHolder().style.backgroundColor = "cornflowerblue";
                 Test.Form.getWindowHolder().style.zIndex = "0";
                 Test.Form.getWindowHolder().style.overflow = "auto";
+
+                Test.Form.getWindowHolder().addEventListener("mousedown", $_.Test.Form.f3);
+
+                Test.Form.getWindowHolder().addEventListener("mousemove", $_.Test.Form.f4);
+
                 //user-select: none;
 
                 $(Test.Form.getWindowHolder()).css("user-select", "none");
@@ -285,9 +293,9 @@
 
                 Test.Form.setInputStartSearch(Test.Form.createStartSearchInput());
 
-                var mouseMove = $_.Test.Form.f3;
+                var mouseMove = $_.Test.Form.f5;
 
-                window.addEventListener("mouseup", $_.Test.Form.f4);
+                window.addEventListener("mouseup", $_.Test.Form.f6);
 
                 window.addEventListener("mousemove", mouseMove);
 
@@ -349,11 +357,11 @@
             this.getBase().appendChild(this.getBody());
             this.getBase().appendChild(this.getBodyOverLay());
 
-            this.getBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f5));
+            this.getBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f7));
 
-            this.getHeading().addEventListener("dblclick", Bridge.fn.bind(this, $_.Test.Form.f6));
+            this.getHeading().addEventListener("dblclick", Bridge.fn.bind(this, $_.Test.Form.f8));
 
-            this.getBase().addEventListener("mousemove", Bridge.fn.bind(this, $_.Test.Form.f7));
+            this.getBase().addEventListener("mousemove", Bridge.fn.bind(this, $_.Test.Form.f9));
 
             this.getBase().style.position = "absolute";
 
@@ -372,7 +380,7 @@
             this.getHeadingTitle().style.textIndent = "3px";
 
 
-            this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f8));
+            this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f10));
 
             this.getHeading().style.fontFamily = "Segoe UI";
             this.getHeading().style.textAlign = 7;
@@ -381,7 +389,7 @@
             this.setButtonExpand(this.createFormButton(Test.Form.FormButtonType.Maximize));
             this.setButtonMinimize(this.createFormButton(Test.Form.FormButtonType.Minimize));
 
-            this.getBody().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f9));
+            this.getBody().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f11));
 
             $(this.getHeading()).css("user-select", "none").css("user-drag:", "none");
 
@@ -409,7 +417,7 @@
             this.getBodyOverLay().style.zIndex = (2147483647).toString();
             this.getBodyOverLay().style.opacity = "0";
 
-            this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f10));
+            this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f12));
 
             this.getBase().style.borderStyle = "solid";
             this.getBase().style.borderWidth = "2px";
@@ -534,7 +542,7 @@
 
                         Test.Form.setActiveForm(this);
                     });
-                    butt.onmouseup = Bridge.fn.bind(this, $_.Test.Form.f11);
+                    butt.onmouseup = Bridge.fn.bind(this, $_.Test.Form.f13);
                     butt.onmouseenter = Bridge.fn.bind(this, function (ev) {
                         if (Test.Form.movingForm != null) {
                             return;
@@ -608,11 +616,11 @@
                 case Test.Form.FormButtonType.Help: 
                     break;
                 default: 
-                    butt.onmouseup = $_.Test.Form.f12;
+                    butt.onmouseup = $_.Test.Form.f14;
                     break;
             }
 
-            butt.onmousemove = $_.Test.Form.f13;
+            butt.onmousemove = $_.Test.Form.f15;
 
             if (Type !== Test.Form.FormButtonType.Close) {
                 butt.onmousedown = Bridge.fn.bind(this, function (ev) {
@@ -727,7 +735,7 @@
             Test.Form.setActiveForm(this);
         },
         bringToFront: function () {
-            if (Test.Form.visibleForm.getCount() > 1 && !Bridge.referenceEquals(System.Linq.Enumerable.from(Test.Form.visibleForm).lastOrDefault(null, null), this)) {
+            if (Test.Form.visibleForm.getCount() > 1 && !Bridge.referenceEquals(Test.Form.visibleForm.getItem(((Test.Form.visibleForm.getCount() - 1) | 0)), this)) {
                 Test.Form.visibleForm.remove(this);
                 Test.Form.visibleForm.add(this);
             }
@@ -773,14 +781,39 @@
             Test.Form.setActiveForm(null);
         },
         f3: function (ev) {
+            Test.Form.setWindowHolderSelectionBox(document.createElement('div'));
+            Test.Form.getWindowHolderSelectionBox().style.position = "absolute";
+            Test.Form.getWindowHolderSelectionBox().style.visibility = "visible";
+            Test.Form.getWindowHolderSelectionBox().style.borderWidth = "thin";
+            Test.Form.getWindowHolderSelectionBox().style.borderStyle = "solid";
+            Test.Form.getWindowHolderSelectionBox().style.borderColor = "black";
+            Test.Form.getWindowHolderSelectionBox().style.backgroundColor = "grey";
+            Test.Form.getWindowHolderSelectionBox().style.opacity = "0.35";
+
+            Test.Form.getWindowHolder().appendChild(Test.Form.getWindowHolderSelectionBox());
+
+            var mev = ev;
+            Test.Form.windowHolderSelectionBoxX = mev.clientX;
+            Test.Form.windowHolderSelectionBoxY = mev.clientY;
+
+            Test.Form.getWindowHolderSelectionBox().style.zIndex = "0";
+
+            Test.Form.setMouse_Down(true);
+        },
+        f4: function (ev) {
+            var mev = ev;
+
+
+        },
+        f5: function (ev) {
+            var mev = ev;
+
             if (Test.Form.movingForm != null) {
                 if (Test.Form.movingForm.getBodyOverLay().style.visibility === "collapse") {
                     Test.Form.movingForm.getBodyOverLay().style.visibility = "visible";
                     Test.Form.movingForm.changeSelectionState$1(true);
                     Test.Form.movingForm.getHeading().focus();
                 }
-
-                var mev = ev;
 
                 var obj = $(Test.Form.movingForm.getBase());
 
@@ -929,9 +962,45 @@
                     default: 
                         break;
                 }
+            } else if (Test.Form.getWindowHolderSelectionBox() != null && Test.Form.getWindowHolderSelectionBox().style.visibility === "visible") {
+                if (Test.Form.getMouse_Down()) {
+                    Test.Form.getWindowHolderSelectionBox().style.visibility = "visible";
+                    Test.Form.getWindowHolderSelectionBox().style.cursor = "default";
+                    Test.Form.getWindowHolder().style.cursor = "default";
+
+                    var left;
+                    var top;
+                    var width;
+                    var height;
+
+                    if (Test.Form.windowHolderSelectionBoxX > mev.clientX) {
+                        left = mev.clientX;
+                        width = (Test.Form.windowHolderSelectionBoxX - mev.clientX) | 0;
+                    } else {
+                        left = Test.Form.windowHolderSelectionBoxX;
+                        width = (mev.clientX - Test.Form.windowHolderSelectionBoxX) | 0;
+                    }
+
+                    if (Test.Form.windowHolderSelectionBoxY > mev.clientY) {
+                        top = mev.clientY;
+                        height = (Test.Form.windowHolderSelectionBoxY - mev.clientY) | 0;
+                    } else {
+                        top = Test.Form.windowHolderSelectionBoxY;
+                        height = (mev.clientY - Test.Form.windowHolderSelectionBoxY) | 0;
+                    }
+
+                    Test.Form.getWindowHolderSelectionBox().style.left = System.String.concat(left, "px");
+                    Test.Form.getWindowHolderSelectionBox().style.top = System.String.concat(top, "px");
+
+                    Test.Form.getWindowHolderSelectionBox().style.width = System.String.concat(width, "px");
+                    Test.Form.getWindowHolderSelectionBox().style.height = System.String.concat(height, "px");
+
+                    mev.stopPropagation();
+                    mev.preventDefault();
+                }
             }
         },
-        f4: function (ev) {
+        f6: function (ev) {
             if (Test.Form.movingForm != null) {
                 Test.Form.movingForm.getBodyOverLay().style.visibility = "collapse";
                 Test.Form.movingForm.changeSelectionState$1(false);
@@ -941,8 +1010,9 @@
             Test.Form.setMouse_Down(false);
             Test.Form.moveAction = Test.Form.MouseMoveAction.Move;
 
+            $(Test.Form.getWindowHolderSelectionBox()).fadeOut(100); // WindowHolderSelectionBox.Style.Visibility = Visibility.Collapse;				
         },
-        f5: function (ev) {
+        f7: function (ev) {
             var mev = ev;
             Test.Form.setMouse_Down(true);
 
@@ -1012,12 +1082,12 @@
             Test.Form.movingForm = this;
             mev.stopPropagation();
         },
-        f6: function (ev) {
+        f8: function (ev) {
             this.changeWindowState();
             ev.preventDefault();
             ev.stopPropagation();
         },
-        f7: function (ev) {
+        f9: function (ev) {
             var mev = ev;
             if (Test.Form.movingForm != null && Test.Form.moveAction === Test.Form.MouseMoveAction.Move) {
                 this.setCursor("default");
@@ -1047,7 +1117,7 @@
                 this.setCursor("default");
             }
         },
-        f8: function (ev) {
+        f10: function (ev) {
             if (this.getwindowState() === Test.Form.WindowState.Maximized) {
                 Test.Form.movingForm = this;
                 this.setCursor("default");
@@ -1059,14 +1129,14 @@
 
             Test.Form.setActiveForm(this);
         },
-        f9: function (ev) {
+        f11: function (ev) {
             Test.Form.setActiveForm(this);
         },
-        f10: function (ev) {
+        f12: function (ev) {
             this.getBodyOverLay().style.visibility = "collapse";
             Test.Form.setActiveForm(this);
         },
-        f11: function (ev) {
+        f13: function (ev) {
             if (Test.Form.movingForm != null) {
                 return;
             }
@@ -1076,7 +1146,7 @@
 
             this.close();
         },
-        f12: function (ev) {
+        f14: function (ev) {
             if (Test.Form.movingForm != null) {
                 return;
             }
@@ -1086,7 +1156,7 @@
 
             Test.Form.setMouse_Down(false);
         },
-        f13: function (ev) {
+        f15: function (ev) {
             if (Test.Form.movingForm != null) {
                 return;
             }
