@@ -613,8 +613,7 @@ namespace Test
 				}else if(WindowHolderSelectionBox != null && WindowHolderSelectionBox.Style.Visibility == Visibility.Visible)
 				{
 					if(Mouse_Down)
-					{
-						WindowHolderSelectionBox.Style.Visibility = Visibility.Visible;
+					{						
 						WindowHolderSelectionBox.Style.Cursor = Cursor.Default;
 						WindowHolder.Style.Cursor = Cursor.Default;
 
