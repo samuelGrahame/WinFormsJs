@@ -361,6 +361,8 @@ namespace Test
 				WindowHolderSelectionBox.Style.ZIndex = "0";
 
 				Mouse_Down = true;
+
+                ActiveForm = null;
 			});			
 			
 			jQuery.Select(WindowHolder).Css("user-select", "none");

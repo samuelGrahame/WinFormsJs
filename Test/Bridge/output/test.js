@@ -808,6 +808,8 @@
             Test.Form.getWindowHolderSelectionBox().style.zIndex = "0";
 
             Test.Form.setMouse_Down(true);
+
+            Test.Form.setActiveForm(null);
         },
         f4: function (ev) {
             var mev = ev;
