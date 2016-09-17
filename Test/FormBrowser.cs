@@ -16,7 +16,7 @@ namespace Test
 
         public void Navigate(string url)
         {
-            if(!url.ToLower().StartsWith("http"))
+            if(!url.ToLower().StartsWith("http") && !url.ToLower().StartsWith("file:///"))
             {
                 url = "http://" + url;
             }

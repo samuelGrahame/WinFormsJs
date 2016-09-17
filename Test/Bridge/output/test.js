@@ -10,12 +10,18 @@
                 onclick: $_.Test.App.f1
             } );
 
+            var butLel = Bridge.merge(document.createElement('button'), {
+                innerHTML: "Lel",
+                onclick: $_.Test.App.f2
+            } );
+
             var butNote = Bridge.merge(document.createElement('button'), {
                 innerHTML: "NotePad",
-                onclick: $_.Test.App.f2
+                onclick: $_.Test.App.f3
             } );
             Test.Form.getWindowHolder().appendChild(butBing);
             Test.Form.getWindowHolder().appendChild(butNote);
+            Test.Form.getWindowHolder().appendChild(butLel);
         }
     });
 
@@ -33,6 +39,14 @@
             frm.show();
         },
         f2: function (ev) {
+            var frm = new Test.FormBrowser();
+            frm.setLeft("50px");
+            frm.setTop("50px");
+            frm.setText("Lel");
+            frm.navigate("file:///C:/Users/Samuel/Desktop/Test/Test/Bridge/www/demo.html");
+            frm.show();
+        },
+        f3: function (ev) {
             var frm = new Test.FormNotePad();
             frm.setLeft("50px");
             frm.setTop("50px");
@@ -1210,7 +1224,7 @@
             }
         },
         navigate: function (url) {
-            if (!System.String.startsWith(url.toLowerCase(), "http")) {
+            if (!System.String.startsWith(url.toLowerCase(), "http") && !System.String.startsWith(url.toLowerCase(), "file:///")) {
                 url = System.String.concat("http://", url);
             }
             this.setURL(url);
@@ -1268,8 +1282,8 @@
             this.setNotePadContent(document.createElement('textarea'));
 
             this.getNotePadContent().style.position = "absolute";
-            this.getNotePadContent().style.width = "-webkit-calc(100% - 7px)";
-            this.getNotePadContent().style.height = "-webkit-calc(100% - 7px)";
+            this.getNotePadContent().style.width = "-webkit-calc(100% - 10px)";
+            this.getNotePadContent().style.height = "-webkit-calc(100% - 9px)";
 
             this.getNotePadContent().style.top = "1px";
             this.getNotePadContent().style.left = "1px";

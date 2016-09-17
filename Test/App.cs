@@ -24,7 +24,21 @@ namespace Test
 				}
 			};
 
-			var butNote = new HTMLButtonElement
+            var butLel = new HTMLButtonElement
+            {
+                InnerHTML = "Lel",
+                OnClick = (ev) =>
+                {
+                    var frm = new FormBrowser();
+                    frm.Left = "50px";
+                    frm.Top = "50px";
+                    frm.Text = "Lel";
+                    frm.Navigate("file:///C:/Users/Samuel/Desktop/Test/Test/Bridge/www/demo.html");
+                    frm.Show();
+                }
+            };
+
+            var butNote = new HTMLButtonElement
 			{
 				InnerHTML = "NotePad",
 				OnClick = (ev) =>
@@ -37,7 +51,7 @@ namespace Test
 				}
 			};
 			Form.WindowHolder.AppendChild(butBing);
-			Form.WindowHolder.AppendChild(butNote);			
+			Form.WindowHolder.AppendChild(butNote);	Form.WindowHolder.AppendChild(butLel);			
 		}
 	}
 }
