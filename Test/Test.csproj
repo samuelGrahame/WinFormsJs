@@ -39,6 +39,7 @@
     <Compile Include="App.cs" />
     <Compile Include="Form.cs" />
     <Compile Include="FormBrowser.cs" />
+    <Compile Include="FormConsole.cs" />
     <Compile Include="FormNotePad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

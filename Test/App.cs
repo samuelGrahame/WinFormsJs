@@ -50,8 +50,23 @@ namespace Test
 					frm.Show();
 				}
 			};
-			Form.WindowHolder.AppendChild(butBing);
+
+            var butCmd = new HTMLButtonElement
+            {
+                InnerHTML = "Command Prompt",
+                OnClick = (ev) =>
+                {
+                    var frm = new FormConsole();
+                    frm.Left = "50px";
+                    frm.Top = "50px";
+                    frm.Text = "Command Prompt";
+                    frm.Show();
+                }
+            };
+
+            Form.WindowHolder.AppendChild(butBing);
 			Form.WindowHolder.AppendChild(butNote);	//Form.WindowHolder.AppendChild(butLel);			
-		}
+            Form.WindowHolder.AppendChild(butCmd);
+        }
 	}
 }

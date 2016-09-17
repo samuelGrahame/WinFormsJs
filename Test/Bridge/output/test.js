@@ -28,8 +28,15 @@
                 innerHTML: "NotePad",
                 onclick: $_.Test.App.f2
             } );
+
+            var butCmd = Bridge.merge(document.createElement('button'), {
+                innerHTML: "Command Prompt",
+                onclick: $_.Test.App.f3
+            } );
+
             Test.Form.getWindowHolder().appendChild(butBing);
             Test.Form.getWindowHolder().appendChild(butNote); //Form.WindowHolder.AppendChild(butLel);			
+            Test.Form.getWindowHolder().appendChild(butCmd);
         }
     });
 
@@ -51,6 +58,13 @@
             frm.setLeft("50px");
             frm.setTop("50px");
             frm.setText("Note Pad");
+            frm.show();
+        },
+        f3: function (ev) {
+            var frm = new Test.FormConsole();
+            frm.setLeft("50px");
+            frm.setTop("50px");
+            frm.setText("Command Prompt");
             frm.show();
         }
     });
@@ -78,9 +92,31 @@
                     Mouse_Down: false,
                     FadeLength: 100,
                     Window_BorderColorFocused: "#FBFBFB",
-                    Window_BorderColor: "#AAAAAA",
+                    Window_BorderColor: "#d8d8d8",
                     Window_HeadingBackgroundColor: "white",
                     Window_DefaultBackgroundColor: "#F0F0F0",
+                    /**
+                     * This is used for testing
+                     *
+                     * @static
+                     * @public
+                     * @this Test.Form
+                     * @memberof Test.Form
+                     * @function getShowBodyOverLay
+                     * @return  {boolean}
+                     */
+                    /**
+                     * This is used for testing
+                     *
+                     * @static
+                     * @public
+                     * @this Test.Form
+                     * @memberof Test.Form
+                     * @function setShowBodyOverLay
+                     * @param   {boolean}    value
+                     * @return  {void}
+                     */
+                    ShowBodyOverLay: false,
                     Window_DefaultHeight: 480,
                     Window_DefaultWidth: 640,
                     WindowHolderSelectionBox: null
@@ -437,7 +473,7 @@
             this.getBodyOverLay().style.left = "2px";
             this.getBodyOverLay().style.position = "absolute";
             this.getBodyOverLay().style.zIndex = (2147483647).toString();
-            this.getBodyOverLay().style.opacity = "0.5";
+            this.getBodyOverLay().style.opacity = Test.Form.getShowBodyOverLay() ? "0.5" : "0";
             this.getBodyOverLay().style.backgroundColor = "black";
 
             this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f13));
@@ -780,6 +816,30 @@
             }
 
             Test.Form.calculateZOrder();
+        },
+        fillControlWithParent: function (element, widthOffset, heightOffset) {
+            if (widthOffset === void 0) { widthOffset = 8; }
+            if (heightOffset === void 0) { heightOffset = 9; }
+            element.style.position = "absolute";
+            element.style.width = System.String.concat(System.String.concat("-webkit-calc(100% - ", widthOffset.toString()), "px)");
+            element.style.height = System.String.concat(System.String.concat("-webkit-calc(100% - ", heightOffset.toString()), "px)");
+
+            element.style.top = "1px";
+            element.style.left = "1px";
+        },
+        fillHorizontalControlWithParent: function (element, widthOffset) {
+            if (widthOffset === void 0) { widthOffset = 8; }
+            element.style.position = "absolute";
+            element.style.width = System.String.concat(System.String.concat("-webkit-calc(100% - ", widthOffset.toString()), "px)");
+
+            element.style.left = "1px";
+        },
+        fillVerticalControlWithParent: function (element, heightOffset) {
+            if (heightOffset === void 0) { heightOffset = 9; }
+            element.style.position = "absolute";
+            element.style.height = System.String.concat(System.String.concat("-webkit-calc(100% - ", heightOffset.toString()), "px)");
+
+            element.style.top = "1px";
         }
     });
 
@@ -1162,7 +1222,6 @@
         f12: function (ev) {
             if (Test.Form.movingForm == null) {
                 ev.stopPropagation();
-                Bridge.Console.log("Mouse Move");
             }
         },
         f13: function (ev) {
@@ -1269,41 +1328,120 @@
             }
         },
         initialise: function () {
-            //Location = new HTMLInputElement();
-            //Location.Style.Position = Position.Absolute;
-            //Location.Style.Top = "1px";
-            //Location.Style.Left = "1px";
-            //Location.Style.Width = "-webkit-calc(100% - 6px)";
-            //Location.Style.Height = "28px";
-
-            //Location.Disabled = true;
-            //Location.Style.Padding = "0";            
-
-            //Content = new HTMLIFrameElement();
-            //Content.Style.Position = Position.Absolute;
-            //Content.Style.Top = "36px";
-            //Content.Style.Left = "1px";
-            //Content.Style.Width = "-webkit-calc(100% - 6px)";
-            //Content.Style.Height = "-webkit-calc(100% - 44px)";
-
             this.setContent(document.createElement('iframe'));
-            this.getContent().style.position = "absolute";
-            this.getContent().style.top = "1px";
-            this.getContent().style.left = "1px";
-            this.getContent().style.width = "-webkit-calc(100% - 6px)";
-            this.getContent().style.height = "-webkit-calc(100% - 6px)";
+
+            this.fillControlWithParent(this.getContent(), 6, 6);
 
             this.setText("Quick Search");
 
-            this.getContent().style.padding = "0";
-
-            //Body.AppendChild(Location);
             this.getBody().appendChild(this.getContent());
         },
         onShowed: function () {
             if (!Bridge.referenceEquals(this.getURL(), this.getContent().src)) {
                 this.getContent().src = this.getURL();
             }
+        }
+    });
+
+    Bridge.define("Test.FormConsole", {
+        inherits: [Test.Form],
+        commandPanel: null,
+        commandInput: null,
+        commandLines: null,
+        line: -1,
+        setCommandLineElement: function (element) {
+            element.style.backgroundColor = "black";
+            element.style.height = "24px";
+            element.style.padding = "0";
+            element.style.color = "white";
+            element.style.margin = "0";
+            element.style.borderStyle = "none";
+            element.style.fontFamily = "monospace";
+            element.style.fontSize = "12pt";
+
+            $(element).on("focus", function () {
+                element.style.outline = "0";
+            });
+        },
+        initialise: function () {
+            this.commandPanel = document.createElement('div');
+            this.commandPanel.style.backgroundColor = "black";
+            this.commandPanel.style.overflow = "auto";
+
+            this.commandLines = new (System.Collections.Generic.List$1(HTMLSpanElement))();
+
+            this.fillControlWithParent(this.commandPanel, 2, 2);
+
+            this.commandInput = Bridge.merge(document.createElement('input'), {
+                type: "text"
+            } );
+
+            this.fillHorizontalControlWithParent(this.commandInput, 2);
+
+            this.setCommandLineElement(this.commandInput);
+
+            this.commandInput.addEventListener("keydown", Bridge.fn.bind(this, $_.Test.FormConsole.f1));
+
+            this.incrementLine();
+
+            this.commandPanel.appendChild(this.commandInput);
+
+            this.commandPanel.addEventListener("click", Bridge.fn.bind(this, $_.Test.FormConsole.f2));
+
+            this.getBody().appendChild(this.commandPanel);
+        },
+        onShowed: function () {
+            this.commandInput.focus();
+        },
+        incrementLine: function () {
+            var cmd = this.commandInput.value;
+            if (cmd.length > 0) {
+                this.commandInput.value = "";
+
+                var SpanText = document.createElement('span');
+                this.fillHorizontalControlWithParent(SpanText, 2);
+
+                this.setCommandLineElement(SpanText);
+                SpanText.innerHTML = cmd;
+                SpanText.style.top = System.String.concat((((((parseInt(this.commandInput.style.height) * this.line) | 0)) + 3) | 0), "px");
+                this.commandPanel.appendChild(SpanText);
+                this.commandLines.add(SpanText);
+            }
+            this.line = (this.line + 1) | 0;
+            this.commandInput.style.top = System.String.concat((((parseInt(this.commandInput.style.height) * this.line) | 0)), "px");
+            this.commandPanel.scrollTop = this.commandPanel.scrollHeight;
+
+            if (Bridge.referenceEquals(cmd.toLowerCase(), "clear")) {
+                this.clear();
+            }
+        },
+        clear: function () {
+            this.line = -1;
+            this.commandInput.value = "";
+
+            for (var i = 0; i < this.commandLines.getCount(); i = (i + 1) | 0) {
+                if (this.commandLines.getItem(i) != null) {
+                    this.commandLines.getItem(i).remove();
+                }
+            }
+            this.commandLines = new (System.Collections.Generic.List$1(HTMLSpanElement))();
+
+            this.incrementLine();
+        }
+    });
+
+    Bridge.ns("Test.FormConsole", $_);
+
+    Bridge.apply($_.Test.FormConsole, {
+        f1: function (ev) {
+            var kev = ev;
+
+            if (kev.keyCode === 13) {
+                this.incrementLine();
+            }
+        },
+        f2: function (ev) {
+            this.commandInput.focus();
         }
     });
 
@@ -1317,12 +1455,8 @@
         initialise: function () {
             this.setNotePadContent(document.createElement('textarea'));
 
-            this.getNotePadContent().style.position = "absolute";
-            this.getNotePadContent().style.width = "-webkit-calc(100% - 8px)";
-            this.getNotePadContent().style.height = "-webkit-calc(100% - 9px)";
+            this.fillControlWithParent(this.getNotePadContent());
 
-            this.getNotePadContent().style.top = "1px";
-            this.getNotePadContent().style.left = "1px";
             this.getNotePadContent().style.resize = "none";
 
             this.getBody().appendChild(this.getNotePadContent());

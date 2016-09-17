@@ -21,10 +21,15 @@ namespace Test
 		public static bool Mouse_Down { get; set; } = false;
 		public static int FadeLength { get; set; } = 100;
         public static string Window_BorderColorFocused { get; set; } = "#FBFBFB";
-        public static string Window_BorderColor { get; set; } = "#AAAAAA";
+        public static string Window_BorderColor { get; set; } = "#d8d8d8";
         public static string Window_HeadingBackgroundColor { get; set; } = "white";
         public static string Window_DefaultBackgroundColor { get; set; } = "#F0F0F0";
         public static List<Form> VisibleForm = new List<Form>();
+        /// <summary>
+        /// This is used for testing
+        /// </summary>
+        public static bool ShowBodyOverLay { get; set; } = false;
+
 
         public static int Window_DefaultHeight { get; set; } = 480;
         public static int Window_DefaultWidth { get; set; } = 640;
@@ -1221,7 +1226,7 @@ namespace Test
             BodyOverLay.Style.Left = "2px";
             BodyOverLay.Style.Position = Position.Absolute;
             BodyOverLay.Style.ZIndex = int.MaxValue.ToString();
-            BodyOverLay.Style.Opacity = "0.5";
+            BodyOverLay.Style.Opacity = ShowBodyOverLay ? "0.5" : "0";
             BodyOverLay.Style.BackgroundColor = "black";
           
             BodyOverLay.AddEventListener(EventType.MouseDown, (ev) =>
@@ -1378,5 +1383,31 @@ namespace Test
 
 			CalculateZOrder();			
 		}
-	}
+
+        public void FillControlWithParent(HTMLElement element, int widthOffset = 8, int heightOffset = 9)
+        {
+            element.Style.Position = Position.Absolute;
+            element.Style.Width = "-webkit-calc(100% - " + widthOffset.ToString() + "px)";
+            element.Style.Height = "-webkit-calc(100% - " + heightOffset.ToString() + "px)";
+
+            element.Style.Top = "1px";
+            element.Style.Left = "1px";
+        }
+
+        public void FillHorizontalControlWithParent(HTMLElement element, int widthOffset = 8)
+        {
+            element.Style.Position = Position.Absolute;
+            element.Style.Width = "-webkit-calc(100% - " + widthOffset.ToString() + "px)";            
+            
+            element.Style.Left = "1px";
+        }
+
+        public void FillVerticalControlWithParent(HTMLElement element, int heightOffset = 9)
+        {
+            element.Style.Position = Position.Absolute;            
+            element.Style.Height = "-webkit-calc(100% - " + heightOffset.ToString() + "px)";
+
+            element.Style.Top = "1px";            
+        }
+    }
 }

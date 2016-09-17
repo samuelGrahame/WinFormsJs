@@ -15,12 +15,8 @@ namespace Test
         {
             NotePadContent = new HTMLTextAreaElement();
 
-            NotePadContent.Style.Position = Position.Absolute;
-            NotePadContent.Style.Width = "-webkit-calc(100% - 8px)";
-            NotePadContent.Style.Height = "-webkit-calc(100% - 9px)";
+            FillControlWithParent(NotePadContent);
 
-            NotePadContent.Style.Top = "1px";
-            NotePadContent.Style.Left = "1px";
             NotePadContent.Style.Resize = Resize.None;
 
             Body.AppendChild(NotePadContent);
