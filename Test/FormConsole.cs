@@ -18,6 +18,20 @@ namespace Test
 
         private void SetCommandLineElement(HTMLElement element)
         {
+            if(element.TagName.ToLower() == "span")
+            {
+                element.SetAttribute("IL", "1");
+                jQuery.Select(element).Css("user-select", "text");
+
+                element.AddEventListener(EventType.MouseMove, (ev) => {
+                    element.Style.Cursor = Cursor.Text;
+                    ev.StopPropagation();
+                });
+                element.AddEventListener(EventType.Click, (ev) => {                    
+                    ev.StopPropagation();
+                });
+            }            
+
             element.Style.BackgroundColor = "black";
             element.Style.Height = "24px";
             element.Style.Padding = "0";
@@ -37,6 +51,11 @@ namespace Test
             CommandPanel = new HTMLDivElement();
             CommandPanel.Style.BackgroundColor = "black";            
             CommandPanel.Style.Overflow = Overflow.Auto;
+
+            CommandPanel.AddEventListener(EventType.MouseMove, (ev) => {
+                CommandPanel.Style.Cursor = Cursor.Text;
+                ev.StopPropagation();
+            });
 
             CommandLines = new List<HTMLSpanElement>();
 
@@ -66,6 +85,9 @@ namespace Test
             });
 
             Body.AppendChild(CommandPanel);
+
+            Width = "677px";
+            Height = "392px";
         }
 
         protected override void OnShowed()

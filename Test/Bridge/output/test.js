@@ -1350,6 +1350,17 @@
         commandLines: null,
         line: -1,
         setCommandLineElement: function (element) {
+            if (Bridge.referenceEquals(element.tagName.toLowerCase(), "span")) {
+                element.setAttribute("IL", "1");
+                $(element).css("user-select", "text");
+
+                element.addEventListener("mousemove", function (ev) {
+                    element.style.cursor = "text";
+                    ev.stopPropagation();
+                });
+                element.addEventListener("click", $_.Test.FormConsole.f1);
+            }
+
             element.style.backgroundColor = "black";
             element.style.height = "24px";
             element.style.padding = "0";
@@ -1368,6 +1379,8 @@
             this.commandPanel.style.backgroundColor = "black";
             this.commandPanel.style.overflow = "auto";
 
+            this.commandPanel.addEventListener("mousemove", Bridge.fn.bind(this, $_.Test.FormConsole.f2));
+
             this.commandLines = new (System.Collections.Generic.List$1(HTMLSpanElement))();
 
             this.fillControlWithParent(this.commandPanel, 2, 2);
@@ -1380,15 +1393,18 @@
 
             this.setCommandLineElement(this.commandInput);
 
-            this.commandInput.addEventListener("keydown", Bridge.fn.bind(this, $_.Test.FormConsole.f1));
+            this.commandInput.addEventListener("keydown", Bridge.fn.bind(this, $_.Test.FormConsole.f3));
 
             this.incrementLine();
 
             this.commandPanel.appendChild(this.commandInput);
 
-            this.commandPanel.addEventListener("click", Bridge.fn.bind(this, $_.Test.FormConsole.f2));
+            this.commandPanel.addEventListener("click", Bridge.fn.bind(this, $_.Test.FormConsole.f4));
 
             this.getBody().appendChild(this.commandPanel);
+
+            this.setWidth("677px");
+            this.setHeight("392px");
         },
         onShowed: function () {
             this.commandInput.focus();
@@ -1434,13 +1450,20 @@
 
     Bridge.apply($_.Test.FormConsole, {
         f1: function (ev) {
+            ev.stopPropagation();
+        },
+        f2: function (ev) {
+            this.commandPanel.style.cursor = "text";
+            ev.stopPropagation();
+        },
+        f3: function (ev) {
             var kev = ev;
 
             if (kev.keyCode === 13) {
                 this.incrementLine();
             }
         },
-        f2: function (ev) {
+        f4: function (ev) {
             this.commandInput.focus();
         }
     });
