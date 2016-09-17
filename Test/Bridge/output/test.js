@@ -59,6 +59,7 @@
         statics: {
             movingForm: null,
             parent: null,
+            visibleForm: null,
             _ActiveForm: null,
             _PrevActiveForm: null,
             moveAction: 0,
@@ -67,19 +68,21 @@
             WinIcon: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')",
             WinIconHover: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')",
             WinIconDown: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACnSURBVFhHY5AZZGDUQYTAqIMIgVEHEQKjDiIERh1ECAxfBynrGGvbehv6JFnGVrmUznWvXRE27zoQQaWJBuQ4SN3UHmg30GLHvIlAi4EiELuxIogW4gHJDkKzD4iwCsIRRBfxYNRBhMCogwgBkh1EazAaZYTAqIMIgVEHEQIkOwgIBlfligsMZPODpmDUQYTAqIMIgVEHEQKjDiIERh1ECAwyB8nIAADHEJbDMY47rQAAAABJRU5ErkJggg==')",
-            visibleForm: null,
             config: {
                 properties: {
                     TaskBar: null,
                     WindowHolder: null,
                     ButtonStart: null,
                     InputStartSearch: null,
-                    ResizeCorners: 3,
+                    ResizeCorners: 2,
                     Mouse_Down: false,
                     FadeLength: 100,
                     Window_BorderColorFocused: "#FBFBFB",
                     Window_BorderColor: "#AAAAAA",
                     Window_HeadingBackgroundColor: "white",
+                    Window_DefaultBackgroundColor: "#F0F0F0",
+                    Window_DefaultHeight: 480,
+                    Window_DefaultWidth: 640,
                     WindowHolderSelectionBox: null
                 },
                 init: function () {
@@ -110,6 +113,14 @@
                     }
                 }
 
+            },
+            setBodyOverLay: function () {
+                for (var i = 0; i < Test.Form.visibleForm.getCount(); i = (i + 1) | 0) {
+                    var frm = Test.Form.visibleForm.getItem(i);
+                    if (frm != null && frm.getBodyOverLay() != null && frm.getBodyOverLay().style.visibility === "collapse") {
+                        frm.getBodyOverLay().style.visibility = "visible";
+                    }
+                }
             },
             createStartSearchInput: function () {
                 var input = Bridge.merge(document.createElement('input'), {
@@ -288,6 +299,8 @@
 
                 Test.Form.getWindowHolder().addEventListener("mousedown", $_.Test.Form.f3);
 
+                //SetBodyOverLay();
+
                 $(Test.Form.getWindowHolder()).css("user-select", "none");
 
                 Test.Form.setTaskBar(document.createElement('div'));
@@ -355,21 +368,20 @@
         ctor: function () {
             this.$initialize();
             this.setBase(document.createElement('div'));
-
-            this.getBase().id = "Base";
-
             this.setHeading(document.createElement('div'));
-
             this.setHeadingTitle(document.createElement('span'));
-
             this.setBody(document.createElement('div'));
             this.setBodyOverLay(document.createElement('div'));
 
-            this.getBodyOverLay().style.visibility = "collapse";
+            this.getBase().id = "Base";
+            this.getBase().style.borderStyle = "solid";
+            this.getBase().style.borderWidth = "2px";
+            this.getBase().style.backgroundColor = Test.Form.getWindow_HeadingBackgroundColor();
 
-            this.getBase().appendChild(this.getHeading());
-            this.getBase().appendChild(this.getBody());
-            this.getBase().appendChild(this.getBodyOverLay());
+            this.getBase().style.borderColor = Test.Form.getWindow_BorderColorFocused();
+            $(this.getBase()).css("box-shadow", "0px 0px 63px -17px rgba(0,0,0,0.75)");
+
+            this.getBodyOverLay().style.visibility = "collapse";
 
             this.getBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f7));
 
@@ -390,22 +402,17 @@
             this.getHeading().style.marginRight = "0";
             this.getHeading().style.marginBottom = "0";
             this.getHeading().style.paddingBottom = "1px";
+            this.getHeading().style.fontFamily = "Segoe UI";
+            this.getHeading().style.textAlign = 7;
+
+            this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f10));
 
             this.getHeadingTitle().style.textIndent = "3px";
             this.getHeadingTitle().setAttribute("IL", "1"); // Internal Label
 
-            this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f10));
-
-            this.getHeading().style.fontFamily = "Segoe UI";
-            this.getHeading().style.textAlign = 7;
-
             this.setButtonClose(this.createFormButton(Test.Form.FormButtonType.Close));
             this.setButtonExpand(this.createFormButton(Test.Form.FormButtonType.Maximize));
             this.setButtonMinimize(this.createFormButton(Test.Form.FormButtonType.Minimize));
-
-            this.getBody().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f11));
-
-            this.getBody().addEventListener("mousemove", $_.Test.Form.f12);
 
             $(this.getHeading()).css("user-select", "none").css("user-drag:", "none");
 
@@ -413,37 +420,37 @@
 
             $(this.getHeadingTitle()).css("user-select", "none").css("user-drag:", "none");
 
-            //user-select: none;
-
             this.getBody().id = "Body";
             this.getBody().style.top = "30px";
             this.getBody().style.height = "-webkit-calc(100% - 30px)"; // -webkit-calc(100% - 60px)
             this.getBody().style.width = "-webkit-calc(100% - 1px)"; // "100%";
             this.getBody().style.position = "absolute";
+            this.getBody().style.backgroundColor = Test.Form.getWindow_DefaultBackgroundColor();
 
-            this.setHeight("480px");
-            this.setWidth("640px");
+            this.getBody().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f11));
 
-            this.getBody().style.backgroundColor = "#F0F0F0";
+            this.getBody().addEventListener("mousemove", $_.Test.Form.f12);
 
-            this.getBodyOverLay().style.top = "30px";
-            this.getBodyOverLay().style.height = "-webkit-calc(100% - 30px)"; // -webkit-calc(100% - 60px)
-            this.getBodyOverLay().style.width = "100%";
+            this.getBodyOverLay().style.top = "31px";
+            this.getBodyOverLay().style.height = "-webkit-calc(100% - 33px)"; // -webkit-calc(100% - 60px)
+            this.getBodyOverLay().style.width = "-webkit-calc(100% - 4px)";
+            this.getBodyOverLay().style.left = "2px";
             this.getBodyOverLay().style.position = "absolute";
             this.getBodyOverLay().style.zIndex = (2147483647).toString();
-            this.getBodyOverLay().style.opacity = "0";
+            this.getBodyOverLay().style.opacity = "0.5";
+            this.getBodyOverLay().style.backgroundColor = "black";
 
             this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f13));
 
-            this.getBodyOverLay().addEventListener("mouseenter", Bridge.fn.bind(this, $_.Test.Form.f14));
+            this.getBody().addEventListener("mouseleave", $_.Test.Form.f14);
 
-            this.getBase().style.borderStyle = "solid";
-            this.getBase().style.borderWidth = "1px";
-            this.getBase().style.backgroundColor = Test.Form.getWindow_HeadingBackgroundColor();
-            this.getBase().style.padding = "1px";
-            this.getBase().style.borderColor = Test.Form.getWindow_BorderColorFocused();
+            this.getBodyOverLay().addEventListener("mouseenter", Bridge.fn.bind(this, $_.Test.Form.f15));
 
-            $(this.getBase()).css("box-shadow", "0px 0px 63px -17px rgba(0,0,0,0.75)");
+            $(this.getBase()).css("width", Test.Form.getWindow_DefaultWidth()).css("height", Test.Form.getWindow_DefaultHeight());
+
+            this.getBase().appendChild(this.getHeading());
+            this.getBase().appendChild(this.getBody());
+            this.getBase().appendChild(this.getBodyOverLay());
 
             this.getHeading().appendChild(this.getHeadingTitle());
             this.getHeading().appendChild(this.getButtonClose());
@@ -563,7 +570,7 @@
 
                         Test.Form.setActiveForm(this);
                     });
-                    butt.onmouseup = Bridge.fn.bind(this, $_.Test.Form.f15);
+                    butt.onmouseup = Bridge.fn.bind(this, $_.Test.Form.f16);
                     butt.onmouseenter = Bridge.fn.bind(this, function (ev) {
                         if (Test.Form.movingForm != null) {
                             return;
@@ -637,11 +644,11 @@
                 case Test.Form.FormButtonType.Help: 
                     break;
                 default: 
-                    butt.onmouseup = $_.Test.Form.f16;
+                    butt.onmouseup = $_.Test.Form.f17;
                     break;
             }
 
-            butt.onmousemove = $_.Test.Form.f17;
+            butt.onmousemove = $_.Test.Form.f18;
 
             if (Type !== Test.Form.FormButtonType.Close) {
                 butt.onmousedown = Bridge.fn.bind(this, function (ev) {
@@ -769,7 +776,7 @@
             Test.Form.visibleForm.remove(this);
 
             if (this.getBase() != null) {
-                $(this.getBase()).fadeOut(Test.Form.getFadeLength(), Bridge.fn.bind(this, $_.Test.Form.f18));
+                $(this.getBase()).fadeOut(Test.Form.getFadeLength(), Bridge.fn.bind(this, $_.Test.Form.f19));
             }
 
             Test.Form.calculateZOrder();
@@ -798,26 +805,28 @@
             Test.Form.setActiveForm(null);
         },
         f3: function (ev) {
-            Test.Form.setWindowHolderSelectionBox(document.createElement('div'));
-            Test.Form.getWindowHolderSelectionBox().style.position = "absolute";
-            Test.Form.getWindowHolderSelectionBox().style.visibility = "visible";
-            Test.Form.getWindowHolderSelectionBox().style.borderWidth = "thin";
-            Test.Form.getWindowHolderSelectionBox().style.borderStyle = "solid";
-            Test.Form.getWindowHolderSelectionBox().style.borderColor = "black";
-            Test.Form.getWindowHolderSelectionBox().style.backgroundColor = "grey";
-            Test.Form.getWindowHolderSelectionBox().style.opacity = "0.35";
+            if (Test.Form.movingForm == null) {
+                Test.Form.setWindowHolderSelectionBox(document.createElement('div'));
+                Test.Form.getWindowHolderSelectionBox().style.position = "absolute";
+                Test.Form.getWindowHolderSelectionBox().style.visibility = "visible";
+                Test.Form.getWindowHolderSelectionBox().style.borderWidth = "thin";
+                Test.Form.getWindowHolderSelectionBox().style.borderStyle = "solid";
+                Test.Form.getWindowHolderSelectionBox().style.borderColor = "black";
+                Test.Form.getWindowHolderSelectionBox().style.backgroundColor = "grey";
+                Test.Form.getWindowHolderSelectionBox().style.opacity = "0.35";
 
-            Test.Form.getWindowHolder().appendChild(Test.Form.getWindowHolderSelectionBox());
+                Test.Form.getWindowHolder().appendChild(Test.Form.getWindowHolderSelectionBox());
 
-            var mev = ev;
-            Test.Form.windowHolderSelectionBoxX = mev.clientX;
-            Test.Form.windowHolderSelectionBoxY = mev.clientY;
+                var mev = ev;
+                Test.Form.windowHolderSelectionBoxX = mev.clientX;
+                Test.Form.windowHolderSelectionBoxY = mev.clientY;
 
-            Test.Form.getWindowHolderSelectionBox().style.zIndex = "0";
+                Test.Form.getWindowHolderSelectionBox().style.zIndex = "0";
 
-            Test.Form.setMouse_Down(true);
+                Test.Form.setMouse_Down(true);
 
-            Test.Form.setActiveForm(null);
+                Test.Form.setActiveForm(null);
+            }
         },
         f4: function (ev) {
             var mev = ev;
@@ -1033,7 +1042,13 @@
         },
         f7: function (ev) {
             var mev = ev;
+
             Test.Form.setMouse_Down(true);
+            Test.Form.movingForm = this;
+
+            Test.Form.setActiveForm(this);
+
+            Test.Form.setBodyOverLay();
 
             var obj = $(this.getBase());
 
@@ -1089,7 +1104,6 @@
 
             this.changeSelectionState$1();
 
-            Test.Form.movingForm = this;
             mev.stopPropagation();
         },
         f8: function (ev) {
@@ -1128,6 +1142,8 @@
             }
         },
         f10: function (ev) {
+            Test.Form.setBodyOverLay();
+
             if (this.getwindowState() === Test.Form.WindowState.Maximized) {
                 Test.Form.movingForm = this;
                 this.setCursor("default");
@@ -1144,26 +1160,26 @@
             ev.stopPropagation();
         },
         f12: function (ev) {
-            ev.stopPropagation();
+            if (Test.Form.movingForm == null) {
+                ev.stopPropagation();
+                Bridge.Console.log("Mouse Move");
+            }
         },
         f13: function (ev) {
             this.getBodyOverLay().style.visibility = "collapse";
             Test.Form.setActiveForm(this);
         },
         f14: function (ev) {
-            if (Test.Form.getWindowHolderSelectionBox() == null && Test.Form.movingForm == null) {
-                this.getBodyOverLay().style.visibility = "collapse";
+            if (Test.Form.movingForm == null) {
+                Test.Form.setBodyOverLay();
             }
         },
         f15: function (ev) {
-            if (Test.Form.movingForm != null) {
-                return;
+            if (Test.Form.getWindowHolderSelectionBox() == null && Test.Form.movingForm == null) {
+                this.getBodyOverLay().style.visibility = "collapse";
+            } else {
+                this.getBodyOverLay().style.visibility = "visible";
             }
-
-            ev.stopPropagation();
-            ev.preventDefault();
-
-            this.close();
         },
         f16: function (ev) {
             if (Test.Form.movingForm != null) {
@@ -1173,9 +1189,19 @@
             ev.stopPropagation();
             ev.preventDefault();
 
-            Test.Form.setMouse_Down(false);
+            this.close();
         },
         f17: function (ev) {
+            if (Test.Form.movingForm != null) {
+                return;
+            }
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            Test.Form.setMouse_Down(false);
+        },
+        f18: function (ev) {
             if (Test.Form.movingForm != null) {
                 return;
             }
@@ -1183,7 +1209,7 @@
             ev.stopImmediatePropagation();
             ev.preventDefault();
         },
-        f18: function () {
+        f19: function () {
             $(this.getBase()).empty();
             this.getBase().remove();
             this.setBase(null);
@@ -1292,7 +1318,7 @@
             this.setNotePadContent(document.createElement('textarea'));
 
             this.getNotePadContent().style.position = "absolute";
-            this.getNotePadContent().style.width = "-webkit-calc(100% - 9px)";
+            this.getNotePadContent().style.width = "-webkit-calc(100% - 8px)";
             this.getNotePadContent().style.height = "-webkit-calc(100% - 9px)";
 
             this.getNotePadContent().style.top = "1px";
