@@ -435,6 +435,8 @@
 
             this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f13));
 
+            this.getBodyOverLay().addEventListener("mouseenter", Bridge.fn.bind(this, $_.Test.Form.f14));
+
             this.getBase().style.borderStyle = "solid";
             this.getBase().style.borderWidth = "1px";
             this.getBase().style.backgroundColor = Test.Form.getWindow_HeadingBackgroundColor();
@@ -561,7 +563,7 @@
 
                         Test.Form.setActiveForm(this);
                     });
-                    butt.onmouseup = Bridge.fn.bind(this, $_.Test.Form.f14);
+                    butt.onmouseup = Bridge.fn.bind(this, $_.Test.Form.f15);
                     butt.onmouseenter = Bridge.fn.bind(this, function (ev) {
                         if (Test.Form.movingForm != null) {
                             return;
@@ -635,11 +637,11 @@
                 case Test.Form.FormButtonType.Help: 
                     break;
                 default: 
-                    butt.onmouseup = $_.Test.Form.f15;
+                    butt.onmouseup = $_.Test.Form.f16;
                     break;
             }
 
-            butt.onmousemove = $_.Test.Form.f16;
+            butt.onmousemove = $_.Test.Form.f17;
 
             if (Type !== Test.Form.FormButtonType.Close) {
                 butt.onmousedown = Bridge.fn.bind(this, function (ev) {
@@ -767,7 +769,7 @@
             Test.Form.visibleForm.remove(this);
 
             if (this.getBase() != null) {
-                $(this.getBase()).fadeOut(Test.Form.getFadeLength(), Bridge.fn.bind(this, $_.Test.Form.f17));
+                $(this.getBase()).fadeOut(Test.Form.getFadeLength(), Bridge.fn.bind(this, $_.Test.Form.f18));
             }
 
             Test.Form.calculateZOrder();
@@ -1035,23 +1037,14 @@
 
             var obj = $(this.getBase());
 
-
+            this.prev_px = (parseInt(obj.css("left")) - mev.clientX) | 0;
+            this.prev_py = (parseInt(obj.css("top")) - mev.clientY) | 0;
 
             if (this.getwindowState() === Test.Form.WindowState.Maximized) {
                 this.setCursor("default");
 
                 Test.Form.moveAction = Test.Form.MouseMoveAction.Move;
-
-                //prev_px = prev_left - mev.ClientX;
-                //prev_py = prev_top - mev.ClientY;
-
-                this.prev_px = (parseInt(obj.css("left")) - mev.clientX) | 0;
-                this.prev_py = (parseInt(obj.css("top")) - mev.clientY) | 0;
-
                 return;
-            } else {
-                this.prev_px = (parseInt(obj.css("left")) - mev.clientX) | 0;
-                this.prev_py = (parseInt(obj.css("top")) - mev.clientY) | 0;
             }
 
             if (mev.layerX <= Test.Form.getResizeCorners() && mev.layerY <= Test.Form.getResizeCorners()) {
@@ -1158,14 +1151,9 @@
             Test.Form.setActiveForm(this);
         },
         f14: function (ev) {
-            if (Test.Form.movingForm != null) {
-                return;
+            if (Test.Form.getWindowHolderSelectionBox() == null && Test.Form.movingForm == null) {
+                this.getBodyOverLay().style.visibility = "collapse";
             }
-
-            ev.stopPropagation();
-            ev.preventDefault();
-
-            this.close();
         },
         f15: function (ev) {
             if (Test.Form.movingForm != null) {
@@ -1175,9 +1163,19 @@
             ev.stopPropagation();
             ev.preventDefault();
 
-            Test.Form.setMouse_Down(false);
+            this.close();
         },
         f16: function (ev) {
+            if (Test.Form.movingForm != null) {
+                return;
+            }
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            Test.Form.setMouse_Down(false);
+        },
+        f17: function (ev) {
             if (Test.Form.movingForm != null) {
                 return;
             }
@@ -1185,7 +1183,7 @@
             ev.stopImmediatePropagation();
             ev.preventDefault();
         },
-        f17: function () {
+        f18: function () {
             $(this.getBase()).empty();
             this.getBase().remove();
             this.setBase(null);

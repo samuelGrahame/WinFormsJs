@@ -988,26 +988,15 @@ namespace Test
 
 				var obj = jQuery.Select(Base);
 
-				
+                prev_px = Global.ParseInt(obj.Css("left")) - mev.ClientX;
+                prev_py = Global.ParseInt(obj.Css("top")) - mev.ClientY;
 
-				if(windowState == WindowState.Maximized)
+                if (windowState == WindowState.Maximized)
 				{
 					SetCursor(Cursor.Default);
 
-					MoveAction = MouseMoveAction.Move;
-
-					//prev_px = prev_left - mev.ClientX;
-					//prev_py = prev_top - mev.ClientY;
-
-					prev_px = Global.ParseInt(obj.Css("left")) - mev.ClientX;
-					prev_py = Global.ParseInt(obj.Css("top")) - mev.ClientY;
-
+					MoveAction = MouseMoveAction.Move;                
 					return;
-				}
-				else
-				{
-					prev_px = Global.ParseInt(obj.Css("left")) - mev.ClientX;
-					prev_py = Global.ParseInt(obj.Css("top")) - mev.ClientY;
 				}				
 
 				if(mev.LayerX <= ResizeCorners && mev.LayerY <= ResizeCorners)
@@ -1209,9 +1198,17 @@ namespace Test
             BodyOverLay.Style.Opacity = "0";            
 
             BodyOverLay.AddEventListener(EventType.MouseDown, (ev) =>
-            {
+            {                
                 BodyOverLay.Style.Visibility = Visibility.Collapse;
-                ActiveForm = this;				
+                ActiveForm = this;                                                
+            });
+
+            BodyOverLay.AddEventListener(EventType.MouseEnter, (ev) =>
+            {
+                if(WindowHolderSelectionBox == null && MovingForm == null)
+                {
+                    BodyOverLay.Style.Visibility = Visibility.Collapse;
+                }                               
             });
 
             Base.Style.BorderStyle = BorderStyle.Solid;
