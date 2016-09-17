@@ -10,18 +10,26 @@
                 onclick: $_.Test.App.f1
             } );
 
-            var butLel = Bridge.merge(document.createElement('button'), {
-                innerHTML: "Lel",
-                onclick: $_.Test.App.f2
-            } );
+            //var butLel = new HTMLButtonElement
+            //{
+            //    InnerHTML = "Lel",
+            //    OnClick = (ev) =>
+            //    {
+            //        var frm = new FormBrowser();
+            //        frm.Left = "50px";
+            //        frm.Top = "50px";
+            //        frm.Text = "Lel";
+            //        frm.Navigate("file:///C:/Users/Samuel/Desktop/Test/Test/Bridge/www/demo.html");
+            //        frm.Show();
+            //    }
+            //};
 
             var butNote = Bridge.merge(document.createElement('button'), {
                 innerHTML: "NotePad",
-                onclick: $_.Test.App.f3
+                onclick: $_.Test.App.f2
             } );
             Test.Form.getWindowHolder().appendChild(butBing);
-            Test.Form.getWindowHolder().appendChild(butNote);
-            Test.Form.getWindowHolder().appendChild(butLel);
+            Test.Form.getWindowHolder().appendChild(butNote); //Form.WindowHolder.AppendChild(butLel);			
         }
     });
 
@@ -39,14 +47,6 @@
             frm.show();
         },
         f2: function (ev) {
-            var frm = new Test.FormBrowser();
-            frm.setLeft("50px");
-            frm.setTop("50px");
-            frm.setText("Lel");
-            frm.navigate("file:///C:/Users/Samuel/Desktop/Test/Test/Bridge/www/demo.html");
-            frm.show();
-        },
-        f3: function (ev) {
             var frm = new Test.FormNotePad();
             frm.setLeft("50px");
             frm.setTop("50px");
