@@ -20,8 +20,11 @@ namespace Test
 		public static HTMLElement Parent = null;
 		public static bool Mouse_Down { get; set; } = false;
 		public static int FadeLength { get; set; } = 100;
+        public static string Window_BorderColorFocused { get; set; } = "#FBFBFB";
+        public static string Window_BorderColor { get; set; } = "#AAAAAA";
+        public static string Window_HeadingBackgroundColor { get; set; } = "white";
 
-		private static Form _ActiveForm;
+        private static Form _ActiveForm;
 		private static Form _PrevActiveForm;
 		private static MouseMoveAction MoveAction = MouseMoveAction.Move;
 		private static HTMLDivElement WindowHolderSelectionBox { get; set; }
@@ -41,9 +44,9 @@ namespace Test
 
 		public HTMLDivElement Body { get; set; }
         public HTMLDivElement BodyOverLay { get; set; }		
-		public HTMLElement Owner { get; set; } = null;
+		public HTMLElement Owner { get; set; } = null;        
 
-		public int prev_px;
+        public int prev_px;
 		public int prev_py;
 
 		private int prev_width;
@@ -117,7 +120,7 @@ namespace Test
 						{
                             _ActiveForm.BodyOverLay.Style.Visibility = Visibility.Visible;
 
-                            _ActiveForm.Base.Style.BorderColor = "#AAAAAA";
+                            _ActiveForm.Base.Style.BorderColor = Window_BorderColor;
 						}						
 					}
 					_ActiveForm = value;
@@ -126,10 +129,10 @@ namespace Test
 						if(_ActiveForm.Base != null)
 						{
                             _ActiveForm.BodyOverLay.Style.Visibility = Visibility.Collapse;
-                            _ActiveForm.Base.Style.BorderColor = "#FBFBFB";
+                            _ActiveForm.Base.Style.BorderColor = Window_BorderColorFocused;
 							_ActiveForm.BringToFront();
-						}						
-					}					
+						}
+					}
 				}
 
 			}
@@ -1132,7 +1135,7 @@ namespace Test
 			Heading.Style.Width = "100%";
 			Heading.Style.VerticalAlign = VerticalAlign.Top;
 			Heading.Style.Cursor = Cursor.Default;
-			Heading.Style.BackgroundColor = "white";// "#007ACC";
+			Heading.Style.BackgroundColor = Window_HeadingBackgroundColor;
 			Heading.Style.MarginTop = "0";
 			Heading.Style.MarginLeft = "0";
 			Heading.Style.MarginRight = "0";
@@ -1166,9 +1169,14 @@ namespace Test
 
 			Body.AddEventListener(EventType.MouseDown, (ev) => {				
 				ActiveForm = this;
+                ev.StopPropagation();
 			});
 
-			jQuery.Select(Heading)
+            Body.AddEventListener(EventType.MouseMove, (ev) => {                
+                ev.StopPropagation();
+            });
+
+            jQuery.Select(Heading)
 				.Css("user-select", "none")
 				.Css("user-drag:", "none");
 
@@ -1185,7 +1193,7 @@ namespace Test
 			Body.Id = "Body";
 			Body.Style.Top = "30px";
 			Body.Style.Height = "-webkit-calc(100% - 30px)"; // -webkit-calc(100% - 60px)
-			Body.Style.Width = "100%";
+            Body.Style.Width = "-webkit-calc(100% - 1px)"; // "100%";
             Body.Style.Position = Position.Absolute;            
 
             Height = "480px";
@@ -1208,9 +1216,10 @@ namespace Test
 
             Base.Style.BorderStyle = BorderStyle.Solid;
 			Base.Style.BorderWidthString = "1px";
-			Base.Style.BackgroundColor = "white";
+			Base.Style.BackgroundColor = Window_HeadingBackgroundColor;
 			Base.Style.Padding = "1px";
-			Base.Style.BorderColor = "#FBFBFB";
+			Base.Style.BorderColor = Window_BorderColorFocused;
+
 			jQuery.Select(Base).Css("box-shadow", "0px 0px 63px -17px rgba(0,0,0,0.75)");
 			
 			Heading.AppendChild(HeadingTitle);
