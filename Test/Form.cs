@@ -420,8 +420,8 @@ namespace WinFormjs
                     WindowHolder.AppendChild(WindowHolderSelectionBox);
 
                     var mev = ev.As<MouseEvent>();
-                    WindowHolderSelectionBoxX = mev.ClientX;
-                    WindowHolderSelectionBoxY = mev.ClientY;
+                    WindowHolderSelectionBoxX = mev.ClientX + WindowHolder.ScrollLeft;
+                    WindowHolderSelectionBoxY = mev.ClientY + WindowHolder.ScrollTop;
 
                     WindowHolderSelectionBox.Style.ZIndex = "0";
 
@@ -469,7 +469,11 @@ namespace WinFormjs
 					
 					var obj = jQuery.Select(MovingForm.Base);
 
-					var Y = (mev.ClientY + MovingForm.prev_py);
+                    //WindowHolderSelectionBoxX = mev.ClientX + WindowHolder.ScrollLeft;
+                    //WindowHolderSelectionBoxY = mev.ClientY + WindowHolder.ScrollTop;
+
+
+                    var Y = (mev.ClientY  + MovingForm.prev_py);
 					var X = (mev.ClientX + MovingForm.prev_px);
 
 					if(MovingForm.windowState == WindowState.Maximized && MoveAction == MouseMoveAction.Move)
@@ -686,26 +690,29 @@ namespace WinFormjs
 						int width;
 						int height;
 
-						if(WindowHolderSelectionBoxX > mev.ClientX)
+                        int ClientX = mev.ClientX + WindowHolder.ScrollLeft;
+                        int ClientY = mev.ClientY + WindowHolder.ScrollTop;
+                        
+                        if (WindowHolderSelectionBoxX > ClientX)
 						{
-							left = mev.ClientX;
-							width = WindowHolderSelectionBoxX - mev.ClientX;
+							left = ClientX;
+							width = WindowHolderSelectionBoxX - ClientX;
 						}
 						else
 						{
 							left = WindowHolderSelectionBoxX;
-							width = mev.ClientX - WindowHolderSelectionBoxX;
+							width = ClientX - WindowHolderSelectionBoxX;
 						}
 
-						if(WindowHolderSelectionBoxY > mev.ClientY)
+						if(WindowHolderSelectionBoxY > ClientY)
 						{
-							top = mev.ClientY;
-							height = WindowHolderSelectionBoxY - mev.ClientY;
+							top = ClientY;
+							height = WindowHolderSelectionBoxY - ClientY;
 						}
 						else
 						{
 							top = WindowHolderSelectionBoxY;
-							height = mev.ClientY - WindowHolderSelectionBoxY;
+							height = ClientY - WindowHolderSelectionBoxY;
 						}
 
 						WindowHolderSelectionBox.Style.Left = left + "px";

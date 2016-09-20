@@ -55,8 +55,8 @@
     <Content Include="Bridge\output\bridge.min.js" />
     <Content Include="Bridge\output\jquery-1.12.0.min.js" />
     <Content Include="Bridge\output\readme.txt" />
-    <Content Include="Bridge\output\test.js" />
-    <Content Include="Bridge\output\test.min.js" />
+    <Content Include="Bridge\output\winFormjs.js" />
+    <Content Include="Bridge\output\winFormjs.min.js" />
     <Content Include="Bridge\www\demo.html" />
   </ItemGroup>
   <ItemGroup>

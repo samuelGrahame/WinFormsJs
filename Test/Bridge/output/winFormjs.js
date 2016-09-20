@@ -1293,8 +1293,8 @@
                 WinFormjs.Form.getWindowHolder().appendChild(WinFormjs.Form.getWindowHolderSelectionBox());
 
                 var mev = ev;
-                WinFormjs.Form.windowHolderSelectionBoxX = mev.clientX;
-                WinFormjs.Form.windowHolderSelectionBoxY = mev.clientY;
+                WinFormjs.Form.windowHolderSelectionBoxX = (mev.clientX + WinFormjs.Form.getWindowHolder().scrollLeft) | 0;
+                WinFormjs.Form.windowHolderSelectionBoxY = (mev.clientY + WinFormjs.Form.getWindowHolder().scrollTop) | 0;
 
                 WinFormjs.Form.getWindowHolderSelectionBox().style.zIndex = "0";
 
@@ -1316,6 +1316,10 @@
                 }
 
                 var obj = $(WinFormjs.Form.movingForm.getBase());
+
+                //WindowHolderSelectionBoxX = mev.ClientX + WindowHolder.ScrollLeft;
+                //WindowHolderSelectionBoxY = mev.ClientY + WindowHolder.ScrollTop;
+
 
                 var Y = (((mev.clientY + WinFormjs.Form.movingForm.prev_py) | 0));
                 var X = (((mev.clientX + WinFormjs.Form.movingForm.prev_px) | 0));
@@ -1472,20 +1476,23 @@
                     var width;
                     var height;
 
-                    if (WinFormjs.Form.windowHolderSelectionBoxX > mev.clientX) {
-                        left = mev.clientX;
-                        width = (WinFormjs.Form.windowHolderSelectionBoxX - mev.clientX) | 0;
+                    var ClientX = (mev.clientX + WinFormjs.Form.getWindowHolder().scrollLeft) | 0;
+                    var ClientY = (mev.clientY + WinFormjs.Form.getWindowHolder().scrollTop) | 0;
+
+                    if (WinFormjs.Form.windowHolderSelectionBoxX > ClientX) {
+                        left = ClientX;
+                        width = (WinFormjs.Form.windowHolderSelectionBoxX - ClientX) | 0;
                     } else {
                         left = WinFormjs.Form.windowHolderSelectionBoxX;
-                        width = (mev.clientX - WinFormjs.Form.windowHolderSelectionBoxX) | 0;
+                        width = (ClientX - WinFormjs.Form.windowHolderSelectionBoxX) | 0;
                     }
 
-                    if (WinFormjs.Form.windowHolderSelectionBoxY > mev.clientY) {
-                        top = mev.clientY;
-                        height = (WinFormjs.Form.windowHolderSelectionBoxY - mev.clientY) | 0;
+                    if (WinFormjs.Form.windowHolderSelectionBoxY > ClientY) {
+                        top = ClientY;
+                        height = (WinFormjs.Form.windowHolderSelectionBoxY - ClientY) | 0;
                     } else {
                         top = WinFormjs.Form.windowHolderSelectionBoxY;
-                        height = (mev.clientY - WinFormjs.Form.windowHolderSelectionBoxY) | 0;
+                        height = (ClientY - WinFormjs.Form.windowHolderSelectionBoxY) | 0;
                     }
 
                     WinFormjs.Form.getWindowHolderSelectionBox().style.left = System.String.concat(left, "px");
