@@ -15,7 +15,7 @@ namespace WinFormjs
                 if(true)
                 {
                     var pathList = new List<string>();
-                    for (int i = 0; i < 100; i++)
+                    for (int i = 0; i < 25; i++)
                     {
                         pathList.Add(string.Format("{0}/New Folder {1}", path, i));
                     }
@@ -39,6 +39,7 @@ namespace WinFormjs
             if (path == FileExplorer.DesktopPath)
             {
                 return new string[] {
+                string.Format("{0}/Recycle Bin", path),
                 string.Format("{0}/iexplore.exe", path),
                 string.Format("{0}/Notepad.exe", path),
                 string.Format("{0}/cmd.exe", path)};
