@@ -2,7 +2,7 @@
 using Bridge;
 using Bridge.Html5;
 
-namespace Test
+namespace WinFormjs
 {
 	public class App
 	{

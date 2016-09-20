@@ -7,7 +7,7 @@ using Bridge.Html5;
 using Bridge.jQuery2;
 using Bridge;
 
-namespace Test
+namespace WinFormjs
 {
 	public class Form
 	{

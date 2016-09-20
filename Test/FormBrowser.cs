@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Test
+namespace WinFormjs
 {
     public class FormBrowser : Form
     {
