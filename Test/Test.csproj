@@ -37,10 +37,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Directory.cs" />
+    <Compile Include="File.cs" />
+    <Compile Include="FileExplorer.cs" />
     <Compile Include="Form.cs" />
     <Compile Include="FormBrowser.cs" />
     <Compile Include="FormConsole.cs" />
     <Compile Include="FormNotePad.cs" />
+    <Compile Include="Path.cs" />
+    <Compile Include="Process.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

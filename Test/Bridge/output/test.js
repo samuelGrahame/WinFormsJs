@@ -5,67 +5,361 @@
         $main: function () {
             Test.Form.setup();
 
-            var butBing = Bridge.merge(document.createElement('button'), {
-                innerHTML: "Bing",
-                onclick: $_.Test.App.f1
-            } );
-
-            //var butLel = new HTMLButtonElement
+            //var butBing = new HTMLButtonElement
             //{
-            //    InnerHTML = "Lel",
-            //    OnClick = (ev) =>
-            //    {
-            //        var frm = new FormBrowser();
-            //        frm.Left = "50px";
-            //        frm.Top = "50px";
-            //        frm.Text = "Lel";
-            //        frm.Navigate("file:///C:/Users/Samuel/Desktop/Test/Test/Bridge/www/demo.html");
-            //        frm.Show();
-            //    }
+            //	InnerHTML = "Bing",
+            //	OnClick = (ev) =>
+            //	{
+            //		var frm = new FormBrowser();
+            //		frm.Left = "50px";
+            //		frm.Top = "50px";
+            //		frm.Text = "Bing";
+            //		frm.Navigate("https://bing.com");
+            //		frm.Show();
+            //	}
             //};
 
-            var butNote = Bridge.merge(document.createElement('button'), {
-                innerHTML: "NotePad",
-                onclick: $_.Test.App.f2
-            } );
+            //         //var butLel = new HTMLButtonElement
+            //         //{
+            //         //    InnerHTML = "Lel",
+            //         //    OnClick = (ev) =>
+            //         //    {
+            //         //        var frm = new FormBrowser();
+            //         //        frm.Left = "50px";
+            //         //        frm.Top = "50px";
+            //         //        frm.Text = "Lel";
+            //         //        frm.Navigate("file:///C:/Users/Samuel/Desktop/Test/Test/Bridge/www/demo.html");
+            //         //        frm.Show();
+            //         //    }
+            //         //};
 
-            var butCmd = Bridge.merge(document.createElement('button'), {
-                innerHTML: "Command Prompt",
-                onclick: $_.Test.App.f3
-            } );
+            //         var butNote = new HTMLButtonElement
+            //{
+            //	InnerHTML = "NotePad",
+            //	OnClick = (ev) =>
+            //	{
+            //		var frm = new FormNotePad();
+            //		frm.Left = "50px";
+            //		frm.Top = "50px";
+            //		frm.Text = "Note Pad";
+            //		frm.Show();
+            //	}
+            //};
 
-            Test.Form.getWindowHolder().appendChild(butBing);
-            Test.Form.getWindowHolder().appendChild(butNote); //Form.WindowHolder.AppendChild(butLel);			
-            Test.Form.getWindowHolder().appendChild(butCmd);
+            //         var butCmd = new HTMLButtonElement
+            //         {
+            //             InnerHTML = "Command Prompt",
+            //             OnClick = (ev) =>
+            //             {
+            //                 var frm = new FormConsole();
+            //                 frm.Left = "50px";
+            //                 frm.Top = "50px";
+            //                 frm.Text = "Command Prompt";
+            //                 frm.Show();
+            //             }
+            //         };
+
+            //         Form.WindowHolder.AppendChild(butBing);
+            //Form.WindowHolder.AppendChild(butNote);	//Form.WindowHolder.AppendChild(butLel);			
+            //         Form.WindowHolder.AppendChild(butCmd);
+        }
+    });
+
+    Bridge.define("Test.FileExplorerNode", {
+        statics: {
+            createNode: function (path, nvt, IsFile) {
+                if (IsFile === void 0) { IsFile = false; }
+                var fen = Bridge.merge(new Test.FileExplorerNode(), {
+                    setIsFile: IsFile,
+                    setnodeViewType: nvt
+                } );
+                fen.setName(Test.Path.getFileName(path));
+                fen.setDirectory(Test.Path.getDirectoryName(path));
+                fen.setFullPath(path);
+
+                fen.createHtmlNode();
+
+                return fen;
+            }
+        },
+        nodeImage: null,
+        nodeText: null,
+        nodeState: 0,
+        config: {
+            properties: {
+                Name: null,
+                Directory: null,
+                FullPath: null,
+                nodeViewType: 0,
+                IsFile: false,
+                NodeBase: null
+            }
+        },
+        getNodeExplorerState: function () {
+            return this.nodeState;
+        },
+        setNodeExplorerState: function (value) {
+            if (this.nodeState !== value) {
+                this.nodeState = value;
+                if (this.getNodeBase() != null) {
+                    this.createHtmlNode();
+                }
+            }
+        },
+        createHtmlNode: function () {
+            if (this.getNodeBase() == null) {
+                this.setNodeBase(document.createElement('div'));
+                this.nodeImage = document.createElement('div');
+                this.nodeText = document.createElement('span');
+
+                this.getNodeBase().style.zIndex = "0";
+
+                this.getNodeBase().style.position = "absolute";
+                this.nodeImage.style.position = "absolute";
+                this.nodeText.style.position = "absolute";
+
+                this.getNodeBase().addEventListener("dblclick", Bridge.fn.bind(this, $_.Test.FileExplorerNode.f1));
+
+                this.getNodeBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.FileExplorerNode.f2));
+
+                this.getNodeBase().addEventListener("mouseenter", Bridge.fn.bind(this, $_.Test.FileExplorerNode.f3));
+
+                this.getNodeBase().addEventListener("mouseleave", Bridge.fn.bind(this, $_.Test.FileExplorerNode.f4));
+
+                if (this.getnodeViewType() === Test.NodeViewType.Medium_Icons) {
+                    $(this.getNodeBase()).css("width", 76).css("height", 70);
+
+                    $(this.nodeImage).css("width", 48).css("height", 48).css("left", 14).css("top", 2);
+
+                    this.getNodeBase().style.borderStyle = "solid";
+                    this.getNodeBase().style.borderWidth = "thin";
+
+                    var img = new Image();
+
+                    img.style.maxWidth = "100%";
+                    img.style.maxHeight = "100%";
+
+                    img.style.position = "absolute";
+                    img.style.display = "block";
+
+                    //position:absolute;
+                    //NodeImage.Style.BackgroundSize = "contain";
+                    //NodeImage.Style.BackgroundRepeat = BackgroundRepeat.NoRepeat;
+
+                    if (this.getIsFile()) {
+                        img.setAttribute("src", Test.FileExplorer.IMAGE_File);
+                    } else {
+                        img.setAttribute("src", Test.FileExplorer.IMAGE_Folder);
+                    } //NodeImage.Style.Background = FileExplorer.IMAGE_Folder;
+
+                    this.nodeImage.appendChild(img);
+
+                    this.nodeText.innerHTML = this.getName();
+                    this.nodeText.style.fontFamily = "Segoe UI";
+                    this.nodeText.style.fontSize = "10pt";
+                    this.nodeText.style.textAlign = "center";
+
+                    $(this.nodeText).css("width", 74).css("height", 20).css("left", 2).css("top", 48);
+
+                    this.nodeText.style.color = "white";
+
+                    this.getNodeBase().appendChild(this.nodeImage);
+                    this.getNodeBase().appendChild(this.nodeText);
+                }
+            }
+
+            // image 48x48
+
+            switch (this.nodeState) {
+                case Test.FileExplorerNode.FileExplorerState.None: 
+                    this.getNodeBase().style.backgroundColor = "";
+                    this.getNodeBase().style.borderColor = "rgba(255, 255, 255, 0)";
+                    break;
+                case Test.FileExplorerNode.FileExplorerState.Hover: 
+                    this.getNodeBase().style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+                    this.getNodeBase().style.borderColor = "rgba(255, 255, 255, 0.5)";
+                    break;
+                case Test.FileExplorerNode.FileExplorerState.Focused: 
+                    this.getNodeBase().style.backgroundColor = "rgba(255, 255, 255, 0.4)";
+                    this.getNodeBase().style.borderColor = "rgba(255, 255, 255, 0.5)";
+                    break;
+                case Test.FileExplorerNode.FileExplorerState.Selected: 
+                    break;
+                case Test.FileExplorerNode.FileExplorerState.HoverFocused: 
+                    this.getNodeBase().style.backgroundColor = "rgba(255, 255, 255, 0.4)";
+                    this.getNodeBase().style.borderColor = "rgba(255, 255, 255, 0.6)";
+                    break;
+                default: 
+                    break;
+            }
+        },
+        remove: function () {
+            if (this.getNodeBase() != null) {
+                this.getNodeBase().remove();
+            }
         }
     });
 
     var $_ = {};
 
-    Bridge.ns("Test.App", $_);
+    Bridge.ns("Test.FileExplorerNode", $_);
 
-    Bridge.apply($_.Test.App, {
+    Bridge.apply($_.Test.FileExplorerNode, {
         f1: function (ev) {
-            var frm = new Test.FormBrowser();
-            frm.setLeft("50px");
-            frm.setTop("50px");
-            frm.setText("Bing");
-            frm.navigate("https://bing.com");
-            frm.show();
+            if (!Test.Form.midleOfAction()) {
+                Test.Process.start(this.getFullPath());
+            }
         },
         f2: function (ev) {
-            var frm = new Test.FormNotePad();
-            frm.setLeft("50px");
-            frm.setTop("50px");
-            frm.setText("Note Pad");
-            frm.show();
+            if (!Test.Form.midleOfAction()) {
+                if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.HoverFocused || this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Focused) {
+                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Hover);
+                } else if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Selected) {
+
+                } else {
+                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.HoverFocused);
+                }
+                ev.stopPropagation();
+            }
         },
         f3: function (ev) {
-            var frm = new Test.FormConsole();
-            frm.setLeft("50px");
-            frm.setTop("50px");
-            frm.setText("Command Prompt");
-            frm.show();
+            if (!Test.Form.midleOfAction()) {
+                if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Focused || this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.HoverFocused) {
+                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.HoverFocused);
+                } else {
+                    if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Selected) {
+                        this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Hover);
+                    } else {
+                        this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Hover);
+                    }
+                }
+                ev.stopPropagation();
+            }
+        },
+        f4: function (ev) {
+            if (!Test.Form.midleOfAction()) {
+                if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.HoverFocused || this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Focused) {
+                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Focused);
+                } else {
+                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.None);
+                }
+                ev.stopPropagation();
+            }
+        }
+    });
+
+    Bridge.define("Test.FileExplorer", {
+        statics: {
+            IMAGE_File: "data:image/png;base64,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",
+            IMAGE_Folder: "data:image/png;base64,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",
+            DesktopPath: "$desktop",
+            isDirectoryRequestValue: function (directory) {
+
+
+
+                return true;
+            }
+        },
+        path: null,
+        element: null,
+        loadedNodes: null,
+        config: {
+            properties: {
+                NodeViewType: 0
+            },
+            init: function () {
+                this.loadedNodes = new (System.Collections.Generic.List$1(Test.FileExplorerNode))();
+            }
+        },
+        ctor: function (element) {
+            this.$initialize();
+            this.element = element;
+        },
+        getPath: function () {
+            return this.path;
+        },
+        setPath: function (value) {
+            if (!Bridge.referenceEquals(this.path, value)) {
+                if (Test.FileExplorer.isDirectoryRequestValue(value)) {
+                    this.path = value;
+                    this.refresh();
+                } else {
+                    this.warnEnduserOfInvalidRequest();
+                }
+            }
+        },
+        warnEnduserOfInvalidRequest: function () {
+
+        },
+        clearItems: function () {
+            for (var i = 0; i < this.loadedNodes.getCount(); i = (i + 1) | 0) {
+                if (this.loadedNodes.getItem(i) != null) {
+                    this.loadedNodes.getItem(i).remove();
+                }
+            }
+            this.loadedNodes = new (System.Collections.Generic.List$1(Test.FileExplorerNode))();
+        },
+        refresh: function () {
+            if (this.loadedNodes == null) {
+                this.loadedNodes = new (System.Collections.Generic.List$1(Test.FileExplorerNode))();
+            } else {
+                if (this.loadedNodes.getCount() > 0) {
+                    this.clearItems();
+                }
+            }
+
+            var nvt = this.getNodeViewType();
+            if (Bridge.referenceEquals(this.getPath(), Test.FileExplorer.DesktopPath)) {
+                // load the locations of the desktop items.
+                nvt = Test.NodeViewType.Medium_Icons;
+            }
+
+            var Files = Test.Directory.getFiles(this.getPath());
+            var Folders = Test.Directory.getDirectories(this.getPath());
+
+            for (var i = 0; i < Files.length; i = (i + 1) | 0) {
+                this.loadedNodes.add(Test.FileExplorerNode.createNode(Files[i], this.getNodeViewType(), true));
+            }
+
+            for (var i1 = 0; i1 < Folders.length; i1 = (i1 + 1) | 0) {
+                this.loadedNodes.add(Test.FileExplorerNode.createNode(Folders[i1], this.getNodeViewType()));
+            }
+
+            // get the order type!! #TODO# sort items
+            var x = 0;
+            var y = 19;
+
+            var j = 0;
+
+            for (var i2 = 0; i2 < this.loadedNodes.getCount(); i2 = (i2 + 1) | 0) {
+                if (this.loadedNodes.getItem(i2) != null && this.loadedNodes.getItem(i2).getNodeBase() != null) {
+                    $(this.loadedNodes.getItem(i2).getNodeBase()).css("left", x).css("top", y);
+                    this.element.appendChild(this.loadedNodes.getItem(i2).getNodeBase());
+                    j = (j + 1) | 0;
+                    if (j > 10) {
+                        x = (x + 76) | 0;
+                        y = 0;
+
+                        j = 0;
+                    }
+
+                    y = (y + 70) | 0;
+
+                    y = (y + 19) | 0;
+                }
+
+            }
+        }
+    });
+
+    Bridge.define("Test.FileExplorerNode.FileExplorerState", {
+        $kind: "enum",
+        statics: {
+            None: 0,
+            Hover: 1,
+            Focused: 2,
+            Selected: 3,
+            HoverFocused: 4
         }
     });
 
@@ -74,14 +368,15 @@
             movingForm: null,
             parent: null,
             visibleForm: null,
+            window_Desktop: null,
             _ActiveForm: null,
             _PrevActiveForm: null,
             moveAction: 0,
             windowHolderSelectionBoxX: 0,
             windowHolderSelectionBoxY: 0,
-            WinIcon: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')",
-            WinIconHover: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')",
-            WinIconDown: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACnSURBVFhHY5AZZGDUQYTAqIMIgVEHEQKjDiIERh1ECAxfBynrGGvbehv6JFnGVrmUznWvXRE27zoQQaWJBuQ4SN3UHmg30GLHvIlAi4EiELuxIogW4gHJDkKzD4iwCsIRRBfxYNRBhMCogwgBkh1EazAaZYTAqIMIgVEHEQIkOwgIBlfligsMZPODpmDUQYTAqIMIgVEHEQKjDiIERh1ECAwyB8nIAADHEJbDMY47rQAAAABJRU5ErkJggg==')",
+            IMAGE_WinIcon: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')",
+            IMAGE_WinIconHover: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')",
+            IMAGE_WinIconDown: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACnSURBVFhHY5AZZGDUQYTAqIMIgVEHEQKjDiIERh1ECAxfBynrGGvbehv6JFnGVrmUznWvXRE27zoQQaWJBuQ4SN3UHmg30GLHvIlAi4EiELuxIogW4gHJDkKzD4iwCsIRRBfxYNRBhMCogwgBkh1EazAaZYTAqIMIgVEHEQIkOwgIBlfligsMZPODpmDUQYTAqIMIgVEHEQKjDiIERh1ECAwyB8nIAADHEJbDMY47rQAAAABJRU5ErkJggg==')",
             config: {
                 properties: {
                     TaskBar: null,
@@ -92,7 +387,7 @@
                     Mouse_Down: false,
                     FadeLength: 100,
                     Window_BorderColorFocused: "#FBFBFB",
-                    Window_BorderColor: "#d8d8d8",
+                    Window_BorderColor: "#FBFBFB",
                     Window_HeadingBackgroundColor: "white",
                     Window_DefaultBackgroundColor: "#F0F0F0",
                     /**
@@ -149,6 +444,9 @@
                     }
                 }
 
+            },
+            midleOfAction: function () {
+                return Test.Form.getWindowHolderSelectionBox() != null || Test.Form.movingForm != null;
             },
             setBodyOverLay: function () {
                 for (var i = 0; i < Test.Form.visibleForm.getCount(); i = (i + 1) | 0) {
@@ -252,7 +550,7 @@
                 butt.style.height = "40px";
                 butt.style.position = "absolute";
                 butt.style.fontSize = "12pt";
-                butt.style.background = Test.Form.WinIcon;
+                butt.style.background = Test.Form.IMAGE_WinIcon;
 
                 butt.onmouseup = function (ev) {
                     if (Test.Form.movingForm != null) {
@@ -262,7 +560,7 @@
                     ev.stopPropagation();
                     ev.preventDefault();
 
-                    butt.style.background = Test.Form.WinIcon;
+                    butt.style.background = Test.Form.IMAGE_WinIcon;
                 };
 
                 butt.onmousedown = function (ev) {
@@ -275,7 +573,7 @@
                     ev.stopPropagation();
                     ev.preventDefault();
 
-                    butt.style.background = Test.Form.WinIconDown;
+                    butt.style.background = Test.Form.IMAGE_WinIconDown;
 
                     Test.Form.setActiveForm(null);
                 };
@@ -286,9 +584,9 @@
                     }
 
                     if (Test.Form.getMouse_Down()) {
-                        butt.style.background = Test.Form.WinIconDown;
+                        butt.style.background = Test.Form.IMAGE_WinIconDown;
                     } else {
-                        butt.style.background = Test.Form.WinIconHover;
+                        butt.style.background = Test.Form.IMAGE_WinIconHover;
                     }
                 };
 
@@ -297,7 +595,7 @@
                         return;
                     }
 
-                    butt.style.background = Test.Form.WinIcon;
+                    butt.style.background = Test.Form.IMAGE_WinIcon;
                 };
 
                 return butt;
@@ -367,6 +665,11 @@
 
                 Test.Form.getTaskBar().appendChild(Test.Form.getButtonStart());
                 Test.Form.getTaskBar().appendChild(Test.Form.getInputStartSearch());
+
+                Test.Form.window_Desktop = Bridge.merge(new Test.FileExplorer(Test.Form.getWindowHolder()), {
+                    setNodeViewType: Test.NodeViewType.Medium_Icons,
+                    setPath: Test.FileExplorer.DesktopPath
+                } );
             },
             calculateZOrder: function () {
                 if (Test.Form.visibleForm == null) {
@@ -593,7 +896,7 @@
                     butt.id = "Close";
                     butt.innerHTML = "&#10006";
                     butt.onmousedown = Bridge.fn.bind(this, function (ev) {
-                        if (Test.Form.movingForm != null) {
+                        if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                             return;
                         }
                         Test.Form.setMouse_Down(true);
@@ -608,7 +911,7 @@
                     });
                     butt.onmouseup = Bridge.fn.bind(this, $_.Test.Form.f16);
                     butt.onmouseenter = Bridge.fn.bind(this, function (ev) {
-                        if (Test.Form.movingForm != null) {
+                        if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                             return;
                         }
 
@@ -622,7 +925,7 @@
                         butt.style.color = "white";
                     });
                     butt.onmouseleave = function (ev) {
-                        if (Test.Form.movingForm != null) {
+                        if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                             return;
                         }
 
@@ -638,7 +941,7 @@
                     butt.innerHTML = "&#9633;";
                     butt.style.fontSize = "14pt";
                     butt.onmouseup = Bridge.fn.bind(this, function (ev) {
-                        if (Test.Form.movingForm != null) {
+                        if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                             return;
                         }
 
@@ -660,7 +963,7 @@
                     butt.id = "Minimize";
                     butt.innerHTML = "&#8213;";
                     butt.onmouseup = Bridge.fn.bind(this, function (ev) {
-                        if (Test.Form.movingForm != null) {
+                        if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                             return;
                         }
 
@@ -688,7 +991,7 @@
 
             if (Type !== Test.Form.FormButtonType.Close) {
                 butt.onmousedown = Bridge.fn.bind(this, function (ev) {
-                    if (Test.Form.movingForm != null) {
+                    if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                         return;
                     }
 
@@ -704,7 +1007,7 @@
                 });
 
                 butt.onmouseenter = Bridge.fn.bind(this, function (ev) {
-                    if (Test.Form.movingForm != null) {
+                    if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                         return;
                     }
                     this.setCursor("default");
@@ -718,7 +1021,7 @@
                 });
 
                 butt.onmouseleave = function (ev) {
-                    if (Test.Form.movingForm != null) {
+                    if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                         return;
                     }
 
@@ -1098,7 +1401,6 @@
             if (Test.Form.getWindowHolderSelectionBox() != null) {
                 $(Test.Form.getWindowHolderSelectionBox()).fadeOut(Test.Form.getFadeLength(), $_.Test.Form.f5);
             }
-
         },
         f7: function (ev) {
             var mev = ev;
@@ -1179,6 +1481,9 @@
             } else if (this.getwindowState() === Test.Form.WindowState.Maximized) {
                 this.setCursor("default");
                 return;
+            } else if (Test.Form.getWindowHolderSelectionBox() != null) {
+                this.setCursor("default");
+                return;
             }
 
             if (Test.Form.moveAction === Test.Form.MouseMoveAction.TopLeftResize || mev.layerX <= Test.Form.getResizeCorners() && mev.layerY <= Test.Form.getResizeCorners()) {
@@ -1241,7 +1546,7 @@
             }
         },
         f16: function (ev) {
-            if (Test.Form.movingForm != null) {
+            if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                 return;
             }
 
@@ -1251,7 +1556,7 @@
             this.close();
         },
         f17: function (ev) {
-            if (Test.Form.movingForm != null) {
+            if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                 return;
             }
 
@@ -1261,7 +1566,7 @@
             Test.Form.setMouse_Down(false);
         },
         f18: function (ev) {
-            if (Test.Form.movingForm != null) {
+            if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                 return;
             }
 
@@ -1307,6 +1612,127 @@
             Normal: 0,
             Minimized: 1,
             Maximized: 2
+        }
+    });
+
+    Bridge.define("Test.NodeViewType", {
+        $kind: "enum",
+        statics: {
+            Content: 0,
+            Tiles: 1,
+            Details: 2,
+            List: 3,
+            Small_Icons: 4,
+            Medium_Icons: 5,
+            Large_Icons: 6,
+            Extra_Large_Icons: 7
+        }
+    });
+
+    Bridge.define("Test.Path", {
+        statics: {
+            getDirectoryName: function (path) {
+                var FileName = Test.Path.getFileName(path);
+                return path.substr(0, ((((path.length - FileName.length) | 0) - 1) | 0));
+            },
+            getFileName: function (path) {
+                if (path != null) {
+                    //                CheckInvalidPathChars(path, false);
+                    var length = path.length;
+                    var num2 = length;
+                    while (((num2 = (num2 - 1) | 0)) >= 0) {
+                        var ch = path.charCodeAt(num2);
+                        if (((ch === 92) || (ch === 47)) || (ch === 58)) {
+                            return path.substr(((num2 + 1) | 0), (((((length - num2) | 0)) - 1) | 0));
+                        }
+                    }
+                }
+                return path;
+            }
+        }
+    });
+
+    Bridge.define("Test.Process", {
+        statics: {
+            start: function (fileName) {
+                var DirectoryName = Test.Path.getDirectoryName(fileName);
+                var FileName = Test.Path.getFileName(fileName);
+
+                if (Bridge.referenceEquals(DirectoryName, Test.FileExplorer.DesktopPath)) {
+                    switch (FileName) {
+                        case "iexplore.exe": 
+                            var iexplore = new Test.FormBrowser();
+                            iexplore.setLeft("50px");
+                            iexplore.setTop("50px");
+                            iexplore.setText("Bing");
+                            iexplore.navigate("https://bing.com");
+                            iexplore.show();
+                            break;
+                        case "Notepad.exe": 
+                            var Notepad = new Test.FormNotePad();
+                            Notepad.setLeft("50px");
+                            Notepad.setTop("50px");
+                            Notepad.setText("Note Pad");
+                            Notepad.show();
+                            break;
+                        case "cmd.exe": 
+                            var cmd = new Test.FormConsole();
+                            cmd.setLeft("50px");
+                            cmd.setTop("50px");
+                            cmd.setText("Command Prompt");
+                            cmd.show();
+                            break;
+                    }
+                } else {
+
+                }
+
+                return null;
+            }
+        }
+    });
+
+    Bridge.define("Test.Directory", {
+        inherits: [Test.FileExplorerNode],
+        statics: {
+            getDirectories: function (path) {
+                if (Bridge.referenceEquals(path, Test.FileExplorer.DesktopPath)) {
+                    return [System.String.format("{0}/New Folder", path)];
+                }
+
+                return null;
+            },
+            getFiles: function (path) {
+                if (Bridge.referenceEquals(path, Test.FileExplorer.DesktopPath)) {
+                    return [System.String.format("{0}/iexplore.exe", path), System.String.format("{0}/Notepad.exe", path), System.String.format("{0}/cmd.exe", path)];
+                }
+
+                return null;
+            }
+        }
+    });
+
+    Bridge.define("Test.File", {
+        inherits: [Test.FileExplorerNode],
+        statics: {
+            readAllText: function (path) {
+                return null;
+            },
+            readAllLines: function (path) {
+                return null;
+            },
+            readAllBytes: function (path) {
+                return null;
+            },
+            writeAllBytes: function (path, bytes) {
+
+            },
+            writeAllLines: function (path, contents) {
+
+            },
+            writeAllText: function (path, contents) {
+
+            }
         }
     });
 

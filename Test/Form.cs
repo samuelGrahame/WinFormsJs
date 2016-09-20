@@ -21,10 +21,11 @@ namespace Test
 		public static bool Mouse_Down { get; set; } = false;
 		public static int FadeLength { get; set; } = 100;
         public static string Window_BorderColorFocused { get; set; } = "#FBFBFB";
-        public static string Window_BorderColor { get; set; } = "#d8d8d8";
+        public static string Window_BorderColor { get; set; } = "#FBFBFB"; // "#d8d8d8";
         public static string Window_HeadingBackgroundColor { get; set; } = "white";
         public static string Window_DefaultBackgroundColor { get; set; } = "#F0F0F0";
         public static List<Form> VisibleForm = new List<Form>();
+        private static FileExplorer Window_Desktop;
         /// <summary>
         /// This is used for testing
         /// </summary>
@@ -37,13 +38,13 @@ namespace Test
         private static Form _ActiveForm;
 		private static Form _PrevActiveForm;
 		private static MouseMoveAction MoveAction = MouseMoveAction.Move;
-		private static HTMLDivElement WindowHolderSelectionBox { get; set; }
+		public static HTMLDivElement WindowHolderSelectionBox { get; set; }
 		private static int WindowHolderSelectionBoxX;
 		private static int WindowHolderSelectionBoxY;
 
-		private const string WinIcon = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')";
-		private const string WinIconHover = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')";
-		private const string WinIconDown = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACnSURBVFhHY5AZZGDUQYTAqIMIgVEHEQKjDiIERh1ECAxfBynrGGvbehv6JFnGVrmUznWvXRE27zoQQaWJBuQ4SN3UHmg30GLHvIlAi4EiELuxIogW4gHJDkKzD4iwCsIRRBfxYNRBhMCogwgBkh1EazAaZYTAqIMIgVEHEQIkOwgIBlfligsMZPODpmDUQYTAqIMIgVEHEQKjDiIERh1ECAwyB8nIAADHEJbDMY47rQAAAABJRU5ErkJggg==')";
+		private const string IMAGE_WinIcon = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')";
+		private const string IMAGE_WinIconHover = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')";
+		private const string IMAGE_WinIconDown = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACnSURBVFhHY5AZZGDUQYTAqIMIgVEHEQKjDiIERh1ECAxfBynrGGvbehv6JFnGVrmUznWvXRE27zoQQaWJBuQ4SN3UHmg30GLHvIlAi4EiELuxIogW4gHJDkKzD4iwCsIRRBfxYNRBhMCogwgBkh1EazAaZYTAqIMIgVEHEQIkOwgIBlfligsMZPODpmDUQYTAqIMIgVEHEQKjDiIERh1ECAwyB8nIAADHEJbDMY47rQAAAABJRU5ErkJggg==')";
 
 		private HTMLDivElement Base { get; set; }
 		private HTMLDivElement Heading { get; set; }
@@ -69,6 +70,11 @@ namespace Test
 		public int MinHeight { get; set; } = 50;
 
 		public WindowState windowState { get; set; }
+
+        public static bool MidleOfAction()
+        {
+            return WindowHolderSelectionBox != null || MovingForm != null;
+        }
 		
         public bool IsVisible()
         {
@@ -280,7 +286,7 @@ namespace Test
 			butt.Style.Height = "40px";
 			butt.Style.Position = Position.Absolute;
 			butt.Style.FontSize = "12pt";
-			butt.Style.Background = WinIcon;
+			butt.Style.Background = IMAGE_WinIcon;
 
 			butt.OnMouseUp = (ev) =>
 			{
@@ -290,7 +296,7 @@ namespace Test
 				ev.StopPropagation();
 				ev.PreventDefault();
 
-				butt.Style.Background = WinIcon;
+				butt.Style.Background = IMAGE_WinIcon;
 			};
 
 			butt.OnMouseDown = (ev) =>
@@ -303,7 +309,7 @@ namespace Test
 				ev.StopPropagation();
 				ev.PreventDefault();
 
-				butt.Style.Background = WinIconDown;
+				butt.Style.Background = IMAGE_WinIconDown;
 
 				ActiveForm = null;
 			};
@@ -315,11 +321,11 @@ namespace Test
 
 				if(Mouse_Down)
 				{
-					butt.Style.Background = WinIconDown;
+					butt.Style.Background = IMAGE_WinIconDown;
 				}
 				else
 				{
-					butt.Style.Background = WinIconHover;
+					butt.Style.Background = IMAGE_WinIconHover;
 				}				
 			};
 
@@ -328,7 +334,7 @@ namespace Test
 				if(MovingForm != null)
 					return;
 
-				butt.Style.Background = WinIcon;
+				butt.Style.Background = IMAGE_WinIcon;
 			};
 
 			return butt;
@@ -391,7 +397,7 @@ namespace Test
 
                     ActiveForm = null;
                 }
-			});
+			});            
     
             //SetBodyOverLay();
 
@@ -694,8 +700,7 @@ namespace Test
 				if(WindowHolderSelectionBox != null)
 				{
 					jQuery.Select(WindowHolderSelectionBox).FadeOut(FadeLength, () => { WindowHolderSelectionBox.Remove(); WindowHolderSelectionBox = null; });
-				}
-				
+				}				
 			});
 
 			Window.AddEventListener(EventType.MouseMove, mouseMove);
@@ -704,8 +709,10 @@ namespace Test
 			Parent.AppendChild(TaskBar);
 			
 			TaskBar.AppendChild(ButtonStart);
-			TaskBar.AppendChild(InputStartSearch);			
-		}
+			TaskBar.AppendChild(InputStartSearch);
+
+            Window_Desktop = new FileExplorer(WindowHolder) { NodeViewType = NodeViewType.Medium_Icons, Path = FileExplorer.DesktopPath };            
+        }
 		private enum FormButtonType
 		{
 			Close,
@@ -766,8 +773,8 @@ namespace Test
 					
 					butt.OnMouseDown = (ev) =>
 					{
-						if(MovingForm != null)
-							return;
+                        if (MovingForm != null || WindowHolderSelectionBox != null)
+                            return;
 						Mouse_Down = true;
 
 						ev.StopPropagation();
@@ -781,8 +788,8 @@ namespace Test
 
 					butt.OnMouseUp = (ev) =>
 					{
-						if(MovingForm != null)
-							return;
+                        if (MovingForm != null || WindowHolderSelectionBox != null)
+                            return;
 
 						ev.StopPropagation();
 						ev.PreventDefault();
@@ -792,8 +799,8 @@ namespace Test
 
 					butt.OnMouseEnter = (ev) =>
 					{                        
-						if(MovingForm != null)
-							return;
+						if(MovingForm != null || WindowHolderSelectionBox != null)
+							return;                        
 
                         SetCursor(Cursor.Default);
                         
@@ -810,8 +817,8 @@ namespace Test
 
 					butt.OnMouseLeave = (ev) =>
 					{
-						if(MovingForm != null)
-							return;
+                        if (MovingForm != null || WindowHolderSelectionBox != null)
+                            return;
 
 						butt.Style.BackgroundColor = "white";
 						butt.Style.Color = "black";
@@ -828,8 +835,8 @@ namespace Test
 
 					butt.OnMouseUp = (ev) =>
 					{
-						if(MovingForm != null)
-							return;
+                        if (MovingForm != null || WindowHolderSelectionBox != null)
+                            return;
 
 						ev.StopPropagation();
 						ev.PreventDefault();
@@ -852,8 +859,8 @@ namespace Test
 
 					butt.OnMouseUp = (ev) =>
 					{
-						if(MovingForm != null)
-							return;
+                        if (MovingForm != null || WindowHolderSelectionBox != null)
+                            return;
 
 						ev.StopPropagation();
 						ev.PreventDefault();
@@ -874,8 +881,8 @@ namespace Test
 				default:
 					butt.OnMouseUp = (ev) =>
 					{
-						if(MovingForm != null)
-							return;
+                        if (MovingForm != null || WindowHolderSelectionBox != null)
+                            return;
 
 						ev.StopPropagation();
 						ev.PreventDefault();
@@ -887,8 +894,8 @@ namespace Test
 
 			butt.OnMouseMove = (ev) =>
 			{
-				if(MovingForm != null)
-					return;
+                if (MovingForm != null || WindowHolderSelectionBox != null)
+                    return;
 
 				ev.StopImmediatePropagation();
 				ev.PreventDefault();				
@@ -898,8 +905,8 @@ namespace Test
 			{
 				butt.OnMouseDown = (ev) =>
 				{
-					if(MovingForm != null)
-						return;
+                    if (MovingForm != null || WindowHolderSelectionBox != null)
+                        return;
 
 					Mouse_Down = true;
 
@@ -914,8 +921,8 @@ namespace Test
 
 				butt.OnMouseEnter = (ev) =>
 				{
-					if(MovingForm != null)
-						return;
+                    if (MovingForm != null || WindowHolderSelectionBox != null)
+                        return;
                     SetCursor(Cursor.Default);
 
                     if (Mouse_Down)
@@ -931,8 +938,8 @@ namespace Test
 
 				butt.OnMouseLeave = (ev) =>
 				{
-					if(MovingForm != null)
-						return;
+                    if (MovingForm != null || WindowHolderSelectionBox != null)
+                        return;
 
 					butt.Style.BackgroundColor = "white";
 					butt.Style.Color = "black";
@@ -1109,7 +1116,11 @@ namespace Test
 				{
 					SetCursor(Cursor.Default);
 					return;
-				}
+				}else if(WindowHolderSelectionBox != null)
+                {
+                    SetCursor(Cursor.Default);
+                    return;
+                }
 
 				if(MoveAction == MouseMoveAction.TopLeftResize || mev.LayerX <= ResizeCorners && mev.LayerY <= ResizeCorners)
 				{					
