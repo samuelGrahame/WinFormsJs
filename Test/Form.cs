@@ -215,7 +215,7 @@ namespace Test
 
 			input.OnMouseUp = (ev) =>
 			{
-				if(MovingForm != null)
+				if(MidleOfAction())
 					return;
 
 				ev.StopPropagation();								
@@ -236,7 +236,7 @@ namespace Test
 			
 			input.OnMouseDown = (ev) =>
 			{
-				if(MovingForm != null)
+				if(MidleOfAction())
 					return;
 
 				Mouse_Down = true;
@@ -248,7 +248,7 @@ namespace Test
 
 			input.OnMouseEnter = (ev) =>
 			{
-				if(MovingForm != null)
+				if(MidleOfAction())
 					return;
 				if(InputFocused)
 				{
@@ -262,7 +262,7 @@ namespace Test
 
 			input.OnMouseLeave = (ev) =>
 			{
-				if(MovingForm != null)
+				if(MidleOfAction())
 					return;
 				
 				if(InputFocused)
@@ -317,7 +317,7 @@ namespace Test
 
 			butt.OnMouseUp = (ev) =>
 			{
-				if(MovingForm != null)
+				if(MidleOfAction())
 					return;
 
 				ev.StopPropagation();
@@ -328,7 +328,7 @@ namespace Test
 
 			butt.OnMouseDown = (ev) =>
 			{
-				if(MovingForm != null)
+				if(MidleOfAction())
 					return;
 
 				Mouse_Down = true;
@@ -343,7 +343,7 @@ namespace Test
 
 			butt.OnMouseEnter = (ev) =>
 			{
-				if(MovingForm != null)
+				if(MidleOfAction())
 					return;
 
 				if(Mouse_Down)
@@ -358,7 +358,7 @@ namespace Test
 
 			butt.OnMouseLeave = (ev) =>
 			{
-				if(MovingForm != null)
+				if(MidleOfAction())
 					return;
 
 				butt.Style.Background = IMAGE_WinIcon;
@@ -403,6 +403,11 @@ namespace Test
 			{
                 if(MovingForm == null)
                 {
+                    if(WindowHolderSelectionBox != null)
+                    {
+                        WindowHolderSelectionBox.Remove();
+                        WindowHolderSelectionBox = null;
+                    }
                     WindowHolderSelectionBox = new HTMLDivElement();
                     WindowHolderSelectionBox.Style.Position = Position.Absolute;
                     WindowHolderSelectionBox.Style.Visibility = Visibility.Visible;

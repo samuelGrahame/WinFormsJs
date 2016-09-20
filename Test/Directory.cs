@@ -12,7 +12,23 @@ namespace Test
         {
             if(path == FileExplorer.DesktopPath)
             {
-                return new string[] { string.Format("{0}/New Folder", path) };
+                if(true)
+                {
+                    var pathList = new List<string>();
+                    for (int i = 0; i < 100; i++)
+                    {
+                        pathList.Add(string.Format("{0}/New Folder {1}", path, i));
+                    }
+                    return pathList.ToArray();
+                }
+                else
+                {
+                    //return new string[] {
+                    //string.Format("{0}/New Folder 1", path),
+                    //string.Format("{0}/New Folder 2", path),
+                    //string.Format("{0}/New Folder 3", path),
+                    //string.Format("{0}/New Folder 4", path)};
+                }                
             }
 
             return null;
