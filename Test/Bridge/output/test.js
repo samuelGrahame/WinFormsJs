@@ -67,12 +67,13 @@
 
     Bridge.define("Test.FileExplorerNode", {
         statics: {
-            createNode: function (path, nvt, IsFile) {
+            createNode: function (path, nvt, parent, IsFile) {
                 if (IsFile === void 0) { IsFile = false; }
                 var fen = Bridge.merge(new Test.FileExplorerNode(), {
                     setIsFile: IsFile,
                     setnodeViewType: nvt
                 } );
+                fen.parent = parent;
                 fen.setName(Test.Path.getFileName(path));
                 fen.setDirectory(Test.Path.getDirectoryName(path));
                 fen.setFullPath(path);
@@ -85,6 +86,7 @@
         nodeImage: null,
         nodeText: null,
         nodeState: 0,
+        parent: null,
         config: {
             properties: {
                 Name: null,
@@ -120,11 +122,13 @@
 
                 this.getNodeBase().addEventListener("dblclick", Bridge.fn.bind(this, $_.Test.FileExplorerNode.f1));
 
-                this.getNodeBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.FileExplorerNode.f2));
+                this.getNodeBase().addEventListener("mouseup", Bridge.fn.bind(this, $_.Test.FileExplorerNode.f2));
 
-                this.getNodeBase().addEventListener("mouseenter", Bridge.fn.bind(this, $_.Test.FileExplorerNode.f3));
+                this.getNodeBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.FileExplorerNode.f3));
 
-                this.getNodeBase().addEventListener("mouseleave", Bridge.fn.bind(this, $_.Test.FileExplorerNode.f4));
+                this.getNodeBase().addEventListener("mouseenter", Bridge.fn.bind(this, $_.Test.FileExplorerNode.f4));
+
+                this.getNodeBase().addEventListener("mouseleave", Bridge.fn.bind(this, $_.Test.FileExplorerNode.f5));
 
                 if (this.getnodeViewType() === Test.NodeViewType.Medium_Icons) {
                     $(this.getNodeBase()).css("width", 76).css("height", 70);
@@ -142,15 +146,13 @@
                     img.style.position = "absolute";
                     img.style.display = "block";
 
-                    //position:absolute;
-                    //NodeImage.Style.BackgroundSize = "contain";
-                    //NodeImage.Style.BackgroundRepeat = BackgroundRepeat.NoRepeat;
-
                     if (this.getIsFile()) {
                         img.setAttribute("src", Test.FileExplorer.IMAGE_File);
                     } else {
                         img.setAttribute("src", Test.FileExplorer.IMAGE_Folder);
                     } //NodeImage.Style.Background = FileExplorer.IMAGE_Folder;
+
+                    Test.Form.disableStateDrag(img);
 
                     this.nodeImage.appendChild(img);
 
@@ -158,6 +160,12 @@
                     this.nodeText.style.fontFamily = "Segoe UI";
                     this.nodeText.style.fontSize = "10pt";
                     this.nodeText.style.textAlign = "center";
+                    this.nodeText.style.cursor = "default";
+
+                    Test.Form.changeStateTextSelection(this.nodeText, false);
+                    Test.Form.changeStateTextSelection(this.nodeImage, false);
+                    Test.Form.changeStateTextSelection(this.getNodeBase(), false);
+                    Test.Form.changeStateTextSelection(img, false);
 
                     $(this.nodeText).css("width", 74).css("height", 20).css("left", 2).css("top", 48);
 
@@ -175,19 +183,16 @@
                     this.getNodeBase().style.backgroundColor = "";
                     this.getNodeBase().style.borderColor = "rgba(255, 255, 255, 0)";
                     break;
+                case Test.FileExplorerNode.FileExplorerState.HoverSelected: 
+                case Test.FileExplorerNode.FileExplorerState.HoverFocused: 
                 case Test.FileExplorerNode.FileExplorerState.Hover: 
                     this.getNodeBase().style.backgroundColor = "rgba(255, 255, 255, 0.2)";
                     this.getNodeBase().style.borderColor = "rgba(255, 255, 255, 0.5)";
                     break;
+                case Test.FileExplorerNode.FileExplorerState.Selected: 
                 case Test.FileExplorerNode.FileExplorerState.Focused: 
                     this.getNodeBase().style.backgroundColor = "rgba(255, 255, 255, 0.4)";
                     this.getNodeBase().style.borderColor = "rgba(255, 255, 255, 0.5)";
-                    break;
-                case Test.FileExplorerNode.FileExplorerState.Selected: 
-                    break;
-                case Test.FileExplorerNode.FileExplorerState.HoverFocused: 
-                    this.getNodeBase().style.backgroundColor = "rgba(255, 255, 255, 0.4)";
-                    this.getNodeBase().style.borderColor = "rgba(255, 255, 255, 0.6)";
                     break;
                 default: 
                     break;
@@ -207,39 +212,53 @@
     Bridge.apply($_.Test.FileExplorerNode, {
         f1: function (ev) {
             if (!Test.Form.midleOfAction()) {
+                this.parent.clearSelection();
+
                 Test.Process.start(this.getFullPath());
             }
         },
         f2: function (ev) {
             if (!Test.Form.midleOfAction()) {
-                if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.HoverFocused || this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Focused) {
-                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Hover);
-                } else if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Selected) {
-
-                } else {
-                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.HoverFocused);
-                }
-                ev.stopPropagation();
+                // did i drag...
+                this.parent.clearSelection(this);
             }
         },
         f3: function (ev) {
             if (!Test.Form.midleOfAction()) {
-                if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Focused || this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.HoverFocused) {
-                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.HoverFocused);
-                } else {
-                    if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Selected) {
-                        this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Hover);
-                    } else {
-                        this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Hover);
+                var selectionCount = this.parent.getSelectionCount(this);
+
+                if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Selected) {
+                    if (selectionCount === 0) {
+                        this.parent.clearSelection(this);
                     }
+                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Focused);
+                } else {
+                    if (selectionCount === 0) {
+                        this.parent.clearSelection(this);
+                    }
+                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Focused);
                 }
                 ev.stopPropagation();
             }
         },
         f4: function (ev) {
             if (!Test.Form.midleOfAction()) {
+                if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Focused || this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.HoverFocused) {
+                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.HoverFocused);
+                } else if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Selected || this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.HoverSelected) {
+                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.HoverSelected);
+                } else {
+                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Hover);
+                }
+                ev.stopPropagation();
+            }
+        },
+        f5: function (ev) {
+            if (!Test.Form.midleOfAction()) {
                 if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.HoverFocused || this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Focused) {
                     this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Focused);
+                } else if (this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.HoverSelected || this.getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Selected) {
+                    this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Selected);
                 } else {
                     this.setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.None);
                 }
@@ -299,6 +318,54 @@
             }
             this.loadedNodes = new (System.Collections.Generic.List$1(Test.FileExplorerNode))();
         },
+        getSelectionCount: function (DontInclude) {
+            if (DontInclude === void 0) { DontInclude = null; }
+            var x = 0;
+            for (var i = 0; i < this.loadedNodes.getCount(); i = (i + 1) | 0) {
+                if (this.loadedNodes.getItem(i) != null && !Bridge.referenceEquals(this.loadedNodes.getItem(i), DontInclude)) {
+                    var htmlNode = this.loadedNodes.getItem(i).getNodeBase();
+                    if (htmlNode != null) {
+                        if (this.loadedNodes.getItem(i).getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Selected || this.loadedNodes.getItem(i).getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.HoverSelected) {
+                            x = (x + 1) | 0;
+                        }
+                    }
+                }
+            }
+            return x;
+        },
+        clearSelection: function (DontInclude) {
+            if (DontInclude === void 0) { DontInclude = null; }
+            for (var i = 0; i < this.loadedNodes.getCount(); i = (i + 1) | 0) {
+                if (this.loadedNodes.getItem(i) != null && !Bridge.referenceEquals(this.loadedNodes.getItem(i), DontInclude)) {
+                    var htmlNode = this.loadedNodes.getItem(i).getNodeBase();
+                    if (htmlNode != null) {
+                        this.loadedNodes.getItem(i).setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.None);
+                    }
+                }
+            }
+        },
+        setFocus: function (index) {
+            this.setFocus$1(this.loadedNodes.getItem(index));
+        },
+        setFocus$1: function (node) {
+            for (var i = 0; i < this.loadedNodes.getCount(); i = (i + 1) | 0) {
+                if (this.loadedNodes.getItem(i) != null) {
+                    var htmlNode = this.loadedNodes.getItem(i).getNodeBase();
+                    if (htmlNode != null) {
+                        if (Bridge.referenceEquals(this.loadedNodes.getItem(i), node)) {
+                            if (this.loadedNodes.getItem(i).getNodeExplorerState() === Test.FileExplorerNode.FileExplorerState.Hover) {
+                                this.loadedNodes.getItem(i).setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.HoverFocused);
+                            } else {
+                                this.loadedNodes.getItem(i).setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Focused);
+                            }
+                        } else {
+                            this.loadedNodes.getItem(i).setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.None);
+                        }
+
+                    }
+                }
+            }
+        },
         refresh: function () {
             if (this.loadedNodes == null) {
                 this.loadedNodes = new (System.Collections.Generic.List$1(Test.FileExplorerNode))();
@@ -318,11 +385,11 @@
             var Folders = Test.Directory.getDirectories(this.getPath());
 
             for (var i = 0; i < Files.length; i = (i + 1) | 0) {
-                this.loadedNodes.add(Test.FileExplorerNode.createNode(Files[i], this.getNodeViewType(), true));
+                this.loadedNodes.add(Test.FileExplorerNode.createNode(Files[i], this.getNodeViewType(), this, true));
             }
 
             for (var i1 = 0; i1 < Folders.length; i1 = (i1 + 1) | 0) {
-                this.loadedNodes.add(Test.FileExplorerNode.createNode(Folders[i1], this.getNodeViewType()));
+                this.loadedNodes.add(Test.FileExplorerNode.createNode(Folders[i1], this.getNodeViewType(), this));
             }
 
             // get the order type!! #TODO# sort items
@@ -359,7 +426,8 @@
             Hover: 1,
             Focused: 2,
             Selected: 3,
-            HoverFocused: 4
+            HoverFocused: 4,
+            HoverSelected: 5
         }
     });
 
@@ -543,6 +611,20 @@
 
                 return input;
             },
+            changeStateTextSelection: function (element, state) {
+                if (state) {
+                    $(element).css("user-select", "text");
+                } else {
+                    $(element).css("user-select", "none");
+                }
+            },
+            disableStateDrag: function (element) {
+                if (Bridge.is(element, HTMLImageElement)) {
+                    element.ondragstart = $_.Test.Form.f3;
+                } else {
+                    $(element).css("user-drag:", "none");
+                }
+            },
             createStartButton: function () {
                 var butt = document.createElement('div');
 
@@ -631,11 +713,11 @@
                 Test.Form.getWindowHolder().style.zIndex = "0";
                 Test.Form.getWindowHolder().style.overflow = "auto";
 
-                Test.Form.getWindowHolder().addEventListener("mousedown", $_.Test.Form.f3);
+                Test.Form.getWindowHolder().addEventListener("mousedown", $_.Test.Form.f4);
 
                 //SetBodyOverLay();
 
-                $(Test.Form.getWindowHolder()).css("user-select", "none");
+                Test.Form.changeStateTextSelection(Test.Form.getWindowHolder(), false);
 
                 Test.Form.setTaskBar(document.createElement('div'));
                 Test.Form.getTaskBar().style.position = "absolute";
@@ -646,7 +728,7 @@
                 Test.Form.getTaskBar().style.left = "0";
                 Test.Form.getTaskBar().style.zIndex = (2147483647).toString();
 
-                $(Test.Form.getTaskBar()).css("user-select", "none");
+                Test.Form.changeStateTextSelection(Test.Form.getTaskBar(), false);
 
                 Test.Form.getTaskBar().style.backgroundColor = "#101010";
 
@@ -654,9 +736,9 @@
 
                 Test.Form.setInputStartSearch(Test.Form.createStartSearchInput());
 
-                var mouseMove = $_.Test.Form.f4;
+                var mouseMove = $_.Test.Form.f5;
 
-                window.addEventListener("mouseup", $_.Test.Form.f6);
+                window.addEventListener("mouseup", $_.Test.Form.f7);
 
                 window.addEventListener("mousemove", mouseMove);
 
@@ -722,11 +804,11 @@
 
             this.getBodyOverLay().style.visibility = "collapse";
 
-            this.getBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f7));
+            this.getBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f8));
 
-            this.getHeading().addEventListener("dblclick", Bridge.fn.bind(this, $_.Test.Form.f8));
+            this.getHeading().addEventListener("dblclick", Bridge.fn.bind(this, $_.Test.Form.f9));
 
-            this.getBase().addEventListener("mousemove", Bridge.fn.bind(this, $_.Test.Form.f9));
+            this.getBase().addEventListener("mousemove", Bridge.fn.bind(this, $_.Test.Form.f10));
 
             this.getBase().style.position = "absolute";
 
@@ -744,7 +826,7 @@
             this.getHeading().style.fontFamily = "Segoe UI";
             this.getHeading().style.textAlign = 7;
 
-            this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f10));
+            this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f11));
 
             this.getHeadingTitle().style.textIndent = "3px";
             this.getHeadingTitle().setAttribute("IL", "1"); // Internal Label
@@ -766,9 +848,9 @@
             this.getBody().style.position = "absolute";
             this.getBody().style.backgroundColor = Test.Form.getWindow_DefaultBackgroundColor();
 
-            this.getBody().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f11));
+            this.getBody().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f12));
 
-            this.getBody().addEventListener("mousemove", $_.Test.Form.f12);
+            this.getBody().addEventListener("mousemove", $_.Test.Form.f13);
 
             this.getBodyOverLay().style.top = "31px";
             this.getBodyOverLay().style.height = "-webkit-calc(100% - 33px)"; // -webkit-calc(100% - 60px)
@@ -779,11 +861,11 @@
             this.getBodyOverLay().style.opacity = Test.Form.getShowBodyOverLay() ? "0.5" : "0";
             this.getBodyOverLay().style.backgroundColor = "black";
 
-            this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f13));
+            this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f14));
 
-            this.getBody().addEventListener("mouseleave", $_.Test.Form.f14);
+            this.getBody().addEventListener("mouseleave", $_.Test.Form.f15);
 
-            this.getBodyOverLay().addEventListener("mouseenter", Bridge.fn.bind(this, $_.Test.Form.f15));
+            this.getBodyOverLay().addEventListener("mouseenter", Bridge.fn.bind(this, $_.Test.Form.f16));
 
             $(this.getBase()).css("width", Test.Form.getWindow_DefaultWidth()).css("height", Test.Form.getWindow_DefaultHeight());
 
@@ -909,7 +991,7 @@
 
                         Test.Form.setActiveForm(this);
                     });
-                    butt.onmouseup = Bridge.fn.bind(this, $_.Test.Form.f16);
+                    butt.onmouseup = Bridge.fn.bind(this, $_.Test.Form.f17);
                     butt.onmouseenter = Bridge.fn.bind(this, function (ev) {
                         if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                             return;
@@ -983,11 +1065,11 @@
                 case Test.Form.FormButtonType.Help: 
                     break;
                 default: 
-                    butt.onmouseup = $_.Test.Form.f17;
+                    butt.onmouseup = $_.Test.Form.f18;
                     break;
             }
 
-            butt.onmousemove = $_.Test.Form.f18;
+            butt.onmousemove = $_.Test.Form.f19;
 
             if (Type !== Test.Form.FormButtonType.Close) {
                 butt.onmousedown = Bridge.fn.bind(this, function (ev) {
@@ -1061,11 +1143,7 @@
             while ($t.moveNext()) {
                 var item = $t.getCurrent();
                 if ((Bridge.referenceEquals(item.tagName.toLowerCase(), "input") || Bridge.referenceEquals(item.tagName.toLowerCase(), "span") || Bridge.referenceEquals(item.tagName.toLowerCase(), "textarea")) && !Bridge.referenceEquals(item.getAttribute("IL"), "1")) {
-                    if (TurnOff) {
-                        $(item).css("user-select", "none");
-                    } else {
-                        $(item).css("user-select", "text");
-                    }
+                    Test.Form.changeStateTextSelection(item, !TurnOff);
                 }
                 if (item.childElementCount > 0) {
                     this.changeSelectionState(item.children, TurnOff);
@@ -1115,7 +1193,7 @@
             Test.Form.visibleForm.remove(this);
 
             if (this.getBase() != null) {
-                $(this.getBase()).fadeOut(Test.Form.getFadeLength(), Bridge.fn.bind(this, $_.Test.Form.f19));
+                $(this.getBase()).fadeOut(Test.Form.getFadeLength(), Bridge.fn.bind(this, $_.Test.Form.f20));
             }
 
             Test.Form.calculateZOrder();
@@ -1168,6 +1246,9 @@
             Test.Form.setActiveForm(null);
         },
         f3: function (ev) {
+            ev.preventDefault();
+        },
+        f4: function (ev) {
             if (Test.Form.movingForm == null) {
                 Test.Form.setWindowHolderSelectionBox(document.createElement('div'));
                 Test.Form.getWindowHolderSelectionBox().style.position = "absolute";
@@ -1186,12 +1267,14 @@
 
                 Test.Form.getWindowHolderSelectionBox().style.zIndex = "0";
 
+                Test.Form.window_Desktop.clearSelection();
+
                 Test.Form.setMouse_Down(true);
 
                 Test.Form.setActiveForm(null);
             }
         },
-        f4: function (ev) {
+        f5: function (ev) {
             var mev = ev;
 
             if (Test.Form.movingForm != null) {
@@ -1380,16 +1463,31 @@
                     Test.Form.getWindowHolderSelectionBox().style.width = System.String.concat(width, "px");
                     Test.Form.getWindowHolderSelectionBox().style.height = System.String.concat(height, "px");
 
+                    var SelectionRec = new Test.Rectange.$ctor1(left, top, width, height);
+
+                    for (var i = 0; i < Test.Form.window_Desktop.loadedNodes.getCount(); i = (i + 1) | 0) {
+                        if (Test.Form.window_Desktop.loadedNodes.getItem(i) != null) {
+                            var htmlNode = Test.Form.window_Desktop.loadedNodes.getItem(i).getNodeBase();
+                            if (htmlNode != null) {
+                                if (Test.Rectange.rectOverlap(Test.Rectange.createFromHTMLElement(htmlNode).$clone(), SelectionRec.$clone())) {
+                                    Test.Form.window_Desktop.loadedNodes.getItem(i).setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.Selected);
+                                } else {
+                                    Test.Form.window_Desktop.loadedNodes.getItem(i).setNodeExplorerState(Test.FileExplorerNode.FileExplorerState.None);
+                                }
+                            }
+                        }
+                    }
+
                     mev.stopImmediatePropagation();
                     mev.preventDefault();
                 }
             }
         },
-        f5: function () {
+        f6: function () {
             Test.Form.getWindowHolderSelectionBox().remove();
             Test.Form.setWindowHolderSelectionBox(null);
         },
-        f6: function (ev) {
+        f7: function (ev) {
             if (Test.Form.movingForm != null) {
                 Test.Form.movingForm.getBodyOverLay().style.visibility = "collapse";
                 Test.Form.movingForm.changeSelectionState$1(false);
@@ -1399,10 +1497,10 @@
             Test.Form.setMouse_Down(false);
             Test.Form.moveAction = Test.Form.MouseMoveAction.Move;
             if (Test.Form.getWindowHolderSelectionBox() != null) {
-                $(Test.Form.getWindowHolderSelectionBox()).fadeOut(Test.Form.getFadeLength(), $_.Test.Form.f5);
+                $(Test.Form.getWindowHolderSelectionBox()).fadeOut(Test.Form.getFadeLength(), $_.Test.Form.f6);
             }
         },
-        f7: function (ev) {
+        f8: function (ev) {
             var mev = ev;
 
             Test.Form.setMouse_Down(true);
@@ -1468,12 +1566,12 @@
 
             mev.stopPropagation();
         },
-        f8: function (ev) {
+        f9: function (ev) {
             this.changeWindowState();
             ev.preventDefault();
             ev.stopPropagation();
         },
-        f9: function (ev) {
+        f10: function (ev) {
             var mev = ev;
             if (Test.Form.movingForm != null && Test.Form.moveAction === Test.Form.MouseMoveAction.Move) {
                 this.setCursor("default");
@@ -1506,7 +1604,7 @@
                 this.setCursor("default");
             }
         },
-        f10: function (ev) {
+        f11: function (ev) {
             Test.Form.setBodyOverLay();
 
             if (this.getwindowState() === Test.Form.WindowState.Maximized) {
@@ -1520,40 +1618,30 @@
 
             Test.Form.setActiveForm(this);
         },
-        f11: function (ev) {
+        f12: function (ev) {
             Test.Form.setActiveForm(this);
             ev.stopPropagation();
         },
-        f12: function (ev) {
+        f13: function (ev) {
             if (Test.Form.movingForm == null) {
                 ev.stopPropagation();
             }
         },
-        f13: function (ev) {
+        f14: function (ev) {
             this.getBodyOverLay().style.visibility = "collapse";
             Test.Form.setActiveForm(this);
         },
-        f14: function (ev) {
+        f15: function (ev) {
             if (Test.Form.movingForm == null) {
                 Test.Form.setBodyOverLay();
             }
         },
-        f15: function (ev) {
+        f16: function (ev) {
             if (Test.Form.getWindowHolderSelectionBox() == null && Test.Form.movingForm == null) {
                 this.getBodyOverLay().style.visibility = "collapse";
             } else {
                 this.getBodyOverLay().style.visibility = "visible";
             }
-        },
-        f16: function (ev) {
-            if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
-                return;
-            }
-
-            ev.stopPropagation();
-            ev.preventDefault();
-
-            this.close();
         },
         f17: function (ev) {
             if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
@@ -1563,9 +1651,19 @@
             ev.stopPropagation();
             ev.preventDefault();
 
-            Test.Form.setMouse_Down(false);
+            this.close();
         },
         f18: function (ev) {
+            if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
+                return;
+            }
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            Test.Form.setMouse_Down(false);
+        },
+        f19: function (ev) {
             if (Test.Form.movingForm != null || Test.Form.getWindowHolderSelectionBox() != null) {
                 return;
             }
@@ -1573,7 +1671,7 @@
             ev.stopImmediatePropagation();
             ev.preventDefault();
         },
-        f19: function () {
+        f20: function () {
             $(this.getBase()).empty();
             this.getBase().remove();
             this.setBase(null);
@@ -1689,6 +1787,73 @@
 
                 return null;
             }
+        }
+    });
+
+    Bridge.define("Test.Rectange", {
+        $kind: "struct",
+        statics: {
+            valueInRange: function (value, min, max) {
+                return (value >= min) && (value <= max);
+            },
+            rectOverlap: function (A, B) {
+                var xOverlap = Test.Rectange.valueInRange(A.x, B.x, ((B.x + B.width) | 0)) || Test.Rectange.valueInRange(B.x, A.x, ((A.x + A.width) | 0));
+
+                var yOverlap = Test.Rectange.valueInRange(A.y, B.y, ((B.y + B.height) | 0)) || Test.Rectange.valueInRange(B.y, A.y, ((A.y + A.height) | 0));
+
+                return xOverlap && yOverlap;
+            },
+            createFromHTMLElement: function (element) {
+                if (element == null) {
+                    return new Test.Rectange.ctor();
+                }
+
+                var obj = $(element);
+                return Bridge.merge(new Test.Rectange.ctor(), {
+                    x: parseInt(obj.css("left")),
+                    y: parseInt(obj.css("top")),
+                    width: parseInt(obj.css("width")),
+                    height: parseInt(obj.css("height"))
+                } );
+            },
+            getDefaultValue: function () { return new Test.Rectange(); }
+        },
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+        $ctor1: function (x, y, width, height) {
+            this.$initialize();
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        },
+        ctor: function () {
+            this.$initialize();
+        },
+        getHashCode: function () {
+            var hash = 17;
+            hash = hash * 23 + 3653948339;
+            hash = hash * 23 + (this.x == null ? 0 : Bridge.getHashCode(this.x));
+            hash = hash * 23 + (this.y == null ? 0 : Bridge.getHashCode(this.y));
+            hash = hash * 23 + (this.width == null ? 0 : Bridge.getHashCode(this.width));
+            hash = hash * 23 + (this.height == null ? 0 : Bridge.getHashCode(this.height));
+            return hash;
+        },
+        equals: function (o) {
+            if (!Bridge.is(o, Test.Rectange)) {
+                return false;
+            }
+            return Bridge.equals(this.x, o.x) && Bridge.equals(this.y, o.y) && Bridge.equals(this.width, o.width) && Bridge.equals(this.height, o.height);
+        },
+        $clone: function (to) {
+            var s = to || new Test.Rectange();
+            s.x = this.x;
+            s.y = this.y;
+            s.width = this.width;
+            s.height = this.height;
+            return s;
         }
     });
 

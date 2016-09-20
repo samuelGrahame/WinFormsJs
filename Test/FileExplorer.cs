@@ -24,7 +24,7 @@ namespace Test
             Element = element;
         }        
 
-        private List<FileExplorerNode> LoadedNodes = new List<FileExplorerNode>();
+        public List<FileExplorerNode> LoadedNodes = new List<FileExplorerNode>();
 
         public string Path
         {
@@ -69,6 +69,74 @@ namespace Test
             LoadedNodes = new List<FileExplorerNode>();
         }
 
+        public int GetSelectionCount(FileExplorerNode DontInclude = null)
+        {
+            int x = 0;
+            for (int i = 0; i < LoadedNodes.Count; i++)
+            {
+                if (LoadedNodes[i] != null && LoadedNodes[i] != DontInclude)
+                {
+                    var htmlNode = LoadedNodes[i].NodeBase;
+                    if (htmlNode != null)
+                    {
+                        if (LoadedNodes[i].NodeExplorerState == FileExplorerNode.FileExplorerState.Selected || LoadedNodes[i].NodeExplorerState == FileExplorerNode.FileExplorerState.HoverSelected)
+                            x++;
+                    }
+                }
+            }
+            return x;
+        }
+
+        public void ClearSelection(FileExplorerNode DontInclude = null)
+        {
+            for (int i = 0; i < LoadedNodes.Count; i++)
+            {
+                if (LoadedNodes[i] != null && LoadedNodes[i] != DontInclude)
+                {
+                    var htmlNode = LoadedNodes[i].NodeBase;
+                    if (htmlNode != null)
+                    {
+                        LoadedNodes[i].NodeExplorerState = FileExplorerNode.FileExplorerState.None;
+                    }
+                }
+            }
+        }
+
+        public void SetFocus(int index)
+        {
+            SetFocus(LoadedNodes[index]);
+        }
+
+        public void SetFocus(FileExplorerNode node)
+        {
+            for (int i = 0; i < LoadedNodes.Count; i++)
+            {
+                if (LoadedNodes[i] != null)
+                {
+                    var htmlNode = LoadedNodes[i].NodeBase;
+                    if (htmlNode != null)
+                    {
+                        if(LoadedNodes[i] == node)
+                        {
+                            if(LoadedNodes[i].NodeExplorerState == FileExplorerNode.FileExplorerState.Hover)
+                            {
+                                LoadedNodes[i].NodeExplorerState = FileExplorerNode.FileExplorerState.HoverFocused;
+                            }
+                            else
+                            {
+                                LoadedNodes[i].NodeExplorerState = FileExplorerNode.FileExplorerState.Focused;
+                            }                            
+                        }
+                        else
+                        {
+                            LoadedNodes[i].NodeExplorerState = FileExplorerNode.FileExplorerState.None;
+                        }
+                        
+                    }
+                }
+            }
+        }
+
         public void Refresh()
         {            
             if (LoadedNodes == null)
@@ -88,12 +156,12 @@ namespace Test
 
             for (int i = 0; i < Files.Length; i++)
             {
-                LoadedNodes.Add(FileExplorerNode.CreateNode(Files[i], NodeViewType, true));                
+                LoadedNodes.Add(FileExplorerNode.CreateNode(Files[i], NodeViewType, this, true));                
             }
 
             for (int i = 0; i < Folders.Length; i++)
             {
-                LoadedNodes.Add(FileExplorerNode.CreateNode(Folders[i], NodeViewType));
+                LoadedNodes.Add(FileExplorerNode.CreateNode(Folders[i], NodeViewType, this));
             }
 
             // get the order type!! #TODO# sort items
@@ -156,6 +224,8 @@ namespace Test
 
         private FileExplorerState nodeState;
 
+        protected FileExplorer parent;
+
         public FileExplorerState NodeExplorerState
         {
             get { return nodeState; }
@@ -190,7 +260,18 @@ namespace Test
                 {
                     if (!Form.MidleOfAction())
                     {
+                        parent.ClearSelection();
+
                         Process.Start(FullPath);
+                    }
+                });
+
+                NodeBase.AddEventListener(EventType.MouseUp, (ev) => 
+                {
+                    if (!Form.MidleOfAction())
+                    {
+                        // did i drag...
+                        parent.ClearSelection(this);
                     }
                 });
 
@@ -198,15 +279,19 @@ namespace Test
                 {
                     if (!Form.MidleOfAction())
                     {
-                        if(NodeExplorerState == FileExplorerState.HoverFocused || NodeExplorerState == FileExplorerState.Focused)
-                        {
-                            NodeExplorerState = FileExplorerState.Hover;
-                        }else if (NodeExplorerState == FileExplorerState.Selected)
-                        {
+                        int selectionCount = parent.GetSelectionCount(this);
 
-                        }else
+                        if (NodeExplorerState == FileExplorerState.Selected)
                         {
-                            NodeExplorerState = FileExplorerState.HoverFocused;
+                            if (selectionCount == 0)
+                                parent.ClearSelection(this);
+                            NodeExplorerState = FileExplorerState.Focused;
+                        }
+                        else
+                        {
+                            if (selectionCount == 0)
+                                parent.ClearSelection(this);
+                            NodeExplorerState = FileExplorerState.Focused;
                         }
                         ev.StopPropagation();
                     }
@@ -217,11 +302,17 @@ namespace Test
                     if(!Form.MidleOfAction())
                     {
                         if (NodeExplorerState == FileExplorerState.Focused || NodeExplorerState == FileExplorerState.HoverFocused)
+                        {                            
                             NodeExplorerState = FileExplorerState.HoverFocused;
-                        else if (NodeExplorerState == FileExplorerState.Selected)
-                            NodeExplorerState = FileExplorerState.Hover;
+                        }
+                        else if (NodeExplorerState == FileExplorerState.Selected || NodeExplorerState == FileExplorerState.HoverSelected)
+                        {                            
+                            NodeExplorerState = FileExplorerState.HoverSelected;
+                        }
                         else
+                        {                            
                             NodeExplorerState = FileExplorerState.Hover;
+                        }
                         ev.StopPropagation();
                     }
                 });
@@ -231,11 +322,15 @@ namespace Test
                     if (!Form.MidleOfAction())
                     {
                         if (NodeExplorerState == FileExplorerState.HoverFocused || NodeExplorerState == FileExplorerState.Focused)
-                        {
+                        {                            
                             NodeExplorerState = FileExplorerState.Focused;
                         }
+                        else if (NodeExplorerState == FileExplorerState.HoverSelected || NodeExplorerState == FileExplorerState.Selected)
+                        {                            
+                            NodeExplorerState = FileExplorerState.Selected;
+                        }
                         else
-                        {
+                        {                            
                             NodeExplorerState = FileExplorerState.None;
                         }
                         ev.StopPropagation();
@@ -265,14 +360,12 @@ namespace Test
                     img.Style.Position = Position.Absolute;
                     img.Style.Display = Display.Block;
 
-                    //position:absolute;
-                    //NodeImage.Style.BackgroundSize = "contain";
-                    //NodeImage.Style.BackgroundRepeat = BackgroundRepeat.NoRepeat;
-
                     if (IsFile)
                         img.SetAttribute("src", FileExplorer.IMAGE_File);// NodeImage.Style.Background = FileExplorer.IMAGE_File;
                     else
                         img.SetAttribute("src", FileExplorer.IMAGE_Folder);//NodeImage.Style.Background = FileExplorer.IMAGE_Folder;
+
+                    Form.DisableStateDrag(img);
 
                     NodeImage.AppendChild(img);
 
@@ -280,6 +373,12 @@ namespace Test
                     NodeText.Style.FontFamily = "Segoe UI";
                     NodeText.Style.FontSize = "10pt";
                     NodeText.Style.TextAlign = TextAlign.Center;
+                    NodeText.Style.Cursor = Cursor.Default;
+
+                    Form.ChangeStateTextSelection(NodeText, false);
+                    Form.ChangeStateTextSelection(NodeImage, false);
+                    Form.ChangeStateTextSelection(NodeBase, false);
+                    Form.ChangeStateTextSelection(img, false);
 
                     jQuery.Select(NodeText).
                        Css("width", 74).
@@ -302,20 +401,22 @@ namespace Test
                     NodeBase.Style.BackgroundColor = "";
                     NodeBase.Style.BorderColor = "rgba(255, 255, 255, 0)";
                     break;
+                case FileExplorerState.HoverSelected:
+                case FileExplorerState.HoverFocused:
                 case FileExplorerState.Hover:
                     NodeBase.Style.BackgroundColor = "rgba(255, 255, 255, 0.2)";
                     NodeBase.Style.BorderColor = "rgba(255, 255, 255, 0.5)";
                     break;
+                case FileExplorerState.Selected:
                 case FileExplorerState.Focused:
                     NodeBase.Style.BackgroundColor = "rgba(255, 255, 255, 0.4)";
                     NodeBase.Style.BorderColor = "rgba(255, 255, 255, 0.5)";
                     break;
-                case FileExplorerState.Selected:
-                    break;
-                case FileExplorerState.HoverFocused:
-                    NodeBase.Style.BackgroundColor = "rgba(255, 255, 255, 0.4)";
-                    NodeBase.Style.BorderColor = "rgba(255, 255, 255, 0.6)";
-                    break;
+                //case FileExplorerState.HoverSelected:
+                //case FileExplorerState.HoverFocused:
+                //    NodeBase.Style.BackgroundColor = "rgba(255, 255, 255, 0.4)";
+                //    NodeBase.Style.BorderColor = "rgba(255, 255, 255, 0.6)";
+                //    break;
                 default:
                     break;
             }            
@@ -328,11 +429,13 @@ namespace Test
             Focused,
             Selected,
             HoverFocused,
+            HoverSelected,
         }
 
-        public static FileExplorerNode CreateNode(string path, NodeViewType nvt, bool IsFile = false)
+        public static FileExplorerNode CreateNode(string path, NodeViewType nvt, FileExplorer parent, bool IsFile = false)
         {
             var fen = new FileExplorerNode() { IsFile = IsFile, nodeViewType = nvt };
+            fen.parent = parent;
             fen.Name = Path.GetFileName(path);
             fen.Directory = Path.GetDirectoryName(path);
             fen.FullPath = path;

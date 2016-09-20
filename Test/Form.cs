@@ -278,7 +278,34 @@ namespace Test
 			return input;
 		}
 
-		public static HTMLDivElement CreateStartButton()
+        public static void ChangeStateTextSelection(HTMLElement element, bool state)
+        {            
+            if (state)
+            {
+                jQuery.Select(element).Css("user-select", "text");
+            }
+            else
+            {
+                jQuery.Select(element).Css("user-select", "none");                
+            }
+        }
+
+        public static void DisableStateDrag(HTMLElement element)
+        {
+            if(element is HTMLImageElement)
+            {
+                element.As<HTMLImageElement>().OnDragStart = (ev) =>
+                {
+                    ev.PreventDefault();
+                };
+            }
+            else
+            {
+                jQuery.Select(element).Css("user-drag:", "none");
+            }            
+        }
+
+        public static HTMLDivElement CreateStartButton()
 		{
 			var butt = new HTMLDivElement();
 
@@ -393,6 +420,8 @@ namespace Test
 
                     WindowHolderSelectionBox.Style.ZIndex = "0";
 
+                    Window_Desktop.ClearSelection();
+
                     Mouse_Down = true;
 
                     ActiveForm = null;
@@ -400,8 +429,8 @@ namespace Test
 			});            
     
             //SetBodyOverLay();
-
-            jQuery.Select(WindowHolder).Css("user-select", "none");
+            
+            ChangeStateTextSelection(WindowHolder, false);
 
 			TaskBar = new HTMLDivElement();
 			TaskBar.Style.Position = Position.Absolute;
@@ -412,7 +441,7 @@ namespace Test
 			TaskBar.Style.Left = "0";
 			TaskBar.Style.ZIndex = int.MaxValue.ToString();
 
-			jQuery.Select(TaskBar).Css("user-select", "none");
+            ChangeStateTextSelection(TaskBar, false);            
 
 			TaskBar.Style.BackgroundColor = "#101010";
 
@@ -679,6 +708,27 @@ namespace Test
 
 						WindowHolderSelectionBox.Style.Width = width + "px";
 						WindowHolderSelectionBox.Style.Height = height + "px";
+
+                        Rectange SelectionRec = new Rectange(left, top, width, height);
+
+                        for (int i = 0; i < Window_Desktop.LoadedNodes.Count; i++)
+                        {
+                            if(Window_Desktop.LoadedNodes[i] != null)
+                            {
+                                var htmlNode = Window_Desktop.LoadedNodes[i].NodeBase;
+                                if(htmlNode != null)
+                                {
+                                    if(Rectange.rectOverlap(Rectange.CreateFromHTMLElement(htmlNode), SelectionRec))
+                                    {
+                                        Window_Desktop.LoadedNodes[i].NodeExplorerState = FileExplorerNode.FileExplorerState.Selected;
+                                    }
+                                    else
+                                    {
+                                        Window_Desktop.LoadedNodes[i].NodeExplorerState = FileExplorerNode.FileExplorerState.None;
+                                    }
+                                }
+                            }
+                        }
 
 						mev.StopImmediatePropagation();
 						mev.PreventDefault();
@@ -980,15 +1030,8 @@ namespace Test
                 if((item.TagName.ToLower() == "input" ||
 					item.TagName.ToLower() == "span" ||
 					item.TagName.ToLower() == "textarea") && item.GetAttribute("IL") != "1")
-                {					
-                    if(TurnOff)
-                    {                        
-                        jQuery.Select(item).Css("user-select", "none");
-                    }
-                    else
-                    {
-                        jQuery.Select(item).Css("user-select", "text");
-                    }
+                {
+                    ChangeStateTextSelection(item, !TurnOff);                    
                 }
                 if(item.ChildElementCount > 0)
                 {
