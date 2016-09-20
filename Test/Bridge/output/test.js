@@ -161,6 +161,10 @@
                     this.nodeText.style.fontSize = "10pt";
                     this.nodeText.style.textAlign = "center";
                     this.nodeText.style.cursor = "default";
+                    this.nodeText.style.textShadow = "0px 2px 7px rgba(0, 0, 0, 0.5)";
+
+
+                    Test.Form.setInternalLabel(this.nodeText);
 
                     Test.Form.changeStateTextSelection(this.nodeText, false);
                     Test.Form.changeStateTextSelection(this.nodeImage, false);
@@ -753,6 +757,9 @@
                     setPath: Test.FileExplorer.DesktopPath
                 } );
             },
+            setInternalLabel: function (element) {
+                element.setAttribute("IL", "1"); // Internal Label
+            },
             calculateZOrder: function () {
                 if (Test.Form.visibleForm == null) {
                     return;
@@ -829,7 +836,7 @@
             this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.Test.Form.f11));
 
             this.getHeadingTitle().style.textIndent = "3px";
-            this.getHeadingTitle().setAttribute("IL", "1"); // Internal Label
+            Test.Form.setInternalLabel(this.getHeadingTitle()); // Internal Label
 
             this.setButtonClose(this.createFormButton(Test.Form.FormButtonType.Close));
             this.setButtonExpand(this.createFormButton(Test.Form.FormButtonType.Maximize));
@@ -1942,7 +1949,7 @@
         line: -1,
         setCommandLineElement: function (element) {
             if (Bridge.referenceEquals(element.tagName.toLowerCase(), "span")) {
-                element.setAttribute("IL", "1");
+                Test.Form.setInternalLabel(element);
                 $(element).css("user-select", "text");
 
                 element.addEventListener("mousemove", function (ev) {

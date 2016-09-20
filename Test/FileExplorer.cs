@@ -374,6 +374,9 @@ namespace Test
                     NodeText.Style.FontSize = "10pt";
                     NodeText.Style.TextAlign = TextAlign.Center;
                     NodeText.Style.Cursor = Cursor.Default;
+                    NodeText.Style.TextShadow = "0px 2px 7px rgba(0, 0, 0, 0.5)";
+
+                    Form.SetInternalLabel(NodeText);
 
                     Form.ChangeStateTextSelection(NodeText, false);
                     Form.ChangeStateTextSelection(NodeImage, false);

@@ -20,7 +20,7 @@ namespace Test
         {
             if(element.TagName.ToLower() == "span")
             {
-                element.SetAttribute("IL", "1");
+                SetInternalLabel(element);
                 jQuery.Select(element).Css("user-select", "text");
 
                 element.AddEventListener(EventType.MouseMove, (ev) => {

@@ -1039,6 +1039,11 @@ namespace Test
                 }
             }
         }
+
+        public static void SetInternalLabel(HTMLElement element)
+        {
+            element.SetAttribute("IL", "1"); // Internal Label
+        }
 		
 		public Form()
 		{			
@@ -1237,7 +1242,7 @@ namespace Test
             });
 
             HeadingTitle.Style.TextIndent = "3px";
-			HeadingTitle.SetAttribute("IL", "1"); // Internal Label
+            SetInternalLabel(HeadingTitle); // Internal Label
             
 			ButtonClose = CreateFormButton(FormButtonType.Close);
 			ButtonExpand = CreateFormButton(FormButtonType.Maximize);
