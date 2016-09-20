@@ -1,4 +1,4 @@
-﻿Bridge.assembly("Test", function ($asm, globals) {
+﻿Bridge.assembly("WinFormjs", function ($asm, globals) {
     "use strict";
 
     Bridge.define("WinFormjs.App", {

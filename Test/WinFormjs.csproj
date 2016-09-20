@@ -13,8 +13,8 @@
     <ProjectGuid>{B7090B20-EE28-493B-A941-885F97B379B2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Test</RootNamespace>
-    <AssemblyName>Test</AssemblyName>
+    <RootNamespace>WinFormjs</RootNamespace>
+    <AssemblyName>WinFormjs</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
