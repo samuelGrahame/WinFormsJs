@@ -8,6 +8,24 @@
          webkit-text-size-adjust:none;
          }
       </style>
+      <script>
+         // el === element on which horizontal scrolling is done 
+         // (can be container of scrolled element or body or any other ancestor)
+         var preventHistoryBack = function (e) {
+           var delta = e.deltaX || e.wheelDeltaX;
+         
+           if (! delta) {
+             return;
+           }
+         
+           window.WebKitMediaKeyError /*detect safari*/ && (delta *= -1);
+         
+           if (((el.scrollLeft + el.offsetWidth) === el.scrollWidth && delta > 0) || (el.scrollLeft === 0 && delta < 0) ) {
+             e.preventDefault();
+           }
+         };
+         el.addEventListener('mousewheel', preventHistoryBack);
+      </script>
    </head>
    <body>
       <script src="https://rawgit.com/samfromdeath/WinFormJs/master/Test/Bridge/output/jquery-1.12.0.min.js"></script>
