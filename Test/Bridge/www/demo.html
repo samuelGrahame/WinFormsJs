@@ -3,11 +3,11 @@
    <head>
       <meta charset="utf-8" />
       <title>WinFormjs</title>
-      <style>
-         *{
-         webkit-text-size-adjust:none;
-         }
-      </style>
+      <script>
+         window.onbeforeunload = function(e) {
+             return 'Would you like to close this application?';
+         }; 
+      </script>
    </head>
    <body>
       <script src="../output/jquery-1.12.0.min.js"></script>
