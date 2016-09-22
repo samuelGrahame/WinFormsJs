@@ -3,29 +3,15 @@
    <head>
       <meta charset="utf-8" />
       <title>WinFormjs</title>
-      <style>
-         *{
-         webkit-text-size-adjust:none;
-         }
-      </style>
       <script>
-         // el === element on which horizontal scrolling is done 
-         // (can be container of scrolled element or body or any other ancestor)
-         var preventHistoryBack = function (e) {
-           var delta = e.deltaX || e.wheelDeltaX;
-         
-           if (! delta) {
-             return;
-           }
-         
-           window.WebKitMediaKeyError /*detect safari*/ && (delta *= -1);
-         
-           if (((el.scrollLeft + el.offsetWidth) === el.scrollWidth && delta > 0) || (el.scrollLeft === 0 && delta < 0) ) {
-             e.preventDefault();
-           }
-         };
-         el.addEventListener('mousewheel', preventHistoryBack);
-      </script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-84585987-1', 'auto');
+  ga('send', 'pageview');
+</script>
    </head>
    <body>
       <script src="https://rawgit.com/samfromdeath/WinFormJs/master/Test/Bridge/output/jquery-1.12.0.min.js"></script>
