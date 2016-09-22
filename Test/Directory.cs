@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Bridge;
+using Bridge.Html5;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,7 +37,7 @@ namespace WinFormjs
         }
 
         public static string[] GetFiles(string path)
-        {
+        {                        
             if (path == FileExplorer.DesktopPath)
             {
                 return new string[] {
@@ -46,6 +48,14 @@ namespace WinFormjs
             }
 
             return null;
+        }        
+    }
+
+    public static class Debugging
+    {
+        public static void Log(string Value)
+        {
+            Script.Call("console.log", Value);
         }
     }
 }

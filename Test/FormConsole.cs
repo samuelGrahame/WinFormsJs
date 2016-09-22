@@ -92,7 +92,19 @@ namespace WinFormjs
 
         protected override void OnShowed()
         {
+            WriteLine("Commands: [clear, toggle bodyoverlay]");
+
             CommandInput.Focus();
+        }
+
+        public void WriteLine(string line)
+        {
+            line = line.Replace('\n', '\r');
+            foreach (var parse in line.Split('\r'))
+            {
+                CommandInput.Value = parse;
+                IncrementLine();
+            }            
         }
 
         private void IncrementLine()
@@ -117,6 +129,10 @@ namespace WinFormjs
 
             if (cmd.ToLower() == "clear")
                 Clear();
+            else if (cmd.ToLower() == "toggle bodyoverlay")
+            {                
+                ShowBodyOverLay = !ShowBodyOverLay;
+            }
         }
 
         private void Clear()

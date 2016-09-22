@@ -31,7 +31,6 @@ namespace WinFormjs
         /// </summary>
         public static bool ShowBodyOverLay { get; set; } = false;
 
-
         public static int Window_DefaultHeight { get; set; } = 480;
         public static int Window_DefaultWidth { get; set; } = 640;
 
@@ -39,10 +38,17 @@ namespace WinFormjs
 		private static Form _PrevActiveForm;
 		private static MouseMoveAction MoveAction = MouseMoveAction.Move;
 		public static HTMLDivElement WindowHolderSelectionBox { get; set; }
-		private static int WindowHolderSelectionBoxX;
-		private static int WindowHolderSelectionBoxY;
 
-		private const string IMAGE_WinIcon = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')";
+        public static FileExplorer ActiveFileExplorer { get; set; }
+
+
+        public static int WindowHolderSelectionBoxX;
+        public static int WindowHolderSelectionBoxY;
+
+        public static int WindowHolderSelectionBoxXOff;
+        public static int WindowHolderSelectionBoxYOff;
+
+        private const string IMAGE_WinIcon = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')";
 		private const string IMAGE_WinIconHover = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')";
 		private const string IMAGE_WinIconDown = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACnSURBVFhHY5AZZGDUQYTAqIMIgVEHEQKjDiIERh1ECAxfBynrGGvbehv6JFnGVrmUznWvXRE27zoQQaWJBuQ4SN3UHmg30GLHvIlAi4EiELuxIogW4gHJDkKzD4iwCsIRRBfxYNRBhMCogwgBkh1EazAaZYTAqIMIgVEHEQIkOwgIBlfligsMZPODpmDUQYTAqIMIgVEHEQKjDiIERh1ECAwyB8nIAADHEJbDMY47rQAAAABJRU5ErkJggg==')";
 
@@ -367,6 +373,24 @@ namespace WinFormjs
 			return butt;
 		}
 
+        protected static void HideFileSelection()
+        {
+            if (ActiveFileExplorer != null)
+            {                
+                if (ActiveFileExplorer.Owner != null)
+                {
+                    ActiveFileExplorer.Owner.BodyOverLay.Style.Visibility = Visibility.Collapse;
+                }
+                ActiveFileExplorer = null;
+            }
+
+            if (WindowHolderSelectionBox != null)
+            {
+
+                jQuery.Select(WindowHolderSelectionBox).FadeOut(FadeLength, () => { WindowHolderSelectionBox.Remove(); WindowHolderSelectionBox = null; });
+            }
+        }
+
 		public static void Setup(HTMLElement parent = null)
 		{
 			var keyCodes =  new List<int>(new int[] { 61, 107, 173, 109, 187, 189 });
@@ -397,41 +421,7 @@ namespace WinFormjs
 			WindowHolder.Style.Left = "0";
 			WindowHolder.Style.BackgroundColor = "cornflowerblue";
 			WindowHolder.Style.ZIndex = "0";
-			WindowHolder.Style.Overflow = Overflow.Auto;						
-
-			WindowHolder.AddEventListener(EventType.MouseDown, (ev) =>
-			{
-                if(MovingForm == null)
-                {
-                    if(WindowHolderSelectionBox != null)
-                    {
-                        WindowHolderSelectionBox.Remove();
-                        WindowHolderSelectionBox = null;
-                    }
-                    WindowHolderSelectionBox = new HTMLDivElement();
-                    WindowHolderSelectionBox.Style.Position = Position.Absolute;
-                    WindowHolderSelectionBox.Style.Visibility = Visibility.Visible;
-                    WindowHolderSelectionBox.Style.BorderWidth = BorderWidth.Thin;
-                    WindowHolderSelectionBox.Style.BorderStyle = BorderStyle.Solid;
-                    WindowHolderSelectionBox.Style.BorderColor = "black";
-                    WindowHolderSelectionBox.Style.BackgroundColor = "grey";
-                    WindowHolderSelectionBox.Style.Opacity = "0.35";
-
-                    WindowHolder.AppendChild(WindowHolderSelectionBox);
-
-                    var mev = ev.As<MouseEvent>();
-                    WindowHolderSelectionBoxX = mev.ClientX + WindowHolder.ScrollLeft;
-                    WindowHolderSelectionBoxY = mev.ClientY + WindowHolder.ScrollTop;
-
-                    WindowHolderSelectionBox.Style.ZIndex = "0";
-
-                    Window_Desktop.ClearSelection();
-
-                    Mouse_Down = true;
-
-                    ActiveForm = null;
-                }
-			});            
+			WindowHolder.Style.Overflow = Overflow.Auto;									            
     
             //SetBodyOverLay();
             
@@ -468,11 +458,7 @@ namespace WinFormjs
                     }
 					
 					var obj = jQuery.Select(MovingForm.Base);
-
-                    //WindowHolderSelectionBoxX = mev.ClientX + WindowHolder.ScrollLeft;
-                    //WindowHolderSelectionBoxY = mev.ClientY + WindowHolder.ScrollTop;
-
-
+                    
                     var Y = (mev.ClientY  + MovingForm.prev_py);
 					var X = (mev.ClientX + MovingForm.prev_px);
 
@@ -681,17 +667,22 @@ namespace WinFormjs
 				}else if(WindowHolderSelectionBox != null && WindowHolderSelectionBox.Style.Visibility == Visibility.Visible)
 				{
 					if(Mouse_Down)
-					{						
+					{
+                        if (ActiveFileExplorer == null)
+                        {                            
+                            return;
+                        }                            
+
 						WindowHolderSelectionBox.Style.Cursor = Cursor.Default;
-						WindowHolder.Style.Cursor = Cursor.Default;
+                        ActiveFileExplorer.Element.Style.Cursor = Cursor.Default;
 
 						int left;
 						int top;
 						int width;
 						int height;
 
-                        int ClientX = mev.ClientX + WindowHolder.ScrollLeft;
-                        int ClientY = mev.ClientY + WindowHolder.ScrollTop;
+                        int ClientX = mev.ClientX - WindowHolderSelectionBoxXOff + ActiveFileExplorer.Element.ScrollLeft;
+                        int ClientY = mev.ClientY - WindowHolderSelectionBoxYOff + ActiveFileExplorer.Element.ScrollTop;
                         
                         if (WindowHolderSelectionBoxX > ClientX)
 						{
@@ -723,20 +714,20 @@ namespace WinFormjs
 
                         Rectange SelectionRec = new Rectange(left, top, width, height);
 
-                        for (int i = 0; i < Window_Desktop.LoadedNodes.Count; i++)
+                        for (int i = 0; i < ActiveFileExplorer.LoadedNodes.Count; i++)
                         {
-                            if(Window_Desktop.LoadedNodes[i] != null)
+                            if(ActiveFileExplorer.LoadedNodes[i] != null)
                             {
-                                var htmlNode = Window_Desktop.LoadedNodes[i].NodeBase;
+                                var htmlNode = ActiveFileExplorer.LoadedNodes[i].NodeBase;
                                 if(htmlNode != null)
                                 {
                                     if(Rectange.rectOverlap(Rectange.CreateFromHTMLElement(htmlNode), SelectionRec))
                                     {
-                                        Window_Desktop.LoadedNodes[i].NodeExplorerState = FileExplorerNode.FileExplorerState.Selected;
+                                        ActiveFileExplorer.LoadedNodes[i].NodeExplorerState = FileExplorerNode.FileExplorerState.Selected;
                                     }
                                     else
                                     {
-                                        Window_Desktop.LoadedNodes[i].NodeExplorerState = FileExplorerNode.FileExplorerState.None;
+                                        ActiveFileExplorer.LoadedNodes[i].NodeExplorerState = FileExplorerNode.FileExplorerState.None;
                                     }
                                 }
                             }
@@ -747,9 +738,9 @@ namespace WinFormjs
 					}
 				}
 			};
-
+            
 			Window.AddEventListener(EventType.MouseUp, (ev) =>
-			{
+			{                
                 if(MovingForm != null)
                 {
                     MovingForm.BodyOverLay.Style.Visibility = Visibility.Collapse;
@@ -759,11 +750,9 @@ namespace WinFormjs
                 MovingForm = null;
 				Mouse_Down = false;				
 				MoveAction = MouseMoveAction.Move;
-				if(WindowHolderSelectionBox != null)
-				{
-					jQuery.Select(WindowHolderSelectionBox).FadeOut(FadeLength, () => { WindowHolderSelectionBox.Remove(); WindowHolderSelectionBox = null; });
-				}				
-			});
+
+                HideFileSelection();
+            });
 
 			Window.AddEventListener(EventType.MouseMove, mouseMove);
 
@@ -1096,7 +1085,7 @@ namespace WinFormjs
 
 					MoveAction = MouseMoveAction.Move;                
 					return;
-				}				
+				}	
 
 				if(mev.LayerX <= ResizeCorners && mev.LayerY <= ResizeCorners)
 				{					
@@ -1148,17 +1137,19 @@ namespace WinFormjs
 					MoveAction = MouseMoveAction.RightResize;					
 				}
 				else
-				{
-					SetCursor(Cursor.Default);
-					
+				{                    
+                    SetCursor(Cursor.Default);
+                    
 					MoveAction = MouseMoveAction.Move;
 					return;
 				}
 
                 ChangeSelectionState();
-                
-				mev.StopPropagation();
-			});
+
+                mev.StopPropagation();
+
+
+            });
 
 			Heading.AddEventListener(EventType.DblClick, (ev) => {
 				changeWindowState();
@@ -1278,15 +1269,19 @@ namespace WinFormjs
             Body.Style.Width = "-webkit-calc(100% - 1px)"; // "100%";
             Body.Style.Position = Position.Absolute;
             Body.Style.BackgroundColor = Window_DefaultBackgroundColor;
+            Body.Style.Overflow = Overflow.Hidden;
 
             Body.AddEventListener(EventType.MouseDown, (ev) => {
                 ActiveForm = this;
+                MovingForm = null;
+                SetCursor(Cursor.Default);
                 ev.StopPropagation();
             });
 
             Body.AddEventListener(EventType.MouseMove, (ev) => {
                 if(MovingForm == null)
                 {
+                    SetCursor(Cursor.Default);
                     ev.StopPropagation();                    
                 }                               
             });
@@ -1306,10 +1301,19 @@ namespace WinFormjs
                 ActiveForm = this;                                                
             });
 
+            BodyOverLay.AddEventListener(EventType.MouseUp, (ev) =>
+            {                
+                if(MovingForm == null &&
+                    ActiveFileExplorer != null)
+                {                    
+                    HideFileSelection();
+                }                               
+            });            
+
             Body.AddEventListener(EventType.MouseLeave, (ev) =>
             {
                 if(MovingForm == null)
-                {
+                {                    
                     SetBodyOverLay();
                 }                
             });
@@ -1341,7 +1345,27 @@ namespace WinFormjs
             Initialise();
         }
 
-		public string Height
+        public int TitleBarHeight()
+        {
+            return Heading.ClientHeight;
+        }
+
+        public int TitleBarWidth()
+        {
+            return Heading.ClientWidth;
+        }
+
+        public int ClientX()
+        {
+            return Body.ClientLeft;
+        }
+
+        public int ClientY()
+        {
+            return Body.ClientTop;
+        }
+
+        public string Height
 		{
 			get { return Base.Style.Height; }
 			set { Base.Style.Height = value; }

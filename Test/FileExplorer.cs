@@ -13,14 +13,62 @@ namespace WinFormjs
         public NodeViewType NodeViewType { get; set; }        
         private string path;
         //url('
-        
+        public FormFileExplorer Owner;
 
         public const string DesktopPath = "$desktop";
-        private HTMLElement Element;
+        public HTMLElement Element;
 
-        public FileExplorer(HTMLElement element)
+        public FileExplorer(HTMLElement element, FormFileExplorer owner = null)
         {
             Element = element;
+            Owner = owner;            
+
+            Element.AddEventListener(EventType.MouseDown, (ev) =>
+            {
+                if (Form.MovingForm == null)
+                {
+                    Form.ActiveFileExplorer = this;
+                    if (Form.WindowHolderSelectionBox != null)
+                    {
+                        Form.WindowHolderSelectionBox.Remove();
+                        Form.WindowHolderSelectionBox = null;
+                    }
+                    Form.WindowHolderSelectionBox = new HTMLDivElement();
+                    Form.WindowHolderSelectionBox.Style.Position = Position.Absolute;
+                    Form.WindowHolderSelectionBox.Style.Visibility = Visibility.Visible;
+                    Form.WindowHolderSelectionBox.Style.BorderWidth = BorderWidth.Thin;
+                    Form.WindowHolderSelectionBox.Style.BorderStyle = BorderStyle.Solid;
+                    Form.WindowHolderSelectionBox.Style.BorderColor = "black";
+                    Form.WindowHolderSelectionBox.Style.BackgroundColor = "grey";
+                    Form.WindowHolderSelectionBox.Style.Opacity = "0.35";
+
+                    Element.AppendChild(Form.WindowHolderSelectionBox);
+
+                    var mev = ev.As<MouseEvent>();
+
+                    
+                    if(Form.ActiveFileExplorer.Owner != null)
+                    {
+                        Form.WindowHolderSelectionBoxXOff = Global.ParseInt(Form.ActiveFileExplorer.Owner.Left);
+                        Form.WindowHolderSelectionBoxYOff = Global.ParseInt(Form.ActiveFileExplorer.Owner.Top) + Form.ActiveFileExplorer.Owner.TitleBarHeight();
+                    }
+                    else
+                    {
+                        Form.WindowHolderSelectionBoxXOff = 0;
+                        Form.WindowHolderSelectionBoxYOff = 0;
+                    }
+
+                    Form.WindowHolderSelectionBoxX = mev.ClientX - Form.WindowHolderSelectionBoxXOff + Element.ScrollLeft;
+                    Form.WindowHolderSelectionBoxY = mev.ClientY - Form.WindowHolderSelectionBoxYOff + Element.ScrollTop;
+
+                    Form.WindowHolderSelectionBox.Style.ZIndex = "0";
+
+                    ClearSelection();
+
+                    Form.Mouse_Down = true;
+                    Form.ActiveForm = null;
+                }
+            });
         }        
 
         public List<FileExplorerNode> LoadedNodes = new List<FileExplorerNode>();
@@ -34,6 +82,9 @@ namespace WinFormjs
                 {
                     if(IsDirectoryRequestValue(value))
                     {
+                        if (Owner != null)
+                            Owner.Text = path;
+
                         path = value;
                         Refresh();
                     }
@@ -252,7 +303,7 @@ namespace WinFormjs
                 NodeImage = new HTMLDivElement();
                 NodeText = new HTMLSpanElement();
 
-                NodeBase.Style.ZIndex = "0";
+                //NodeBase.Style.ZIndex = "0";
 
                 NodeBase.Style.Position = Position.Absolute;
                 NodeImage.Style.Position = Position.Absolute;
@@ -264,7 +315,23 @@ namespace WinFormjs
                     {
                         parent.ClearSelection();
 
-                        Process.Start(FullPath);
+                        if(IsFile)
+                            Process.Start(FullPath);
+                        else
+                        {
+                            if(parent.Owner == null)
+                            {
+                                var frm = new FormFileExplorer(FullPath);
+                                frm.Left = "50px";
+                                frm.Top = "50px";                                
+
+                                frm.Show();
+                            }else
+                            {
+                                parent.Path = FileExplorer.DesktopPath; // FullPath;
+                                parent.Refresh();
+                            }
+                        }
                     }
                 });
 

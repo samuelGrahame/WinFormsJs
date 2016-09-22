@@ -65,6 +65,14 @@
         }
     });
 
+    Bridge.define("WinFormjs.Debugging", {
+        statics: {
+            log: function (Value) {
+                console.log(Value);
+            }
+        }
+    });
+
     Bridge.define("WinFormjs.FileExplorerNode", {
         statics: {
             createNode: function (path, nvt, parent, IsFile) {
@@ -116,7 +124,7 @@
                 this.nodeImage = document.createElement('div');
                 this.nodeText = document.createElement('span');
 
-                this.getNodeBase().style.zIndex = "0";
+                //NodeBase.Style.ZIndex = "0";
 
                 this.getNodeBase().style.position = "absolute";
                 this.nodeImage.style.position = "absolute";
@@ -239,7 +247,20 @@
             if (!WinFormjs.Form.midleOfAction()) {
                 this.parent.clearSelection();
 
-                WinFormjs.Process.start(this.getFullPath());
+                if (this.getIsFile()) {
+                    WinFormjs.Process.start(this.getFullPath());
+                } else {
+                    if (this.parent.owner == null) {
+                        var frm = new WinFormjs.FormFileExplorer(this.getFullPath());
+                        frm.setLeft("50px");
+                        frm.setTop("50px");
+
+                        frm.show();
+                    } else {
+                        this.parent.setPath(WinFormjs.FileExplorer.DesktopPath); // FullPath;
+                        this.parent.refresh();
+                    }
+                }
             }
         },
         f2: function (ev) {
@@ -303,6 +324,7 @@
             }
         },
         path: null,
+        owner: null,
         element: null,
         loadedNodes: null,
         config: {
@@ -313,9 +335,14 @@
                 this.loadedNodes = new (System.Collections.Generic.List$1(WinFormjs.FileExplorerNode))();
             }
         },
-        ctor: function (element) {
+        ctor: function (element, owner) {
+            if (owner === void 0) { owner = null; }
+
             this.$initialize();
             this.element = element;
+            this.owner = owner;
+
+            this.element.addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.FileExplorer.f1));
         },
         getPath: function () {
             return this.path;
@@ -323,6 +350,10 @@
         setPath: function (value) {
             if (!Bridge.referenceEquals(this.path, value)) {
                 if (WinFormjs.FileExplorer.isDirectoryRequestValue(value)) {
+                    if (this.owner != null) {
+                        this.owner.setText(this.path);
+                    }
+
                     this.path = value;
                     this.refresh();
                 } else {
@@ -443,6 +474,51 @@
         }
     });
 
+    Bridge.ns("WinFormjs.FileExplorer", $_);
+
+    Bridge.apply($_.WinFormjs.FileExplorer, {
+        f1: function (ev) {
+            if (WinFormjs.Form.movingForm == null) {
+                WinFormjs.Form.setActiveFileExplorer(this);
+                if (WinFormjs.Form.getWindowHolderSelectionBox() != null) {
+                    WinFormjs.Form.getWindowHolderSelectionBox().remove();
+                    WinFormjs.Form.setWindowHolderSelectionBox(null);
+                }
+                WinFormjs.Form.setWindowHolderSelectionBox(document.createElement('div'));
+                WinFormjs.Form.getWindowHolderSelectionBox().style.position = "absolute";
+                WinFormjs.Form.getWindowHolderSelectionBox().style.visibility = "visible";
+                WinFormjs.Form.getWindowHolderSelectionBox().style.borderWidth = "thin";
+                WinFormjs.Form.getWindowHolderSelectionBox().style.borderStyle = "solid";
+                WinFormjs.Form.getWindowHolderSelectionBox().style.borderColor = "black";
+                WinFormjs.Form.getWindowHolderSelectionBox().style.backgroundColor = "grey";
+                WinFormjs.Form.getWindowHolderSelectionBox().style.opacity = "0.35";
+
+                this.element.appendChild(WinFormjs.Form.getWindowHolderSelectionBox());
+
+                var mev = ev;
+
+
+                if (WinFormjs.Form.getActiveFileExplorer().owner != null) {
+                    WinFormjs.Form.windowHolderSelectionBoxXOff = parseInt(WinFormjs.Form.getActiveFileExplorer().owner.getLeft());
+                    WinFormjs.Form.windowHolderSelectionBoxYOff = (parseInt(WinFormjs.Form.getActiveFileExplorer().owner.getTop()) + WinFormjs.Form.getActiveFileExplorer().owner.titleBarHeight()) | 0;
+                } else {
+                    WinFormjs.Form.windowHolderSelectionBoxXOff = 0;
+                    WinFormjs.Form.windowHolderSelectionBoxYOff = 0;
+                }
+
+                WinFormjs.Form.windowHolderSelectionBoxX = (((mev.clientX - WinFormjs.Form.windowHolderSelectionBoxXOff) | 0) + this.element.scrollLeft) | 0;
+                WinFormjs.Form.windowHolderSelectionBoxY = (((mev.clientY - WinFormjs.Form.windowHolderSelectionBoxYOff) | 0) + this.element.scrollTop) | 0;
+
+                WinFormjs.Form.getWindowHolderSelectionBox().style.zIndex = "0";
+
+                this.clearSelection();
+
+                WinFormjs.Form.setMouse_Down(true);
+                WinFormjs.Form.setActiveForm(null);
+            }
+        }
+    });
+
     Bridge.define("WinFormjs.FileExplorerNode.FileExplorerState", {
         $kind: "enum",
         statics: {
@@ -466,6 +542,8 @@
             moveAction: 0,
             windowHolderSelectionBoxX: 0,
             windowHolderSelectionBoxY: 0,
+            windowHolderSelectionBoxXOff: 0,
+            windowHolderSelectionBoxYOff: 0,
             IMAGE_WinIcon: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')",
             IMAGE_WinIconHover: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')",
             IMAGE_WinIconDown: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACnSURBVFhHY5AZZGDUQYTAqIMIgVEHEQKjDiIERh1ECAxfBynrGGvbehv6JFnGVrmUznWvXRE27zoQQaWJBuQ4SN3UHmg30GLHvIlAi4EiELuxIogW4gHJDkKzD4iwCsIRRBfxYNRBhMCogwgBkh1EazAaZYTAqIMIgVEHEQIkOwgIBlfligsMZPODpmDUQYTAqIMIgVEHEQKjDiIERh1ECAwyB8nIAADHEJbDMY47rQAAAABJRU5ErkJggg==')",
@@ -506,7 +584,8 @@
                     ShowBodyOverLay: false,
                     Window_DefaultHeight: 480,
                     Window_DefaultWidth: 640,
-                    WindowHolderSelectionBox: null
+                    WindowHolderSelectionBox: null,
+                    ActiveFileExplorer: null
                 },
                 init: function () {
                     this.visibleForm = new (System.Collections.Generic.List$1(WinFormjs.Form))();
@@ -706,6 +785,19 @@
 
                 return butt;
             },
+            hideFileSelection: function () {
+                if (WinFormjs.Form.getActiveFileExplorer() != null) {
+                    if (WinFormjs.Form.getActiveFileExplorer().owner != null) {
+                        WinFormjs.Form.getActiveFileExplorer().owner.getBodyOverLay().style.visibility = "collapse";
+                    }
+                    WinFormjs.Form.setActiveFileExplorer(null);
+                }
+
+                if (WinFormjs.Form.getWindowHolderSelectionBox() != null) {
+
+                    $(WinFormjs.Form.getWindowHolderSelectionBox()).fadeOut(WinFormjs.Form.getFadeLength(), $_.WinFormjs.Form.f4);
+                }
+            },
             setup: function (parent) {
                 if (parent === void 0) { parent = null; }
                 var keyCodes = new (System.Collections.Generic.List$1(System.Int32))([61, 107, 173, 109, 187, 189]);
@@ -737,8 +829,6 @@
                 WinFormjs.Form.getWindowHolder().style.zIndex = "0";
                 WinFormjs.Form.getWindowHolder().style.overflow = "auto";
 
-                WinFormjs.Form.getWindowHolder().addEventListener("mousedown", $_.WinFormjs.Form.f4);
-
                 //SetBodyOverLay();
 
                 WinFormjs.Form.changeStateTextSelection(WinFormjs.Form.getWindowHolder(), false);
@@ -762,7 +852,7 @@
 
                 var mouseMove = $_.WinFormjs.Form.f5;
 
-                window.addEventListener("mouseup", $_.WinFormjs.Form.f7);
+                window.addEventListener("mouseup", $_.WinFormjs.Form.f6);
 
                 window.addEventListener("mousemove", mouseMove);
 
@@ -831,11 +921,11 @@
 
             this.getBodyOverLay().style.visibility = "collapse";
 
-            this.getBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f8));
+            this.getBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f7));
 
-            this.getHeading().addEventListener("dblclick", Bridge.fn.bind(this, $_.WinFormjs.Form.f9));
+            this.getHeading().addEventListener("dblclick", Bridge.fn.bind(this, $_.WinFormjs.Form.f8));
 
-            this.getBase().addEventListener("mousemove", Bridge.fn.bind(this, $_.WinFormjs.Form.f10));
+            this.getBase().addEventListener("mousemove", Bridge.fn.bind(this, $_.WinFormjs.Form.f9));
 
             this.getBase().style.position = "absolute";
 
@@ -853,7 +943,7 @@
             this.getHeading().style.fontFamily = "Segoe UI";
             this.getHeading().style.textAlign = 7;
 
-            this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f11));
+            this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f10));
 
             this.getHeadingTitle().style.textIndent = "3px";
             WinFormjs.Form.setInternalLabel(this.getHeadingTitle()); // Internal Label
@@ -874,10 +964,11 @@
             this.getBody().style.width = "-webkit-calc(100% - 1px)"; // "100%";
             this.getBody().style.position = "absolute";
             this.getBody().style.backgroundColor = WinFormjs.Form.getWindow_DefaultBackgroundColor();
+            this.getBody().style.overflow = "hidden";
 
-            this.getBody().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f12));
+            this.getBody().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f11));
 
-            this.getBody().addEventListener("mousemove", $_.WinFormjs.Form.f13);
+            this.getBody().addEventListener("mousemove", Bridge.fn.bind(this, $_.WinFormjs.Form.f12));
 
             this.getBodyOverLay().style.top = "31px";
             this.getBodyOverLay().style.height = "-webkit-calc(100% - 33px)"; // -webkit-calc(100% - 60px)
@@ -888,7 +979,9 @@
             this.getBodyOverLay().style.opacity = WinFormjs.Form.getShowBodyOverLay() ? "0.5" : "0";
             this.getBodyOverLay().style.backgroundColor = "black";
 
-            this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f14));
+            this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f13));
+
+            this.getBodyOverLay().addEventListener("mouseup", $_.WinFormjs.Form.f14);
 
             this.getBody().addEventListener("mouseleave", $_.WinFormjs.Form.f15);
 
@@ -1177,6 +1270,18 @@
                 }
             }
         },
+        titleBarHeight: function () {
+            return this.getHeading().clientHeight;
+        },
+        titleBarWidth: function () {
+            return this.getHeading().clientWidth;
+        },
+        clientX: function () {
+            return this.getBody().clientLeft;
+        },
+        clientY: function () {
+            return this.getBody().clientTop;
+        },
         show: function (owner) {
             if (owner === void 0) { owner = null; }
             if (!WinFormjs.Form.visibleForm.contains(this)) {
@@ -1275,35 +1380,9 @@
         f3: function (ev) {
             ev.preventDefault();
         },
-        f4: function (ev) {
-            if (WinFormjs.Form.movingForm == null) {
-                if (WinFormjs.Form.getWindowHolderSelectionBox() != null) {
-                    WinFormjs.Form.getWindowHolderSelectionBox().remove();
-                    WinFormjs.Form.setWindowHolderSelectionBox(null);
-                }
-                WinFormjs.Form.setWindowHolderSelectionBox(document.createElement('div'));
-                WinFormjs.Form.getWindowHolderSelectionBox().style.position = "absolute";
-                WinFormjs.Form.getWindowHolderSelectionBox().style.visibility = "visible";
-                WinFormjs.Form.getWindowHolderSelectionBox().style.borderWidth = "thin";
-                WinFormjs.Form.getWindowHolderSelectionBox().style.borderStyle = "solid";
-                WinFormjs.Form.getWindowHolderSelectionBox().style.borderColor = "black";
-                WinFormjs.Form.getWindowHolderSelectionBox().style.backgroundColor = "grey";
-                WinFormjs.Form.getWindowHolderSelectionBox().style.opacity = "0.35";
-
-                WinFormjs.Form.getWindowHolder().appendChild(WinFormjs.Form.getWindowHolderSelectionBox());
-
-                var mev = ev;
-                WinFormjs.Form.windowHolderSelectionBoxX = (mev.clientX + WinFormjs.Form.getWindowHolder().scrollLeft) | 0;
-                WinFormjs.Form.windowHolderSelectionBoxY = (mev.clientY + WinFormjs.Form.getWindowHolder().scrollTop) | 0;
-
-                WinFormjs.Form.getWindowHolderSelectionBox().style.zIndex = "0";
-
-                WinFormjs.Form.window_Desktop.clearSelection();
-
-                WinFormjs.Form.setMouse_Down(true);
-
-                WinFormjs.Form.setActiveForm(null);
-            }
+        f4: function () {
+            WinFormjs.Form.getWindowHolderSelectionBox().remove();
+            WinFormjs.Form.setWindowHolderSelectionBox(null);
         },
         f5: function (ev) {
             var mev = ev;
@@ -1316,10 +1395,6 @@
                 }
 
                 var obj = $(WinFormjs.Form.movingForm.getBase());
-
-                //WindowHolderSelectionBoxX = mev.ClientX + WindowHolder.ScrollLeft;
-                //WindowHolderSelectionBoxY = mev.ClientY + WindowHolder.ScrollTop;
-
 
                 var Y = (((mev.clientY + WinFormjs.Form.movingForm.prev_py) | 0));
                 var X = (((mev.clientX + WinFormjs.Form.movingForm.prev_px) | 0));
@@ -1468,16 +1543,20 @@
                 }
             } else if (WinFormjs.Form.getWindowHolderSelectionBox() != null && WinFormjs.Form.getWindowHolderSelectionBox().style.visibility === "visible") {
                 if (WinFormjs.Form.getMouse_Down()) {
+                    if (WinFormjs.Form.getActiveFileExplorer() == null) {
+                        return;
+                    }
+
                     WinFormjs.Form.getWindowHolderSelectionBox().style.cursor = "default";
-                    WinFormjs.Form.getWindowHolder().style.cursor = "default";
+                    WinFormjs.Form.getActiveFileExplorer().element.style.cursor = "default";
 
                     var left;
                     var top;
                     var width;
                     var height;
 
-                    var ClientX = (mev.clientX + WinFormjs.Form.getWindowHolder().scrollLeft) | 0;
-                    var ClientY = (mev.clientY + WinFormjs.Form.getWindowHolder().scrollTop) | 0;
+                    var ClientX = (((mev.clientX - WinFormjs.Form.windowHolderSelectionBoxXOff) | 0) + WinFormjs.Form.getActiveFileExplorer().element.scrollLeft) | 0;
+                    var ClientY = (((mev.clientY - WinFormjs.Form.windowHolderSelectionBoxYOff) | 0) + WinFormjs.Form.getActiveFileExplorer().element.scrollTop) | 0;
 
                     if (WinFormjs.Form.windowHolderSelectionBoxX > ClientX) {
                         left = ClientX;
@@ -1503,14 +1582,14 @@
 
                     var SelectionRec = new WinFormjs.Rectange.$ctor1(left, top, width, height);
 
-                    for (var i = 0; i < WinFormjs.Form.window_Desktop.loadedNodes.getCount(); i = (i + 1) | 0) {
-                        if (WinFormjs.Form.window_Desktop.loadedNodes.getItem(i) != null) {
-                            var htmlNode = WinFormjs.Form.window_Desktop.loadedNodes.getItem(i).getNodeBase();
+                    for (var i = 0; i < WinFormjs.Form.getActiveFileExplorer().loadedNodes.getCount(); i = (i + 1) | 0) {
+                        if (WinFormjs.Form.getActiveFileExplorer().loadedNodes.getItem(i) != null) {
+                            var htmlNode = WinFormjs.Form.getActiveFileExplorer().loadedNodes.getItem(i).getNodeBase();
                             if (htmlNode != null) {
                                 if (WinFormjs.Rectange.rectOverlap(WinFormjs.Rectange.createFromHTMLElement(htmlNode).$clone(), SelectionRec.$clone())) {
-                                    WinFormjs.Form.window_Desktop.loadedNodes.getItem(i).setNodeExplorerState(WinFormjs.FileExplorerNode.FileExplorerState.Selected);
+                                    WinFormjs.Form.getActiveFileExplorer().loadedNodes.getItem(i).setNodeExplorerState(WinFormjs.FileExplorerNode.FileExplorerState.Selected);
                                 } else {
-                                    WinFormjs.Form.window_Desktop.loadedNodes.getItem(i).setNodeExplorerState(WinFormjs.FileExplorerNode.FileExplorerState.None);
+                                    WinFormjs.Form.getActiveFileExplorer().loadedNodes.getItem(i).setNodeExplorerState(WinFormjs.FileExplorerNode.FileExplorerState.None);
                                 }
                             }
                         }
@@ -1521,11 +1600,7 @@
                 }
             }
         },
-        f6: function () {
-            WinFormjs.Form.getWindowHolderSelectionBox().remove();
-            WinFormjs.Form.setWindowHolderSelectionBox(null);
-        },
-        f7: function (ev) {
+        f6: function (ev) {
             if (WinFormjs.Form.movingForm != null) {
                 WinFormjs.Form.movingForm.getBodyOverLay().style.visibility = "collapse";
                 WinFormjs.Form.movingForm.changeSelectionState$1(false);
@@ -1534,11 +1609,10 @@
             WinFormjs.Form.movingForm = null;
             WinFormjs.Form.setMouse_Down(false);
             WinFormjs.Form.moveAction = WinFormjs.Form.MouseMoveAction.Move;
-            if (WinFormjs.Form.getWindowHolderSelectionBox() != null) {
-                $(WinFormjs.Form.getWindowHolderSelectionBox()).fadeOut(WinFormjs.Form.getFadeLength(), $_.WinFormjs.Form.f6);
-            }
+
+            WinFormjs.Form.hideFileSelection();
         },
-        f8: function (ev) {
+        f7: function (ev) {
             var mev = ev;
 
             WinFormjs.Form.setMouse_Down(true);
@@ -1603,13 +1677,15 @@
             this.changeSelectionState$1();
 
             mev.stopPropagation();
+
+
         },
-        f9: function (ev) {
+        f8: function (ev) {
             this.changeWindowState();
             ev.preventDefault();
             ev.stopPropagation();
         },
-        f10: function (ev) {
+        f9: function (ev) {
             var mev = ev;
             if (WinFormjs.Form.movingForm != null && WinFormjs.Form.moveAction === WinFormjs.Form.MouseMoveAction.Move) {
                 this.setCursor("default");
@@ -1642,7 +1718,7 @@
                 this.setCursor("default");
             }
         },
-        f11: function (ev) {
+        f10: function (ev) {
             WinFormjs.Form.setBodyOverLay();
 
             if (this.getwindowState() === WinFormjs.Form.WindowState.Maximized) {
@@ -1656,18 +1732,26 @@
 
             WinFormjs.Form.setActiveForm(this);
         },
-        f12: function (ev) {
+        f11: function (ev) {
             WinFormjs.Form.setActiveForm(this);
+            WinFormjs.Form.movingForm = null;
+            this.setCursor("default");
             ev.stopPropagation();
         },
-        f13: function (ev) {
+        f12: function (ev) {
             if (WinFormjs.Form.movingForm == null) {
+                this.setCursor("default");
                 ev.stopPropagation();
             }
         },
-        f14: function (ev) {
+        f13: function (ev) {
             this.getBodyOverLay().style.visibility = "collapse";
             WinFormjs.Form.setActiveForm(this);
+        },
+        f14: function (ev) {
+            if (WinFormjs.Form.movingForm == null && WinFormjs.Form.getActiveFileExplorer() != null) {
+                WinFormjs.Form.hideFileSelection();
+            }
         },
         f15: function (ev) {
             if (WinFormjs.Form.movingForm == null) {
@@ -2069,7 +2153,19 @@
             this.setHeight("392px");
         },
         onShowed: function () {
+            this.writeLine("Commands: [clear, toggle bodyoverlay]");
+
             this.commandInput.focus();
+        },
+        writeLine: function (line) {
+            var $t;
+            line = System.String.replaceAll(line, String.fromCharCode(10), String.fromCharCode(13));
+            $t = Bridge.getEnumerator(line.split(String.fromCharCode(13)));
+            while ($t.moveNext()) {
+                var parse = $t.getCurrent();
+                this.commandInput.value = parse;
+                this.incrementLine();
+            }
         },
         incrementLine: function () {
             var cmd = this.commandInput.value;
@@ -2091,6 +2187,10 @@
 
             if (Bridge.referenceEquals(cmd.toLowerCase(), "clear")) {
                 this.clear();
+            } else {
+                if (Bridge.referenceEquals(cmd.toLowerCase(), "toggle bodyoverlay")) {
+                    WinFormjs.Form.setShowBodyOverLay(!WinFormjs.Form.getShowBodyOverLay());
+                }
             }
         },
         clear: function () {
@@ -2127,6 +2227,28 @@
         },
         f4: function (ev) {
             this.commandInput.focus();
+        }
+    });
+
+    Bridge.define("WinFormjs.FormFileExplorer", {
+        inherits: [WinFormjs.Form],
+        fileExplorerRender: null,
+        startingLocation: null,
+        ctor: function (startingLocation) {
+            this.$initialize();
+            WinFormjs.Form.ctor.call(this);
+            this.startingLocation = startingLocation;
+        },
+        initialise: function () {
+            WinFormjs.Form.prototype.initialise.call(this);
+
+            this.fileExplorerRender = Bridge.merge(new WinFormjs.FileExplorer(this.getBody(), this), {
+                setNodeViewType: WinFormjs.NodeViewType.Medium_Icons
+            } );
+        },
+        onShowed: function () {
+            this.fileExplorerRender.setPath(WinFormjs.FileExplorer.DesktopPath); // StartingLocation;
+            this.fileExplorerRender.refresh();
         }
     });
 
