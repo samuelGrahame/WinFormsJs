@@ -47,11 +47,7 @@ namespace WinFormjs
 
         public static int WindowHolderSelectionBoxXOff;
         public static int WindowHolderSelectionBoxYOff;
-
-        private const string IMAGE_WinIcon = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')";
-		private const string IMAGE_WinIconHover = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')";
-		private const string IMAGE_WinIconDown = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACnSURBVFhHY5AZZGDUQYTAqIMIgVEHEQKjDiIERh1ECAxfBynrGGvbehv6JFnGVrmUznWvXRE27zoQQaWJBuQ4SN3UHmg30GLHvIlAi4EiELuxIogW4gHJDkKzD4iwCsIRRBfxYNRBhMCogwgBkh1EazAaZYTAqIMIgVEHEQIkOwgIBlfligsMZPODpmDUQYTAqIMIgVEHEQKjDiIERh1ECAwyB8nIAADHEJbDMY47rQAAAABJRU5ErkJggg==')";
-
+        
 		private HTMLDivElement Base { get; set; }
 		private HTMLDivElement Heading { get; set; }
 		private HTMLDivElement ButtonClose { get; set; }
@@ -319,7 +315,7 @@ namespace WinFormjs
 			butt.Style.Height = "40px";
 			butt.Style.Position = Position.Absolute;
 			butt.Style.FontSize = "12pt";
-			butt.Style.Background = IMAGE_WinIcon;
+			butt.Style.Background = IconRepository.IMAGE_WinIcon;
 
 			butt.OnMouseUp = (ev) =>
 			{
@@ -329,7 +325,7 @@ namespace WinFormjs
 				ev.StopPropagation();
 				ev.PreventDefault();
 
-				butt.Style.Background = IMAGE_WinIcon;
+				butt.Style.Background = IconRepository.IMAGE_WinIcon;
 			};
 
 			butt.OnMouseDown = (ev) =>
@@ -342,7 +338,7 @@ namespace WinFormjs
 				ev.StopPropagation();
 				ev.PreventDefault();
 
-				butt.Style.Background = IMAGE_WinIconDown;
+				butt.Style.Background = IconRepository.IMAGE_WinIconDown;
 
 				ActiveForm = null;
 			};
@@ -354,11 +350,11 @@ namespace WinFormjs
 
 				if(Mouse_Down)
 				{
-					butt.Style.Background = IMAGE_WinIconDown;
+					butt.Style.Background = IconRepository.IMAGE_WinIconDown;
 				}
 				else
 				{
-					butt.Style.Background = IMAGE_WinIconHover;
+					butt.Style.Background = IconRepository.IMAGE_WinIconHover;
 				}				
 			};
 
@@ -367,7 +363,7 @@ namespace WinFormjs
 				if(MidleOfAction())
 					return;
 
-				butt.Style.Background = IMAGE_WinIcon;
+				butt.Style.Background = IconRepository.IMAGE_WinIcon;
 			};
 
 			return butt;
@@ -486,8 +482,8 @@ namespace WinFormjs
 					switch(MoveAction)
 					{
 						case MouseMoveAction.Move:							
-							obj.Css("top", Y);
-							obj.Css("left", X);
+							obj.Css("top", Y).
+                                Css("left", X);							
 
 							break;
 						case MouseMoveAction.TopLeftResize:
@@ -512,11 +508,7 @@ namespace WinFormjs
 								H = MovingForm.MinHeight;
 							}
 
-							obj.Css("top", Y);
-							obj.Css("left", X);
-
-							obj.Css("width", W);
-							obj.Css("height", H);
+                            obj.Css("left", X).Css("top", Y).Css("width", W).Css("height", H);                            
 
 							break;
 						case MouseMoveAction.TopResize:							
@@ -532,9 +524,8 @@ namespace WinFormjs
 								H = MovingForm.MinHeight;
 							}
 
-							obj.Css("top", Y);						
-							
-							obj.Css("height", H);
+							obj.Css("top", Y).
+                                Css("height", H);
 
 							break;
 						case MouseMoveAction.TopRightResize:
@@ -558,10 +549,7 @@ namespace WinFormjs
 								W = MovingForm.MinWidth;
 							}
 
-							obj.Css("top", Y);
-
-							obj.Css("height", H);
-							obj.Css("width", W);
+							obj.Css("top", Y).Css("height", H).Css("width", W);
 														
 							break;
 						case MouseMoveAction.LeftResize:
@@ -601,11 +589,7 @@ namespace WinFormjs
 								H = MovingForm.MinHeight;
 							}
 
-							obj.Css("left", X);
-							obj.Css("width", W);
-							
-							obj.Css("height", H);
-
+							obj.Css("left", X).Css("width", W).Css("height", H);
 
 							break;
 						case MouseMoveAction.BottomResize:
@@ -657,8 +641,7 @@ namespace WinFormjs
 								W = MovingForm.MinWidth;
 							}
 
-							obj.Css("width", W);
-							obj.Css("height", H);
+							obj.Css("width", W).Css("height", H);
 
 							break;
 						default:

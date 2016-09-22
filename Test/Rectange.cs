@@ -49,6 +49,6 @@ namespace WinFormjs
                 Width = Global.ParseInt(obj.Css("width")),
                 Height = Global.ParseInt(obj.Css("height"))
             };
-        }
+        }        
     }
 }
