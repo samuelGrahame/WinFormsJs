@@ -15,6 +15,14 @@ namespace WinFormjs
         public int Width;
         public int Height;
 
+        public static void SetExternalVariables(out int x, out int y, out int w, out int h, jQuery obj)
+        {
+            x = Global.ParseInt(obj.Css("left"));
+            y = Global.ParseInt(obj.Css("top"));
+            w = Global.ParseInt(obj.Css("width"));
+            h = Global.ParseInt(obj.Css("height"));
+        }
+
         public static bool valueInRange(int value, int min, int max)
         {
             return (value >= min) && (value <= max);

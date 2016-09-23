@@ -1403,11 +1403,11 @@
                     WinFormjs.Form.movingForm.prev_px = (X - mev.clientX) | 0;
                 }
 
-                var X1;
-                var Y1;
+                var X1 = { };
+                var Y1 = { };
 
-                var W;
-                var H;
+                var W = { };
+                var H = { };
 
                 if (Y < 0) {
                     Y = 1;
@@ -1420,120 +1420,98 @@
 
                 switch (WinFormjs.Form.moveAction) {
                     case WinFormjs.Form.MouseMoveAction.Move: 
-                        obj.css("top", Y);
-                        obj.css("left", X);
+                        obj.css("top", Y).css("left", X);
                         break;
                     case WinFormjs.Form.MouseMoveAction.TopLeftResize: 
-                        X1 = parseInt(obj.css("left"));
-                        Y1 = parseInt(obj.css("top"));
-                        W = parseInt(obj.css("width"));
-                        H = parseInt(obj.css("height"));
-                        W = (W - (((X - X1) | 0))) | 0;
-                        H = (H - (((Y - Y1) | 0))) | 0;
-                        if (W < WinFormjs.Form.movingForm.getMinWidth()) {
-                            X = (X - (((WinFormjs.Form.movingForm.getMinWidth() - W) | 0))) | 0;
-                            W = WinFormjs.Form.movingForm.getMinWidth();
+                        WinFormjs.Rectange.setExternalVariables(X1, Y1, W, H, obj);
+                        W.v = (W.v - (((X - X1.v) | 0))) | 0;
+                        H.v = (H.v - (((Y - Y1.v) | 0))) | 0;
+                        if (W.v < WinFormjs.Form.movingForm.getMinWidth()) {
+                            X = (X - (((WinFormjs.Form.movingForm.getMinWidth() - W.v) | 0))) | 0;
+                            W.v = WinFormjs.Form.movingForm.getMinWidth();
                         }
-                        if (H < WinFormjs.Form.movingForm.getMinHeight()) {
-                            Y = (Y - (((WinFormjs.Form.movingForm.getMinHeight() - H) | 0))) | 0;
-                            H = WinFormjs.Form.movingForm.getMinHeight();
+                        if (H.v < WinFormjs.Form.movingForm.getMinHeight()) {
+                            Y = (Y - (((WinFormjs.Form.movingForm.getMinHeight() - H.v) | 0))) | 0;
+                            H.v = WinFormjs.Form.movingForm.getMinHeight();
                         }
-                        obj.css("top", Y);
-                        obj.css("left", X);
-                        obj.css("width", W);
-                        obj.css("height", H);
+                        obj.css("left", X).css("top", Y).css("width", W.v).css("height", H.v);
                         break;
                     case WinFormjs.Form.MouseMoveAction.TopResize: 
-                        Y1 = parseInt(obj.css("top"));
-                        H = parseInt(obj.css("height"));
-                        H = (H - (((Y - Y1) | 0))) | 0;
-                        if (H < WinFormjs.Form.movingForm.getMinHeight()) {
-                            Y = (Y - (((WinFormjs.Form.movingForm.getMinHeight() - H) | 0))) | 0;
-                            H = WinFormjs.Form.movingForm.getMinHeight();
+                        Y1.v = parseInt(obj.css("top"));
+                        H.v = parseInt(obj.css("height"));
+                        H.v = (H.v - (((Y - Y1.v) | 0))) | 0;
+                        if (H.v < WinFormjs.Form.movingForm.getMinHeight()) {
+                            Y = (Y - (((WinFormjs.Form.movingForm.getMinHeight() - H.v) | 0))) | 0;
+                            H.v = WinFormjs.Form.movingForm.getMinHeight();
                         }
-                        obj.css("top", Y);
-                        obj.css("height", H);
+                        obj.css("top", Y).css("height", H.v);
                         break;
                     case WinFormjs.Form.MouseMoveAction.TopRightResize: 
-                        Y1 = parseInt(obj.css("top"));
-                        X1 = parseInt(obj.css("left"));
-                        W = parseInt(obj.css("width"));
-                        H = parseInt(obj.css("height"));
-                        H = (H - (((Y - Y1) | 0))) | 0;
-                        W = (mev.clientX - X1) | 0;
-                        if (H < WinFormjs.Form.movingForm.getMinHeight()) {
-                            Y = (Y - (((WinFormjs.Form.movingForm.getMinHeight() - H) | 0))) | 0;
-                            H = WinFormjs.Form.movingForm.getMinHeight();
+                        WinFormjs.Rectange.setExternalVariables(X1, Y1, W, H, obj);
+                        H.v = (H.v - (((Y - Y1.v) | 0))) | 0;
+                        W.v = (mev.clientX - X1.v) | 0;
+                        if (H.v < WinFormjs.Form.movingForm.getMinHeight()) {
+                            Y = (Y - (((WinFormjs.Form.movingForm.getMinHeight() - H.v) | 0))) | 0;
+                            H.v = WinFormjs.Form.movingForm.getMinHeight();
                         }
-                        if (W < WinFormjs.Form.movingForm.getMinWidth()) {
-                            W = WinFormjs.Form.movingForm.getMinWidth();
+                        if (W.v < WinFormjs.Form.movingForm.getMinWidth()) {
+                            W.v = WinFormjs.Form.movingForm.getMinWidth();
                         }
-                        obj.css("top", Y);
-                        obj.css("height", H);
-                        obj.css("width", W);
+                        obj.css("top", Y).css("height", H.v).css("width", W.v);
                         break;
                     case WinFormjs.Form.MouseMoveAction.LeftResize: 
-                        X1 = parseInt(obj.css("left"));
-                        W = parseInt(obj.css("width"));
-                        W = (W - (((X - X1) | 0))) | 0;
-                        if (W < WinFormjs.Form.movingForm.getMinWidth()) {
-                            X = (X - (((WinFormjs.Form.movingForm.getMinWidth() - W) | 0))) | 0;
-                            W = WinFormjs.Form.movingForm.getMinWidth();
+                        X1.v = parseInt(obj.css("left"));
+                        W.v = parseInt(obj.css("width"));
+                        W.v = (W.v - (((X - X1.v) | 0))) | 0;
+                        if (W.v < WinFormjs.Form.movingForm.getMinWidth()) {
+                            X = (X - (((WinFormjs.Form.movingForm.getMinWidth() - W.v) | 0))) | 0;
+                            W.v = WinFormjs.Form.movingForm.getMinWidth();
                         }
                         obj.css("left", X);
-                        obj.css("width", W);
+                        obj.css("width", W.v);
                         break;
                     case WinFormjs.Form.MouseMoveAction.BottomLeftResize: 
-                        X1 = parseInt(obj.css("left"));
-                        Y1 = parseInt(obj.css("top"));
-                        W = parseInt(obj.css("width"));
-                        H = parseInt(obj.css("height"));
-                        W = (W - (((X - X1) | 0))) | 0;
-                        H = (mev.clientY - Y1) | 0;
-                        if (W < WinFormjs.Form.movingForm.getMinWidth()) {
-                            X = (X - (((WinFormjs.Form.movingForm.getMinWidth() - W) | 0))) | 0;
-                            W = WinFormjs.Form.movingForm.getMinWidth();
+                        WinFormjs.Rectange.setExternalVariables(X1, Y1, W, H, obj);
+                        W.v = (W.v - (((X - X1.v) | 0))) | 0;
+                        H.v = (mev.clientY - Y1.v) | 0;
+                        if (W.v < WinFormjs.Form.movingForm.getMinWidth()) {
+                            X = (X - (((WinFormjs.Form.movingForm.getMinWidth() - W.v) | 0))) | 0;
+                            W.v = WinFormjs.Form.movingForm.getMinWidth();
                         }
-                        if (H < WinFormjs.Form.movingForm.getMinHeight()) {
-                            H = WinFormjs.Form.movingForm.getMinHeight();
+                        if (H.v < WinFormjs.Form.movingForm.getMinHeight()) {
+                            H.v = WinFormjs.Form.movingForm.getMinHeight();
                         }
-                        obj.css("left", X);
-                        obj.css("width", W);
-                        obj.css("height", H);
+                        obj.css("left", X).css("width", W.v).css("height", H.v);
                         break;
                     case WinFormjs.Form.MouseMoveAction.BottomResize: 
-                        Y1 = parseInt(obj.css("top"));
-                        H = parseInt(obj.css("height"));
-                        H = (mev.clientY - Y1) | 0;
-                        if (H < WinFormjs.Form.movingForm.getMinHeight()) {
-                            H = WinFormjs.Form.movingForm.getMinHeight();
+                        Y1.v = parseInt(obj.css("top"));
+                        H.v = parseInt(obj.css("height"));
+                        H.v = (mev.clientY - Y1.v) | 0;
+                        if (H.v < WinFormjs.Form.movingForm.getMinHeight()) {
+                            H.v = WinFormjs.Form.movingForm.getMinHeight();
                         }
-                        obj.css("height", H);
+                        obj.css("height", H.v);
                         break;
                     case WinFormjs.Form.MouseMoveAction.RightResize: 
-                        X1 = parseInt(obj.css("left"));
-                        W = parseInt(obj.css("width"));
-                        W = (mev.clientX - X1) | 0;
-                        if (W < WinFormjs.Form.movingForm.getMinWidth()) {
-                            W = WinFormjs.Form.movingForm.getMinWidth();
+                        X1.v = parseInt(obj.css("left"));
+                        W.v = parseInt(obj.css("width"));
+                        W.v = (mev.clientX - X1.v) | 0;
+                        if (W.v < WinFormjs.Form.movingForm.getMinWidth()) {
+                            W.v = WinFormjs.Form.movingForm.getMinWidth();
                         }
-                        obj.css("width", W);
+                        obj.css("width", W.v);
                         break;
                     case WinFormjs.Form.MouseMoveAction.BottomRightResize: 
-                        Y1 = parseInt(obj.css("top"));
-                        H = parseInt(obj.css("height"));
-                        X1 = parseInt(obj.css("left"));
-                        W = parseInt(obj.css("width"));
-                        W = (mev.clientX - X1) | 0;
-                        H = (mev.clientY - Y1) | 0;
-                        if (H < WinFormjs.Form.movingForm.getMinHeight()) {
-                            H = WinFormjs.Form.movingForm.getMinHeight();
+                        WinFormjs.Rectange.setExternalVariables(X1, Y1, W, H, obj);
+                        W.v = (mev.clientX - X1.v) | 0;
+                        H.v = (mev.clientY - Y1.v) | 0;
+                        if (H.v < WinFormjs.Form.movingForm.getMinHeight()) {
+                            H.v = WinFormjs.Form.movingForm.getMinHeight();
                         }
-                        if (W < WinFormjs.Form.movingForm.getMinWidth()) {
-                            W = WinFormjs.Form.movingForm.getMinWidth();
+                        if (W.v < WinFormjs.Form.movingForm.getMinWidth()) {
+                            W.v = WinFormjs.Form.movingForm.getMinWidth();
                         }
-                        obj.css("width", W);
-                        obj.css("height", H);
+                        obj.css("width", W.v).css("height", H.v);
                         break;
                     default: 
                         break;
@@ -1843,6 +1821,16 @@
             IMAGE_WinIcon: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')",
             IMAGE_WinIconHover: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')",
             IMAGE_WinIconDown: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACnSURBVFhHY5AZZGDUQYTAqIMIgVEHEQKjDiIERh1ECAxfBynrGGvbehv6JFnGVrmUznWvXRE27zoQQaWJBuQ4SN3UHmg30GLHvIlAi4EiELuxIogW4gHJDkKzD4iwCsIRRBfxYNRBhMCogwgBkh1EazAaZYTAqIMIgVEHEQIkOwgIBlfligsMZPODpmDUQYTAqIMIgVEHEQKjDiIERh1ECAwyB8nIAADHEJbDMY47rQAAAABJRU5ErkJggg==')",
+            /**
+             * #TODO This needs to link to regedit#
+             *
+             * @static
+             * @public
+             * @this WinFormjs.IconRepository
+             * @memberof WinFormjs.IconRepository
+             * @param   {string}    Name
+             * @return  {string}
+             */
             getIconByFileName: function (Name) {
                 if (Bridge.referenceEquals(Name, "cmd.exe")) {
                     return WinFormjs.IconRepository.IMAGE_CMD;
@@ -1936,6 +1924,12 @@
     Bridge.define("WinFormjs.Rectange", {
         $kind: "struct",
         statics: {
+            setExternalVariables: function (x, y, w, h, obj) {
+                x.v = parseInt(obj.css("left"));
+                y.v = parseInt(obj.css("top"));
+                w.v = parseInt(obj.css("width"));
+                h.v = parseInt(obj.css("height"));
+            },
             valueInRange: function (value, min, max) {
                 return (value >= min) && (value <= max);
             },
