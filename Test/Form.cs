@@ -505,7 +505,7 @@ namespace WinFormjs
 
 							break;
 						case MouseMoveAction.TopLeftResize:							
-                            Rectange.SetExternalVariables(out X1, out Y1, out W, out H, obj);
+                            Rectange.SetBounds(out X1, out Y1, out W, out H, obj);
 
                             W -= X - X1;
 							H -= Y - Y1;
@@ -542,7 +542,7 @@ namespace WinFormjs
 
 							break;
 						case MouseMoveAction.TopRightResize:							
-                            Rectange.SetExternalVariables(out X1, out Y1, out W, out H, obj);
+                            Rectange.SetBounds(out X1, out Y1, out W, out H, obj);
 
                             H -= Y - Y1;
 							W = mev.ClientX - X1;
@@ -578,7 +578,7 @@ namespace WinFormjs
 
 							break;
 						case MouseMoveAction.BottomLeftResize:							
-                            Rectange.SetExternalVariables(out X1, out Y1, out W, out H, obj);
+                            Rectange.SetBounds(out X1, out Y1, out W, out H, obj);
 
                             W -= X - X1;
 							H = mev.ClientY - Y1;					
@@ -626,7 +626,7 @@ namespace WinFormjs
 
 							break;
 						case MouseMoveAction.BottomRightResize:							
-                            Rectange.SetExternalVariables(out X1, out Y1, out W, out H, obj);
+                            Rectange.SetBounds(out X1, out Y1, out W, out H, obj);
 
                             W = mev.ClientX - X1;
 
