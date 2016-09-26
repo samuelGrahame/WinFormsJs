@@ -75,6 +75,14 @@
 
     Bridge.define("WinFormjs.FileExplorerNode", {
         statics: {
+            createSaveToken: function (path, isFile) {
+                if (isFile === void 0) { isFile = true; }
+                if (isFile) {
+                    return System.String.format("@{0}", path);
+                } else {
+                    return System.String.format("#{0}", path);
+                }
+            },
             createNode: function (path, nvt, parent, IsFile) {
                 if (IsFile === void 0) { IsFile = false; }
                 var fen = Bridge.merge(new WinFormjs.FileExplorerNode(), {
@@ -257,7 +265,7 @@
 
                         frm.show();
                     } else {
-                        this.parent.setPath(WinFormjs.FileExplorer.DesktopPath); // FullPath;
+                        this.parent.setPath(this.getFullPath());
                         this.parent.refresh();
                     }
                 }
@@ -316,6 +324,19 @@
     Bridge.define("WinFormjs.FileExplorer", {
         statics: {
             DesktopPath: "$desktop",
+            loadedExplorers: null,
+            config: {
+                init: function () {
+                    this.loadedExplorers = new (System.Collections.Generic.List$1(WinFormjs.FileExplorer))();
+                }
+            },
+            fileChangeAt: function (path) {
+                for (var i = 0; i < WinFormjs.FileExplorer.loadedExplorers.getCount(); i = (i + 1) | 0) {
+                    if (WinFormjs.FileExplorer.loadedExplorers.getItem(i) != null && Bridge.referenceEquals(WinFormjs.FileExplorer.loadedExplorers.getItem(i).path, path) || Bridge.referenceEquals(WinFormjs.FileExplorer.loadedExplorers.getItem(i).path, System.String.concat(path, "\\"))) {
+                        WinFormjs.FileExplorer.loadedExplorers.getItem(i).refresh();
+                    }
+                }
+            },
             isDirectoryRequestValue: function (directory) {
 
 
@@ -342,6 +363,8 @@
             this.element = element;
             this.owner = owner;
 
+            WinFormjs.FileExplorer.loadedExplorers.add(this);
+
             this.element.addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.FileExplorer.f1));
         },
         getPath: function () {
@@ -351,7 +374,7 @@
             if (!Bridge.referenceEquals(this.path, value)) {
                 if (WinFormjs.FileExplorer.isDirectoryRequestValue(value)) {
                     if (this.owner != null) {
-                        this.owner.setText(this.path);
+                        this.owner.setText(value);
                     }
 
                     this.path = value;
@@ -655,14 +678,27 @@
 
                     if (kev.keyCode === 13) {
                         // create a new Form
-
-                        var frm = new WinFormjs.FormBrowser();
-                        frm.setLeft("100px");
-                        frm.setTop("100px");
-                        //https://www.bing.com/search?q=
-                        //https://www.google.com/#q=
-                        frm.navigate(System.String.format("https://www.bing.com/search?q={0}", input.value));
-                        frm.show();
+                        if (Bridge.referenceEquals(input.value.toLowerCase(), "notepad")) {
+                            var Notepad = new WinFormjs.FormNotePad();
+                            Notepad.setLeft("50px");
+                            Notepad.setTop("50px");
+                            Notepad.setText("Note Pad");
+                            Notepad.show();
+                        } else if (Bridge.referenceEquals(input.value.toLowerCase(), "cmd")) {
+                            var cmd = new WinFormjs.FormConsole();
+                            cmd.setLeft("50px");
+                            cmd.setTop("50px");
+                            cmd.setText("Command Prompt");
+                            cmd.show();
+                        } else {
+                            var frm = new WinFormjs.FormBrowser();
+                            frm.setLeft("100px");
+                            frm.setTop("100px");
+                            //https://www.bing.com/search?q=
+                            //https://www.google.com/#q=
+                            frm.navigate(System.String.format("https://www.bing.com/search?q={0}", input.value));
+                            frm.show();
+                        }
 
                         input.blur();
                     }
@@ -1838,6 +1874,8 @@
                     return WinFormjs.IconRepository.IMAGE_Notepad;
                 } else if (Bridge.referenceEquals(Name, "Recycle Bin")) {
                     return WinFormjs.IconRepository.IMAGE_BinEmpty;
+                } else if (System.String.endsWith(Name, ".txt")) {
+                    return WinFormjs.IconRepository.IMAGE_Notepad;
                 }
                 return "";
             }
@@ -1887,6 +1925,17 @@
                 var DirectoryName = WinFormjs.Path.getDirectoryName(fileName);
                 var FileName = WinFormjs.Path.getFileName(fileName);
 
+                if (System.String.endsWith(FileName, ".txt")) {
+                    var Notepad = new WinFormjs.FormNotePad();
+                    Notepad.setLeft("50px");
+                    Notepad.setTop("50px");
+                    Notepad.setText("Note Pad");
+                    Notepad.setPath(fileName);
+                    Notepad.show();
+                } else {
+                    // ??
+                }
+
                 if (Bridge.referenceEquals(DirectoryName, WinFormjs.FileExplorer.DesktopPath)) {
                     switch (FileName) {
                         case "iexplore.exe": 
@@ -1898,11 +1947,11 @@
                             iexplore.show();
                             break;
                         case "Notepad.exe": 
-                            var Notepad = new WinFormjs.FormNotePad();
-                            Notepad.setLeft("50px");
-                            Notepad.setTop("50px");
-                            Notepad.setText("Note Pad");
-                            Notepad.show();
+                            var Notepad1 = new WinFormjs.FormNotePad();
+                            Notepad1.setLeft("50px");
+                            Notepad1.setTop("50px");
+                            Notepad1.setText("Note Pad");
+                            Notepad1.show();
                             break;
                         case "cmd.exe": 
                             var cmd = new WinFormjs.FormConsole();
@@ -1997,31 +2046,46 @@
     Bridge.define("WinFormjs.Directory", {
         inherits: [WinFormjs.FileExplorerNode],
         statics: {
+            create: function (path) {
+                Bridge.global.localStorage.setItem(WinFormjs.FileExplorerNode.createSaveToken(path, false), "");
+            },
             getDirectories: function (path) {
-                if (Bridge.referenceEquals(path, WinFormjs.FileExplorer.DesktopPath)) {
-                    if (true) {
-                        var pathList = new (System.Collections.Generic.List$1(String))();
-                        for (var i = 0; i < 25; i = (i + 1) | 0) {
-                            pathList.add(System.String.format("{0}/New Folder {1}", path, i));
+                return WinFormjs.Directory.getTokens(path, "#");
+            },
+            getTokens: function (path, Token) {
+                if (Token === void 0) { Token = "@"; }
+                if (!System.String.endsWith(path, "\\")) {
+                    path = System.String.concat(path, "\\");
+                }
+                path = System.String.replaceAll(path, "\\ate", "\\");
+
+                var Tokens = new (System.Collections.Generic.List$1(String))();
+
+                var SearchToken = System.String.format("{0}{1}", Token, path);
+
+                for (var i = 0; i < Bridge.global.localStorage.length; i = (i + 1) | 0) {
+                    var key = Bridge.global.localStorage.key(i);
+
+                    if (System.String.startsWith(key, SearchToken)) {
+                        if (System.String.contains(key.substr(SearchToken.length),"\\")) {
+                            continue;
                         }
-                        return pathList.toArray();
-                    } else {
-                        //return new string[] {
-                        //string.Format("{0}/New Folder 1", path),
-                        //string.Format("{0}/New Folder 2", path),
-                        //string.Format("{0}/New Folder 3", path),
-                        //string.Format("{0}/New Folder 4", path)};
+
+                        key = System.String.replaceAll(key, "\\ate", "\\");
+                        Tokens.add(key.substr(1));
                     }
                 }
-
-                return null;
+                return Tokens.toArray();
             },
             getFiles: function (path) {
+                var Tokens = new (System.Collections.Generic.List$1(String))();
                 if (Bridge.referenceEquals(path, WinFormjs.FileExplorer.DesktopPath)) {
-                    return [System.String.format("{0}/Recycle Bin", path), System.String.format("{0}/iexplore.exe", path), System.String.format("{0}/Notepad.exe", path), System.String.format("{0}/cmd.exe", path)];
+                    Tokens.addRange([System.String.format("{0}/Recycle Bin", path), System.String.format("{0}/iexplore.exe", path), System.String.format("{0}/Notepad.exe", path), System.String.format("{0}/cmd.exe", path)]);
                 }
 
-                return null;
+                Tokens.addRange(WinFormjs.Directory.getTokens(path));
+
+                return Tokens.toArray();
             }
         }
     });
@@ -2038,23 +2102,59 @@
     Bridge.define("WinFormjs.File", {
         inherits: [WinFormjs.FileExplorerNode],
         statics: {
+            exists: function (path) {
+                return Bridge.global.localStorage[WinFormjs.FileExplorerNode.createSaveToken(path)] != null;
+            },
             readAllText: function (path) {
-                return null;
+                return Bridge.cast(Bridge.global.localStorage.getItem(WinFormjs.FileExplorerNode.createSaveToken(path)), String);
             },
             readAllLines: function (path) {
-                return null;
+                return WinFormjs.File.readAllText(path).toString().split("\r\n");
             },
             readAllBytes: function (path) {
-                return null;
+                return WinFormjs.File.getBytes(WinFormjs.File.readAllText(path));
+            },
+            getBytes: function (value) {
+                var data = System.Array.init(value.length, 0);
+
+                for (var i = 0; i < value.length; i = (i + 1) | 0) {
+                    data[i] = (value.charCodeAt(i)) & 255;
+                }
+                return data;
+            },
+            getCharArray: function (value) {
+                var data = System.Array.init(value.length, function (){
+                    return new System.Char();
+                });
+                for (var i = 0; i < value.length; i = (i + 1) | 0) {
+                    data[i] = value[i];
+                }
+                return data;
+            },
+            getString: function (value) {
+                var data = System.Array.init(value.length, function (){
+                    return new System.Char();
+                });
+                for (var i = 0; i < value.length; i = (i + 1) | 0) {
+                    data[i] = value[i];
+                }
+                return String.fromCharCode.apply(null, data);
             },
             writeAllBytes: function (path, bytes) {
-
+                WinFormjs.File.writeAllText(path, WinFormjs.File.getString(bytes));
             },
             writeAllLines: function (path, contents) {
-
+                var builder = new System.Text.StringBuilder();
+                for (var i = 0; i < contents.length; i = (i + 1) | 0) {
+                    builder.appendLine(contents[i]);
+                }
+                WinFormjs.File.writeAllText(path, builder.toString());
             },
             writeAllText: function (path, contents) {
-
+                Bridge.global.localStorage.setItem(WinFormjs.FileExplorerNode.createSaveToken(path), contents);
+            },
+            delete: function (path) {
+                Bridge.global.localStorage.removeItem(WinFormjs.FileExplorerNode.createSaveToken(path));
             }
         }
     });
@@ -2097,6 +2197,7 @@
         commandPanel: null,
         commandInput: null,
         commandLines: null,
+        currentcd: null,
         line: -1,
         setCommandLineElement: function (element) {
             if (Bridge.referenceEquals(element.tagName.toLowerCase(), "span")) {
@@ -2155,10 +2256,17 @@
             this.setWidth("677px");
             this.setHeight("392px");
         },
-        onShowed: function () {
-            this.writeLine("Commands: [clear, toggle bodyoverlay]");
+        reset: function () {
+            this.currentcd = WinFormjs.FileExplorer.DesktopPath;
+            this.setText(System.String.concat("Console - Path: ", this.currentcd));
+            this.clear();
+            this.writeLine("Commands: [clear, toggle bodyoverlay, cd, dir, createfile, deletefile, createdir]");
 
             this.commandInput.focus();
+        },
+        onShowed: function () {
+
+            this.reset();
         },
         writeLine: function (line) {
             var $t;
@@ -2171,13 +2279,14 @@
             }
         },
         incrementLine: function () {
+            var $t, $t1;
             var cmd = this.commandInput.value;
             if (cmd.length > 0) {
                 this.commandInput.value = "";
 
                 var SpanText = document.createElement('span');
                 this.fillHorizontalControlWithParent(SpanText, 2);
-
+                SpanText.style.whiteSpace = "nowrap";
                 this.setCommandLineElement(SpanText);
                 SpanText.innerHTML = cmd;
                 SpanText.style.top = System.String.concat((((((parseInt(this.commandInput.style.height) * this.line) | 0)) + 3) | 0), "px");
@@ -2189,10 +2298,50 @@
             this.commandPanel.scrollTop = this.commandPanel.scrollHeight;
 
             if (Bridge.referenceEquals(cmd.toLowerCase(), "clear")) {
-                this.clear();
+                this.reset();
             } else {
                 if (Bridge.referenceEquals(cmd.toLowerCase(), "toggle bodyoverlay")) {
                     WinFormjs.Form.setShowBodyOverLay(!WinFormjs.Form.getShowBodyOverLay());
+                } else if (System.String.startsWith(cmd.toLowerCase(), "cd ")) {
+                    this.currentcd = System.String.concat(this.currentcd, (System.String.concat("\\", cmd.substr(3))));
+                    this.setText(System.String.concat("Console - Path: ", this.currentcd));
+                } else if (System.String.startsWith(cmd.toLowerCase(), "dir")) {
+                    var location;
+
+                    if (System.String.startsWith(cmd.toLowerCase(), "dir ")) {
+                        location = cmd.substr(("dir ").length);
+                    } else {
+                        location = this.currentcd;
+                    }
+
+                    $t = Bridge.getEnumerator(WinFormjs.Directory.getDirectories(location));
+                    while ($t.moveNext()) {
+                        var item = $t.getCurrent();
+                        this.writeLine(item);
+                    }
+                    $t1 = Bridge.getEnumerator(WinFormjs.Directory.getFiles(location));
+                    while ($t1.moveNext()) {
+                        var item1 = $t1.getCurrent();
+                        this.writeLine(item1);
+                    }
+                } else if (System.String.startsWith(cmd.toLowerCase(), "createfile ")) {
+                    var pathAndFile = System.String.concat(System.String.concat(this.currentcd, "\\"), cmd.substr(("createfile ").length));
+
+                    WinFormjs.File.writeAllText(pathAndFile, "");
+
+                    WinFormjs.FileExplorer.fileChangeAt(WinFormjs.Path.getDirectoryName(pathAndFile));
+                } else if (System.String.startsWith(cmd.toLowerCase(), "deletefile ")) {
+                    var pathAndFile1 = System.String.concat(System.String.concat(this.currentcd, "\\"), cmd.substr(("deletefile ").length));
+
+                    WinFormjs.File.delete(pathAndFile1);
+
+                    WinFormjs.FileExplorer.fileChangeAt(WinFormjs.Path.getDirectoryName(pathAndFile1));
+                } else if (System.String.startsWith(cmd.toLowerCase(), "createdir ")) {
+                    var pathAndFile2 = System.String.concat(System.String.concat(this.currentcd, "\\"), cmd.substr(("createdir ").length));
+
+                    WinFormjs.Directory.create(pathAndFile2);
+
+                    WinFormjs.FileExplorer.fileChangeAt(WinFormjs.Path.getDirectoryName(pathAndFile2));
                 }
             }
         },
@@ -2248,10 +2397,16 @@
             this.fileExplorerRender = Bridge.merge(new WinFormjs.FileExplorer(this.getBody(), this), {
                 setNodeViewType: WinFormjs.NodeViewType.Medium_Icons
             } );
+            this.setBackColor("cornflowerblue");
+            this.getBody().style.overflow = "auto";
         },
         onShowed: function () {
-            this.fileExplorerRender.setPath(WinFormjs.FileExplorer.DesktopPath); // StartingLocation;
+            this.fileExplorerRender.setPath(this.startingLocation); // StartingLocation;
             this.fileExplorerRender.refresh();
+        },
+        onClosing: function () {
+            WinFormjs.FileExplorer.loadedExplorers.remove(this.fileExplorerRender);
+            WinFormjs.Form.prototype.onClosing.call(this);
         }
     });
 
@@ -2259,6 +2414,7 @@
         inherits: [WinFormjs.Form],
         config: {
             properties: {
+                Path: null,
                 NotePadContent: null
             }
         },
@@ -2270,6 +2426,19 @@
             this.getNotePadContent().style.resize = "none";
 
             this.getBody().appendChild(this.getNotePadContent());
+        },
+        onShowing: function () {
+            if (this.getPath() != null) {
+                this.getNotePadContent().value = WinFormjs.File.readAllText(this.getPath());
+            }
+        },
+        onClosing: function () {
+            // Ask if you would like to save changes!!
+
+            if (this.getPath() != null) {
+                WinFormjs.File.writeAllText(this.getPath(), this.getNotePadContent().value);
+            }
+            WinFormjs.Form.prototype.onClosing.call(this);
         }
     });
 });

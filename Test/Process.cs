@@ -13,6 +13,19 @@ namespace WinFormjs
         {            
             string DirectoryName = Path.GetDirectoryName(fileName);
             string FileName = Path.GetFileName(fileName);
+
+            if(FileName.EndsWith(".txt"))
+            {
+                var Notepad = new FormNotePad();
+                Notepad.Left = "50px";
+                Notepad.Top = "50px";
+                Notepad.Text = "Note Pad";
+                Notepad.Path = fileName;
+                Notepad.Show();
+            }else
+            {
+                // ??
+            }
             
             if(DirectoryName == FileExplorer.DesktopPath)
             {                

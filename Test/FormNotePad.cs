@@ -9,6 +9,7 @@ namespace WinFormjs
 {
     public class FormNotePad : Form
     {
+        public string Path { get; set; }
         public HTMLTextAreaElement NotePadContent { get; set; }
 
         protected override void Initialise()
@@ -19,7 +20,26 @@ namespace WinFormjs
 
             NotePadContent.Style.Resize = Resize.None;
 
-            Body.AppendChild(NotePadContent);
+            Body.AppendChild(NotePadContent);            
+        }
+
+        protected override void OnShowing()
+        {            
+            if (Path != null)
+            {
+                NotePadContent.Value = File.ReadAllText(Path);
+            }
+        }
+
+        protected override void OnClosing()
+        {
+            // Ask if you would like to save changes!!
+
+            if (Path != null)
+            {
+                File.WriteAllText(Path, NotePadContent.Value);
+            }
+            base.OnClosing();
         }
     }
 }

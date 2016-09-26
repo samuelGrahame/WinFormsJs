@@ -18,10 +18,24 @@ namespace WinFormjs
         public const string DesktopPath = "$desktop";
         public HTMLElement Element;
 
+        public static List<FileExplorer> LoadedExplorers = new List<FileExplorer>();
+
+        public static void FileChangeAt(string path)
+        {
+            for (int i = 0; i < LoadedExplorers.Count; i++)
+            {
+                if (LoadedExplorers[i] != null &&
+                    LoadedExplorers[i].path == path || LoadedExplorers[i].path == path + "\\")
+                    LoadedExplorers[i].Refresh();
+            }
+        }
+
         public FileExplorer(HTMLElement element, FormFileExplorer owner = null)
         {
             Element = element;
-            Owner = owner;            
+            Owner = owner;
+
+            LoadedExplorers.Add(this);
 
             Element.AddEventListener(EventType.MouseDown, (ev) =>
             {
@@ -83,7 +97,7 @@ namespace WinFormjs
                     if(IsDirectoryRequestValue(value))
                     {
                         if (Owner != null)
-                            Owner.Text = path;
+                            Owner.Text = value;
 
                         path = value;
                         Refresh();
@@ -279,6 +293,17 @@ namespace WinFormjs
 
         protected FileExplorer parent;
 
+        protected static string CreateSaveToken(string path, bool isFile = true)
+        {
+            if(isFile)
+            {
+                return string.Format("@{0}", path);
+            }else
+            {
+                return string.Format("#{0}", path);
+            }
+        }
+
         public FileExplorerState NodeExplorerState
         {
             get { return nodeState; }
@@ -328,7 +353,7 @@ namespace WinFormjs
                                 frm.Show();
                             }else
                             {
-                                parent.Path = FileExplorer.DesktopPath; // FullPath;
+                                parent.Path = FullPath;
                                 parent.Refresh();
                             }
                         }

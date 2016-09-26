@@ -201,14 +201,32 @@ namespace WinFormjs
                 if(kev.KeyCode == 13)
                 {
                     // create a new Form
-
-                    var frm = new FormBrowser();
-                    frm.Left = "100px";
-                    frm.Top = "100px";
-                    //https://www.bing.com/search?q=
-                    //https://www.google.com/#q=
-                    frm.Navigate(string.Format("https://www.bing.com/search?q={0}", input.Value));
-                    frm.Show();
+                    if(input.Value.ToLower() == "notepad")
+                    {
+                        var Notepad = new FormNotePad();
+                        Notepad.Left = "50px";
+                        Notepad.Top = "50px";
+                        Notepad.Text = "Note Pad";
+                        Notepad.Show();
+                    }
+                    else if (input.Value.ToLower() == "cmd")
+                    {
+                        var cmd = new FormConsole();
+                        cmd.Left = "50px";
+                        cmd.Top = "50px";
+                        cmd.Text = "Command Prompt";
+                        cmd.Show();
+                    }
+                    else
+                    {
+                        var frm = new FormBrowser();
+                        frm.Left = "100px";
+                        frm.Top = "100px";
+                        //https://www.bing.com/search?q=
+                        //https://www.google.com/#q=
+                        frm.Navigate(string.Format("https://www.bing.com/search?q={0}", input.Value));
+                        frm.Show();
+                    }                    
 
                     input.Blur();
                 }
