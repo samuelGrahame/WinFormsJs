@@ -13,6 +13,12 @@ namespace WinFormjs
         public List<MenuItem> Items = new List<MenuItem>();
         public HTMLDivElement Base { get; set; } // Need to create base Control...
 
+        public const string BeginGroupColor = "#919191"; // Also Disabled Forecolor 
+        public const string BorderColor = "#A0A0A0";
+        public const string BackgroundColor = "#F2F2F2";
+        public const string MenuHoverColor = "#D9D9D9";
+        public const string Forecolor = "black";
+
         public void Show(Point location)
         {
             if (Base != null)
@@ -23,13 +29,13 @@ namespace WinFormjs
 
             Base = new HTMLDivElement();
 
-            Base.Style.BorderColor = "#A0A0A0";
+            Base.Style.BorderColor = BorderColor;
             Base.Style.BorderStyle = BorderStyle.Solid;
             Base.Style.BorderWidth = BorderWidth.Thin;
             Base.Style.Padding = "2px";
             Base.Style.Margin = "0";
 
-            Base.Style.BackgroundColor = "#F2F2F2";
+            Base.Style.BackgroundColor = BackgroundColor;
 
             jQuery.Select(Base).
                 Css("left", location.X).
@@ -51,7 +57,7 @@ namespace WinFormjs
         public void Close()
         {
 
-        }        
+        }
     }
 
     public class MenuItem
