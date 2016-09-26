@@ -46,6 +46,7 @@ namespace WinFormjs
         public bool Enabled { get; set; }
         public string Color { get; set; }
         public Action OnClick { get; set; }
+        public bool BeginGroup { get; set; }
 
         public virtual HTMLDivElement GenerateDiv() // Allow other menu items to add stuff to them :D
         {
