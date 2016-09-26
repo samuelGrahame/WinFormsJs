@@ -62,7 +62,10 @@ namespace WinFormjs
 
     public class MenuItem
     {
-        public string Image { get; set; }
+        // 1px between each menu item
+        // beginGroup 2px on top, 1px height, 3px bottom
+        // Height is 22px
+        public string Image { get; set; } // Height is 16x16
         public string Caption { get; set; }
         public bool Enabled { get; set; }
         public string Color { get; set; }
