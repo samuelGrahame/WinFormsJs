@@ -15,7 +15,21 @@ namespace WinFormjs
 
         public void Show(Point location)
         {
+            if (Base != null)
+            {
+                Base.Remove();
+                Base = null;
+            }
+
             Base = new HTMLDivElement();
+
+            Base.Style.BorderColor = "#A0A0A0";
+            Base.Style.BorderStyle = BorderStyle.Solid;
+            Base.Style.BorderWidth = BorderWidth.Thin;
+            Base.Style.Padding = "2px";
+            Base.Style.Margin = "0";
+
+            Base.Style.BackgroundColor = "#F2F2F2";
 
             jQuery.Select(Base).
                 Css("left", location.X).
@@ -42,6 +56,7 @@ namespace WinFormjs
 
     public class MenuItem
     {
+        public string Image { get; set; }
         public string Caption { get; set; }
         public bool Enabled { get; set; }
         public string Color { get; set; }
