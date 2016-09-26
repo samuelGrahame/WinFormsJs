@@ -44,6 +44,7 @@
     <Compile Include="FormBrowser.cs" />
     <Compile Include="FormConsole.cs" />
     <Compile Include="FormFileExplorer.cs" />
+    <Compile Include="Controls\PopupMenu.cs" />
     <Compile Include="FormNotePad.cs" />
     <Compile Include="IconRepository.cs" />
     <Compile Include="Path.cs" />
