@@ -88,6 +88,19 @@ namespace WinFormjs
                 // Add Image
             }
 
+            if(!string.IsNullOrWhiteSpace(Caption))
+            {
+                var span = new HTMLSpanElement();
+                span.InnerHTML = Caption;
+                span.Style.Position = Position.Absolute;
+                jQuery.Select(span).
+                    Css("left", 34).
+                    Css("top", 0).                    
+                    Css("height", 22);
+                span.Style.Width = StyleController
+                //Css("width", 202 - 34).
+                //div.AppendChild()
+            }
             // add text
 
 
