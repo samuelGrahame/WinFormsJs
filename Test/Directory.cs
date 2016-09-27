@@ -10,44 +10,59 @@ namespace WinFormjs
 {
     public class Directory : FileExplorerNode
     {
+        public static void Create(string path)
+        {
+            Global.LocalStorage.SetItem(CreateSaveToken(path, false), "");
+        }
+
         public static string[] GetDirectories(string path)
         {
-            if(path == FileExplorer.DesktopPath)
-            {
-                if(true)
-                {
-                    var pathList = new List<string>();
-                    for (int i = 0; i < 25; i++)
-                    {
-                        pathList.Add(string.Format("{0}/New Folder {1}", path, i));
-                    }
-                    return pathList.ToArray();
-                }
-                else
-                {
-                    //return new string[] {
-                    //string.Format("{0}/New Folder 1", path),
-                    //string.Format("{0}/New Folder 2", path),
-                    //string.Format("{0}/New Folder 3", path),
-                    //string.Format("{0}/New Folder 4", path)};
-                }                
-            }
+            return GetTokens(path, "#");
+        }
 
-            return null;
+        public static string[] GetTokens(string path, string Token = "@")
+        {
+            if (!path.EndsWith("\\"))
+                path += "\\";
+            path = path.Replace(@"\ate", @"\");
+            
+            List<string> Tokens = new List<string>();
+
+            string SearchToken = string.Format("{0}{1}", Token, path);
+
+            for (int i = 0; i < Global.LocalStorage.Length; i++)
+            {
+                string key = Global.LocalStorage.Key(i);
+
+                if (key.StartsWith(SearchToken))
+                {
+                    if (key.Substring(SearchToken.Length).Contains("\\"))
+                    {
+                        continue;
+                    }
+
+                    key = key.Replace(@"\ate", @"\");
+                    Tokens.Add(key.Substring(1));
+                }
+            }
+            return Tokens.ToArray();
         }
 
         public static string[] GetFiles(string path)
-        {                        
+        {
+            List<string> Tokens = new List<string>();
             if (path == FileExplorer.DesktopPath)
             {
-                return new string[] {
+                Tokens.AddRange(new string[] {
                 string.Format("{0}/Recycle Bin", path),
                 string.Format("{0}/iexplore.exe", path),
                 string.Format("{0}/Notepad.exe", path),
-                string.Format("{0}/cmd.exe", path)};
+                string.Format("{0}/cmd.exe", path)});                
             }
 
-            return null;
+            Tokens.AddRange(GetTokens(path));
+
+            return Tokens.ToArray();            
         }        
     }
 

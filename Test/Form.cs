@@ -201,14 +201,32 @@ namespace WinFormjs
                 if(kev.KeyCode == 13)
                 {
                     // create a new Form
-
-                    var frm = new FormBrowser();
-                    frm.Left = "100px";
-                    frm.Top = "100px";
-                    //https://www.bing.com/search?q=
-                    //https://www.google.com/#q=
-                    frm.Navigate(string.Format("https://www.bing.com/search?q={0}", input.Value));
-                    frm.Show();
+                    if(input.Value.ToLower() == "notepad")
+                    {
+                        var Notepad = new FormNotePad();
+                        Notepad.Left = "50px";
+                        Notepad.Top = "50px";
+                        Notepad.Text = "Note Pad";
+                        Notepad.Show();
+                    }
+                    else if (input.Value.ToLower() == "cmd")
+                    {
+                        var cmd = new FormConsole();
+                        cmd.Left = "50px";
+                        cmd.Top = "50px";
+                        cmd.Text = "Command Prompt";
+                        cmd.Show();
+                    }
+                    else
+                    {
+                        var frm = new FormBrowser();
+                        frm.Left = "100px";
+                        frm.Top = "100px";
+                        //https://www.bing.com/search?q=
+                        //https://www.google.com/#q=
+                        frm.Navigate(string.Format("https://www.bing.com/search?q={0}", input.Value));
+                        frm.Show();
+                    }                    
 
                     input.Blur();
                 }
@@ -486,14 +504,10 @@ namespace WinFormjs
                                 Css("left", X);							
 
 							break;
-						case MouseMoveAction.TopLeftResize:
-							X1 = Global.ParseInt(obj.Css("left"));
-							Y1 = Global.ParseInt(obj.Css("top"));
+						case MouseMoveAction.TopLeftResize:							
+                            Rectange.SetBounds(out X1, out Y1, out W, out H, obj);
 
-							W = Global.ParseInt(obj.Css("width"));
-							H = Global.ParseInt(obj.Css("height"));							
-							
-							W -= X - X1;
+                            W -= X - X1;
 							H -= Y - Y1;
 
 							if(W < MovingForm.MinWidth)
@@ -512,8 +526,7 @@ namespace WinFormjs
 
 							break;
 						case MouseMoveAction.TopResize:							
-							Y1 = Global.ParseInt(obj.Css("top"));
-							
+							Y1 = Global.ParseInt(obj.Css("top"));							
 							H = Global.ParseInt(obj.Css("height"));
 							
 							H -= Y - Y1;
@@ -528,14 +541,10 @@ namespace WinFormjs
                                 Css("height", H);
 
 							break;
-						case MouseMoveAction.TopRightResize:
-							Y1 = Global.ParseInt(obj.Css("top"));
-							X1 = Global.ParseInt(obj.Css("left"));
+						case MouseMoveAction.TopRightResize:							
+                            Rectange.SetBounds(out X1, out Y1, out W, out H, obj);
 
-							W = Global.ParseInt(obj.Css("width"));
-							H = Global.ParseInt(obj.Css("height"));
-
-							H -= Y - Y1;
+                            H -= Y - Y1;
 							W = mev.ClientX - X1;
 
 							if(H < MovingForm.MinHeight)
@@ -568,14 +577,10 @@ namespace WinFormjs
 							obj.Css("width", W);
 
 							break;
-						case MouseMoveAction.BottomLeftResize:
-							X1 = Global.ParseInt(obj.Css("left"));
-							Y1 = Global.ParseInt(obj.Css("top"));
+						case MouseMoveAction.BottomLeftResize:							
+                            Rectange.SetBounds(out X1, out Y1, out W, out H, obj);
 
-							W = Global.ParseInt(obj.Css("width"));
-							H = Global.ParseInt(obj.Css("height"));
-
-							W -= X - X1;
+                            W -= X - X1;
 							H = mev.ClientY - Y1;					
 							
 							if(W < MovingForm.MinWidth)
@@ -620,14 +625,10 @@ namespace WinFormjs
 							obj.Css("width", W);
 
 							break;
-						case MouseMoveAction.BottomRightResize:
-							Y1 = Global.ParseInt(obj.Css("top"));
-							H = Global.ParseInt(obj.Css("height"));
+						case MouseMoveAction.BottomRightResize:							
+                            Rectange.SetBounds(out X1, out Y1, out W, out H, obj);
 
-							X1 = Global.ParseInt(obj.Css("left"));
-							W = Global.ParseInt(obj.Css("width"));
-
-							W = mev.ClientX - X1;
+                            W = mev.ClientX - X1;
 
 							H = mev.ClientY - Y1;
 

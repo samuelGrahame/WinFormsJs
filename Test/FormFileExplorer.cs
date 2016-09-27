@@ -15,17 +15,26 @@ namespace WinFormjs
         {
             StartingLocation = startingLocation;
         }
+
         protected override void Initialise()
         {
             base.Initialise();
 
-            FileExplorerRender = new FileExplorer(this.Body, this) { NodeViewType = NodeViewType.Medium_Icons };            
+            FileExplorerRender = new FileExplorer(this.Body, this) { NodeViewType = NodeViewType.Medium_Icons };
+            BackColor = "cornflowerblue";
+            Body.Style.Overflow = Bridge.Html5.Overflow.Auto;
         }
 
         protected override void OnShowed()
         {
-            FileExplorerRender.Path = FileExplorer.DesktopPath; // StartingLocation;
+            FileExplorerRender.Path = StartingLocation; // StartingLocation;
             FileExplorerRender.Refresh();
+        }
+
+        protected override void OnClosing()
+        {
+            FileExplorer.LoadedExplorers.Remove(FileExplorerRender);
+            base.OnClosing();
         }
     }
 }

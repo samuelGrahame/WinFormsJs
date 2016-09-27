@@ -14,6 +14,8 @@ namespace WinFormjs
         private HTMLInputElement CommandInput;
         private List<HTMLSpanElement> CommandLines;
 
+        public string currentcd;
+
         private int Line = -1;
 
         private void SetCommandLineElement(HTMLElement element)
@@ -90,11 +92,20 @@ namespace WinFormjs
             Height = "392px";
         }
 
-        protected override void OnShowed()
+        public void Reset()
         {
-            WriteLine("Commands: [clear, toggle bodyoverlay]");
+            currentcd = FileExplorer.DesktopPath;
+            Text = "Console - Path: " + currentcd;
+            Clear();
+            WriteLine("Commands: [clear, toggle bodyoverlay, cd, dir, createfile, deletefile, createdir]");
 
             CommandInput.Focus();
+        }
+
+        protected override void OnShowed()
+        {
+            
+            Reset();
         }
 
         public void WriteLine(string line)
@@ -116,7 +127,7 @@ namespace WinFormjs
 
                 var SpanText = new HTMLSpanElement();
                 FillHorizontalControlWithParent(SpanText, 2);
-                
+                SpanText.Style.WhiteSpace = WhiteSpace.NoWrap;
                 SetCommandLineElement(SpanText);
                 SpanText.InnerHTML = cmd;
                 SpanText.Style.Top = (Global.ParseInt(CommandInput.Style.Height) * Line) + 3 + "px";
@@ -128,10 +139,59 @@ namespace WinFormjs
             CommandPanel.ScrollTop = CommandPanel.ScrollHeight;
 
             if (cmd.ToLower() == "clear")
-                Clear();
+                Reset();
             else if (cmd.ToLower() == "toggle bodyoverlay")
-            {                
+            {
                 ShowBodyOverLay = !ShowBodyOverLay;
+            }
+            else if (cmd.ToLower().StartsWith("cd "))
+            {
+                currentcd += "\\" + cmd.Substring(3);
+                Text = "Console - Path: " + currentcd;
+            }
+            else if (cmd.ToLower().StartsWith("dir"))
+            {
+                string location;
+
+                if (cmd.ToLower().StartsWith("dir "))
+                {
+                    location = cmd.Substring("dir ".Length);
+                }else
+                {
+                    location = currentcd;
+                }
+
+                foreach (string item in Directory.GetDirectories(location))
+                {
+                    WriteLine(item);
+                }
+                foreach (string item in Directory.GetFiles(location))
+                {
+                    WriteLine(item);
+                }
+            }
+            else if (cmd.ToLower().StartsWith("createfile "))
+            {
+                string pathAndFile = currentcd + @"\" + cmd.Substring("createfile ".Length);
+                
+                File.WriteAllText(pathAndFile, "");
+                
+                FileExplorer.FileChangeAt(Path.GetDirectoryName(pathAndFile));
+            }else if (cmd.ToLower().StartsWith("deletefile "))
+            {
+                string pathAndFile = currentcd + @"\" + cmd.Substring("deletefile ".Length);
+                
+                File.Delete(pathAndFile);
+
+                FileExplorer.FileChangeAt(Path.GetDirectoryName(pathAndFile));
+            }
+            else if (cmd.ToLower().StartsWith("createdir "))
+            {
+                string pathAndFile = currentcd + @"\" + cmd.Substring("createdir ".Length);
+
+                Directory.Create(pathAndFile);
+
+                FileExplorer.FileChangeAt(Path.GetDirectoryName(pathAndFile));
             }
         }
 

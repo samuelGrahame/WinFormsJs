@@ -45,6 +45,9 @@ namespace WinFormjs
             }else if(Name == "Recycle Bin")
             {
                 return IMAGE_BinEmpty;
+            }else if (Name.EndsWith(".txt"))
+            {
+                return IMAGE_Notepad;
             }
             return string.Empty;
         }
