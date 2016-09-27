@@ -28,6 +28,7 @@ namespace WinFormjs
             }
 
             Base = new HTMLDivElement();
+            Base.Style.Position = Position.Absolute;
 
             Base.Style.BorderColor = BorderColor;
             Base.Style.BorderStyle = BorderStyle.Solid;
@@ -74,6 +75,24 @@ namespace WinFormjs
 
         public virtual HTMLDivElement GenerateDiv() // Allow other menu items to add stuff to them :D
         {
+            var div = new HTMLDivElement();
+            div.Style.Position = Position.Absolute;
+
+            jQuery.Select(div).
+                Css("left", 8).
+                Css("width", 202). // static as set now, need to change
+                Css("height", 22);
+
+            if(!string.IsNullOrWhiteSpace(Image))
+            {
+                // Add Image
+            }
+
+            // add text
+
+
+
+
             return null;
         }
     }
