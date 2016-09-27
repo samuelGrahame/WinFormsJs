@@ -580,6 +580,7 @@
                     Window_BorderColor: "#FBFBFB",
                     Window_HeadingBackgroundColor: "white",
                     Window_DefaultBackgroundColor: "#F0F0F0",
+                    Window_PopuoMenu: null,
                     /**
                      * This is used for testing
                      *
@@ -835,6 +836,32 @@
                 if (parent === void 0) { parent = null; }
                 WinFormjs.StyleController.setup();
 
+                WinFormjs.Form.setWindow_PopuoMenu(new WinFormjs.PopupMenu());
+                WinFormjs.Form.getWindow_PopuoMenu().items.addRange([Bridge.merge(new WinFormjs.MenuItem(), {
+                    setCaption: "View"
+                } ), Bridge.merge(new WinFormjs.MenuItem(), {
+                    setCaption: "Sort by"
+                } ), Bridge.merge(new WinFormjs.MenuItem(), {
+                    setCaption: "Refresh"
+                } ), Bridge.merge(new WinFormjs.MenuItem(), {
+                    setCaption: "Paste",
+                    setBeginGroup: true
+                } ), Bridge.merge(new WinFormjs.MenuItem(), {
+                    setCaption: "Paste Shortcut"
+                } ), Bridge.merge(new WinFormjs.MenuItem(), {
+                    setCaption: "Graphics Properties...",
+                    setBeginGroup: true
+                } ), Bridge.merge(new WinFormjs.MenuItem(), {
+                    setCaption: "Graphics Options"
+                } ), Bridge.merge(new WinFormjs.MenuItem(), {
+                    setCaption: "New",
+                    setBeginGroup: true
+                } ), Bridge.merge(new WinFormjs.MenuItem(), {
+                    setCaption: "Display settings",
+                    setBeginGroup: true
+                } ), Bridge.merge(new WinFormjs.MenuItem(), {
+                    setCaption: "Personalise"
+                } )]);
 
                 var keyCodes = new (System.Collections.Generic.List$1(System.Int32))([61, 107, 173, 109, 187, 189]);
 
@@ -888,7 +915,11 @@
 
                 var mouseMove = $_.WinFormjs.Form.f5;
 
-                window.addEventListener("mouseup", $_.WinFormjs.Form.f6);
+                window.oncontextmenu = $_.WinFormjs.Form.f6;
+
+                window.addEventListener("mousedown", $_.WinFormjs.Form.f7);
+
+                window.addEventListener("mouseup", $_.WinFormjs.Form.f8);
 
                 window.addEventListener("mousemove", mouseMove);
 
@@ -925,6 +956,7 @@
         prev_left: 0,
         config: {
             properties: {
+                ContextMenu: null,
                 Base: null,
                 Heading: null,
                 ButtonClose: null,
@@ -957,11 +989,11 @@
 
             this.getBodyOverLay().style.visibility = "collapse";
 
-            this.getBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f7));
+            this.getBase().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f9));
 
-            this.getHeading().addEventListener("dblclick", Bridge.fn.bind(this, $_.WinFormjs.Form.f8));
+            this.getHeading().addEventListener("dblclick", Bridge.fn.bind(this, $_.WinFormjs.Form.f10));
 
-            this.getBase().addEventListener("mousemove", Bridge.fn.bind(this, $_.WinFormjs.Form.f9));
+            this.getBase().addEventListener("mousemove", Bridge.fn.bind(this, $_.WinFormjs.Form.f11));
 
             this.getBase().style.position = "absolute";
 
@@ -979,7 +1011,7 @@
             this.getHeading().style.fontFamily = "Segoe UI";
             this.getHeading().style.textAlign = 7;
 
-            this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f10));
+            this.getHeading().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f12));
 
             this.getHeadingTitle().style.textIndent = "3px";
             WinFormjs.Form.setInternalLabel(this.getHeadingTitle()); // Internal Label
@@ -1002,9 +1034,9 @@
             this.getBody().style.backgroundColor = WinFormjs.Form.getWindow_DefaultBackgroundColor();
             this.getBody().style.overflow = "hidden";
 
-            this.getBody().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f11));
+            this.getBody().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f13));
 
-            this.getBody().addEventListener("mousemove", Bridge.fn.bind(this, $_.WinFormjs.Form.f12));
+            this.getBody().addEventListener("mousemove", Bridge.fn.bind(this, $_.WinFormjs.Form.f14));
 
             this.getBodyOverLay().style.top = "31px";
             this.getBodyOverLay().style.height = WinFormjs.StyleController.calc(100, 33);
@@ -1015,13 +1047,13 @@
             this.getBodyOverLay().style.opacity = WinFormjs.Form.getShowBodyOverLay() ? "0.5" : "0";
             this.getBodyOverLay().style.backgroundColor = "black";
 
-            this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f13));
+            this.getBodyOverLay().addEventListener("mousedown", Bridge.fn.bind(this, $_.WinFormjs.Form.f15));
 
-            this.getBodyOverLay().addEventListener("mouseup", $_.WinFormjs.Form.f14);
+            this.getBodyOverLay().addEventListener("mouseup", $_.WinFormjs.Form.f16);
 
-            this.getBody().addEventListener("mouseleave", $_.WinFormjs.Form.f15);
+            this.getBody().addEventListener("mouseleave", $_.WinFormjs.Form.f17);
 
-            this.getBodyOverLay().addEventListener("mouseenter", Bridge.fn.bind(this, $_.WinFormjs.Form.f16));
+            this.getBodyOverLay().addEventListener("mouseenter", Bridge.fn.bind(this, $_.WinFormjs.Form.f18));
 
             $(this.getBase()).css("width", WinFormjs.Form.getWindow_DefaultWidth()).css("height", WinFormjs.Form.getWindow_DefaultHeight());
 
@@ -1147,7 +1179,7 @@
 
                         WinFormjs.Form.setActiveForm(this);
                     });
-                    butt.onmouseup = Bridge.fn.bind(this, $_.WinFormjs.Form.f17);
+                    butt.onmouseup = Bridge.fn.bind(this, $_.WinFormjs.Form.f19);
                     butt.onmouseenter = Bridge.fn.bind(this, function (ev) {
                         if (WinFormjs.Form.movingForm != null || WinFormjs.Form.getWindowHolderSelectionBox() != null) {
                             return;
@@ -1221,11 +1253,11 @@
                 case WinFormjs.Form.FormButtonType.Help: 
                     break;
                 default: 
-                    butt.onmouseup = $_.WinFormjs.Form.f18;
+                    butt.onmouseup = $_.WinFormjs.Form.f20;
                     break;
             }
 
-            butt.onmousemove = $_.WinFormjs.Form.f19;
+            butt.onmousemove = $_.WinFormjs.Form.f21;
 
             if (Type !== WinFormjs.Form.FormButtonType.Close) {
                 butt.onmousedown = Bridge.fn.bind(this, function (ev) {
@@ -1361,7 +1393,7 @@
             WinFormjs.Form.visibleForm.remove(this);
 
             if (this.getBase() != null) {
-                $(this.getBase()).fadeOut(WinFormjs.Form.getFadeLength(), Bridge.fn.bind(this, $_.WinFormjs.Form.f20));
+                $(this.getBase()).fadeOut(WinFormjs.Form.getFadeLength(), Bridge.fn.bind(this, $_.WinFormjs.Form.f22));
             }
 
             WinFormjs.Form.calculateZOrder();
@@ -1615,6 +1647,28 @@
             }
         },
         f6: function (ev) {
+            var mev = ev;
+
+            var point = new WinFormjs.Point.$ctor1(((mev.clientX + WinFormjs.Form.getWindowHolder().scrollLeft) | 0), ((mev.clientY + WinFormjs.Form.getWindowHolder().scrollTop) | 0));
+
+            if (WinFormjs.Form.getActiveForm() == null) {
+                if (WinFormjs.Form.getWindow_PopuoMenu() != null) {
+                    ev.preventDefault();
+                    ev.stopImmediatePropagation();
+                    WinFormjs.Form.getWindow_PopuoMenu().show(point.$clone());
+                }
+            } else if (WinFormjs.Form.getActiveForm().getContextMenu() != null) {
+                ev.stopImmediatePropagation();
+                ev.preventDefault();
+                WinFormjs.Form.getActiveForm().getContextMenu().show(point.$clone());
+            }
+        },
+        f7: function (ev) {
+            if (WinFormjs.PopupMenu.getActivePopupMenu() != null) {
+                WinFormjs.PopupMenu.getActivePopupMenu().close();
+            }
+        },
+        f8: function (ev) {
             if (WinFormjs.Form.movingForm != null) {
                 WinFormjs.Form.movingForm.getBodyOverLay().style.visibility = "collapse";
                 WinFormjs.Form.movingForm.changeSelectionState$1(false);
@@ -1626,7 +1680,7 @@
 
             WinFormjs.Form.hideFileSelection();
         },
-        f7: function (ev) {
+        f9: function (ev) {
             var mev = ev;
 
             WinFormjs.Form.setMouse_Down(true);
@@ -1694,12 +1748,12 @@
 
 
         },
-        f8: function (ev) {
+        f10: function (ev) {
             this.changeWindowState();
             ev.preventDefault();
             ev.stopPropagation();
         },
-        f9: function (ev) {
+        f11: function (ev) {
             var mev = ev;
             if (WinFormjs.Form.movingForm != null && WinFormjs.Form.moveAction === WinFormjs.Form.MouseMoveAction.Move) {
                 this.setCursor("default");
@@ -1732,7 +1786,7 @@
                 this.setCursor("default");
             }
         },
-        f10: function (ev) {
+        f12: function (ev) {
             WinFormjs.Form.setBodyOverLay();
 
             if (this.getwindowState() === WinFormjs.Form.WindowState.Maximized) {
@@ -1746,40 +1800,40 @@
 
             WinFormjs.Form.setActiveForm(this);
         },
-        f11: function (ev) {
+        f13: function (ev) {
             WinFormjs.Form.setActiveForm(this);
             WinFormjs.Form.movingForm = null;
             this.setCursor("default");
             ev.stopPropagation();
         },
-        f12: function (ev) {
+        f14: function (ev) {
             if (WinFormjs.Form.movingForm == null) {
                 this.setCursor("default");
                 ev.stopPropagation();
             }
         },
-        f13: function (ev) {
+        f15: function (ev) {
             this.getBodyOverLay().style.visibility = "collapse";
             WinFormjs.Form.setActiveForm(this);
         },
-        f14: function (ev) {
+        f16: function (ev) {
             if (WinFormjs.Form.movingForm == null && WinFormjs.Form.getActiveFileExplorer() != null) {
                 WinFormjs.Form.hideFileSelection();
             }
         },
-        f15: function (ev) {
+        f17: function (ev) {
             if (WinFormjs.Form.movingForm == null) {
                 WinFormjs.Form.setBodyOverLay();
             }
         },
-        f16: function (ev) {
+        f18: function (ev) {
             if (WinFormjs.Form.getWindowHolderSelectionBox() == null && WinFormjs.Form.movingForm == null) {
                 this.getBodyOverLay().style.visibility = "collapse";
             } else {
                 this.getBodyOverLay().style.visibility = "visible";
             }
         },
-        f17: function (ev) {
+        f19: function (ev) {
             if (WinFormjs.Form.movingForm != null || WinFormjs.Form.getWindowHolderSelectionBox() != null) {
                 return;
             }
@@ -1789,7 +1843,7 @@
 
             this.close();
         },
-        f18: function (ev) {
+        f20: function (ev) {
             if (WinFormjs.Form.movingForm != null || WinFormjs.Form.getWindowHolderSelectionBox() != null) {
                 return;
             }
@@ -1799,7 +1853,7 @@
 
             WinFormjs.Form.setMouse_Down(false);
         },
-        f19: function (ev) {
+        f21: function (ev) {
             if (WinFormjs.Form.movingForm != null || WinFormjs.Form.getWindowHolderSelectionBox() != null) {
                 return;
             }
@@ -1807,7 +1861,7 @@
             ev.stopImmediatePropagation();
             ev.preventDefault();
         },
-        f20: function () {
+        f22: function () {
             $(this.getBase()).empty();
             this.getBase().remove();
             this.setBase(null);
@@ -1905,16 +1959,32 @@
 
             $(div).css("left", 8).css("width", 202).css("height", 22);
 
+            div.style.backgroundColor = WinFormjs.PopupMenu.BackgroundColor;
+
+            div.onmouseenter = function (ev) {
+                div.style.backgroundColor = WinFormjs.PopupMenu.MenuHoverColor;
+            };
+            div.onmouseleave = function (ev) {
+                div.style.backgroundColor = WinFormjs.PopupMenu.BackgroundColor;
+            };
+
             if (!System.String.isNullOrWhiteSpace(this.getImage())) {
                 // Add Image
             }
 
-            // add text
-
-
-
-
-            return null;
+            if (!System.String.isNullOrWhiteSpace(this.getCaption())) {
+                var span = document.createElement('span');
+                span.innerHTML = this.getCaption();
+                span.style.position = "absolute";
+                $(span).css("left", 34).css("top", 0).css("height", 22);
+                span.style.width = WinFormjs.StyleController.calc(100, 34);
+                span.style.fontFamily = "Segoe UI";
+                span.style.fontSize = "9.5pt";
+                span.style.cursor = "default";
+                div.appendChild(span);
+            }
+            // add text            
+            return div;
         }
     });
 
@@ -1997,7 +2067,12 @@
             BorderColor: "#A0A0A0",
             BackgroundColor: "#F2F2F2",
             MenuHoverColor: "#D9D9D9",
-            Forecolor: "black"
+            Forecolor: "black",
+            config: {
+                properties: {
+                    ActivePopupMenu: null
+                }
+            }
         },
         items: null,
         config: {
@@ -2009,6 +2084,13 @@
             }
         },
         show: function (location) {
+            if (!Bridge.referenceEquals(WinFormjs.PopupMenu.getActivePopupMenu(), this)) {
+                if (WinFormjs.PopupMenu.getActivePopupMenu() != null) {
+                    WinFormjs.PopupMenu.getActivePopupMenu().close();
+                }
+                WinFormjs.PopupMenu.setActivePopupMenu(this);
+            }
+
             if (this.getBase() != null) {
                 this.getBase().remove();
                 this.setBase(null);
@@ -2023,23 +2105,67 @@
             this.getBase().style.padding = "2px";
             this.getBase().style.margin = "0";
 
+            this.getBase().onmousedown = $_.WinFormjs.PopupMenu.f1;
+
             this.getBase().style.backgroundColor = WinFormjs.PopupMenu.BackgroundColor;
+            var ubound = (this.items.getCount() - 1) | 0;
 
-            $(this.getBase()).css("left", location.x).css("top", location.y);
-
-            // need to make the width min-width 100%
-            // Fill Content :D
-            this.getBase().style.minWidth = "100%";
-            this.getBase().style.minHeight = "100%";
-
+            var y = 3;
 
             for (var i = 0; i < this.items.getCount(); i = (i + 1) | 0) {
                 // Add Menu Item / Generate Div :D
-                this.getBase().appendChild(this.items.getItem(i).generateDiv());
+                var inObj = this.items.getItem(i);
+                var item = inObj.generateDiv();
+
+                if (inObj.getBeginGroup()) {
+                    var div = document.createElement('div');
+                    div.style.position = "absolute";
+                    y = (y + 1) | 0;
+
+                    $(div).css("left", 8).css("width", 202).css("height", 1).css("top", y);
+
+                    div.style.backgroundColor = WinFormjs.PopupMenu.BeginGroupColor;
+
+                    this.getBase().appendChild(div);
+
+                    y = (y + 3) | 0;
+                }
+
+                $(item).css("top", y);
+                this.getBase().appendChild(item);
+
+                if (!Bridge.staticEquals(inObj.getOnClick(), null)) {
+                    item.onclick = inObj.getOnClick();
+                }
+
+                y = (y + 24) | 0;
             }
+
+            $(this.getBase()).css("left", location.x).css("top", location.y).css("width", 214).css("height", y);
+
+            this.getBase().style.overflow = "visible";
+            this.getBase().style.zIndex = (2147483647).toString();
+            // need to make the width min-width 100%
+            // Fill Content :D
+            //Base.Style.MinWidth = "100%";
+            //Base.Style.MinHeight = "100%";                        
+
+            WinFormjs.Form.getWindowHolder().appendChild(this.getBase());
         },
         close: function () {
+            WinFormjs.PopupMenu.setActivePopupMenu(null);
+            if (this.getBase() != null) {
+                this.getBase().remove();
+                this.setBase(null);
+            }
+        }
+    });
 
+    Bridge.ns("WinFormjs.PopupMenu", $_);
+
+    Bridge.apply($_.WinFormjs.PopupMenu, {
+        f1: function (ev) {
+            ev.stopPropagation();
         }
     });
 

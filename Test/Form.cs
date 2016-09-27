@@ -25,7 +25,11 @@ namespace WinFormjs
         public static string Window_HeadingBackgroundColor { get; set; } = "white";
         public static string Window_DefaultBackgroundColor { get; set; } = "#F0F0F0";
         public static List<Form> VisibleForm = new List<Form>();
+        public static PopupMenu Window_PopuoMenu { get; set; }        
+
+        public PopupMenu ContextMenu { get; set; }
         private static FileExplorer Window_Desktop;
+
         /// <summary>
         /// This is used for testing
         /// </summary>
@@ -409,8 +413,21 @@ namespace WinFormjs
 		{
 			StyleController.Setup();
 
+            Window_PopuoMenu = new PopupMenu();
+            Window_PopuoMenu.Items.AddRange(new MenuItem[] {
+                new MenuItem() { Caption = "View" },
+                new MenuItem() { Caption = "Sort by" },
+                new MenuItem() { Caption = "Refresh" },
+                new MenuItem() { Caption = "Paste", BeginGroup = true },
+                new MenuItem() { Caption = "Paste Shortcut"},
+                new MenuItem() { Caption = "Graphics Properties...", BeginGroup = true },
+                new MenuItem() { Caption = "Graphics Options"},
+                new MenuItem() { Caption = "New", BeginGroup = true },
+                new MenuItem() { Caption = "Display settings", BeginGroup = true },
+                new MenuItem() { Caption = "Personalise"}
+            });
 
-			var keyCodes =  new List<int>(new int[] { 61, 107, 173, 109, 187, 189 });
+            var keyCodes =  new List<int>(new int[] { 61, 107, 173, 109, 187, 189 });
 
 			Document.AddEventListener(EventType.KeyDown, (ev) =>
 			{
@@ -725,10 +742,34 @@ namespace WinFormjs
 					}
 				}
 			};
-            
-			Window.AddEventListener(EventType.MouseUp, (ev) =>
-			{                
-                if(MovingForm != null)
+
+            Window.OnContextMenu = (ev) => {
+                var mev = ev.As<MouseEvent>();
+
+                var point = new Point(mev.ClientX + WindowHolder.ScrollLeft, mev.ClientY + WindowHolder.ScrollTop);
+
+                if (ActiveForm == null)
+                {
+                    if (Window_PopuoMenu != null)
+                    {
+                        ev.PreventDefault();
+                        ev.StopImmediatePropagation();
+                        Window_PopuoMenu.Show(point);
+                    }
+                }
+                else if (ActiveForm.ContextMenu != null)
+                {
+                    ev.StopImmediatePropagation();
+                    ev.PreventDefault();
+                    ActiveForm.ContextMenu.Show(point);
+                }
+            };
+
+            Window.AddEventListener(EventType.MouseDown, (ev) => { if (PopupMenu.ActivePopupMenu != null) { PopupMenu.ActivePopupMenu.Close(); }  });
+
+            Window.AddEventListener(EventType.MouseUp, (ev) =>
+			{             
+                if (MovingForm != null)
                 {
                     MovingForm.BodyOverLay.Style.Visibility = Visibility.Collapse;
                     MovingForm.ChangeSelectionState(false);
