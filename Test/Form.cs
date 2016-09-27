@@ -333,7 +333,7 @@ namespace WinFormjs
 			butt.Style.Height = "40px";
 			butt.Style.Position = Position.Absolute;
 			butt.Style.FontSize = "12pt";
-			butt.Style.Background = IconRepository.IMAGE_WinIcon;
+			butt.Style.Background = IconRepository.WrapBase64(IconRepository.IMAGE_WinIcon);
 
 			butt.OnMouseUp = (ev) =>
 			{
@@ -343,7 +343,7 @@ namespace WinFormjs
 				ev.StopPropagation();
 				ev.PreventDefault();
 
-				butt.Style.Background = IconRepository.IMAGE_WinIcon;
+				butt.Style.Background = IconRepository.WrapBase64(IconRepository.IMAGE_WinIcon);
 			};
 
 			butt.OnMouseDown = (ev) =>
@@ -356,7 +356,7 @@ namespace WinFormjs
 				ev.StopPropagation();
 				ev.PreventDefault();
 
-				butt.Style.Background = IconRepository.IMAGE_WinIconDown;
+				butt.Style.Background = IconRepository.WrapBase64(IconRepository.IMAGE_WinIconDown);
 
 				ActiveForm = null;
 			};
@@ -368,11 +368,11 @@ namespace WinFormjs
 
 				if(Mouse_Down)
 				{
-					butt.Style.Background = IconRepository.IMAGE_WinIconDown;
+					butt.Style.Background = IconRepository.WrapBase64(IconRepository.IMAGE_WinIconDown);
 				}
 				else
 				{
-					butt.Style.Background = IconRepository.IMAGE_WinIconHover;
+					butt.Style.Background = IconRepository.WrapBase64(IconRepository.IMAGE_WinIconHover);
 				}				
 			};
 
@@ -381,7 +381,7 @@ namespace WinFormjs
 				if(MidleOfAction())
 					return;
 
-				butt.Style.Background = IconRepository.IMAGE_WinIcon;
+				butt.Style.Background = IconRepository.WrapBase64(IconRepository.IMAGE_WinIcon);
 			};
 
 			return butt;
@@ -407,6 +407,9 @@ namespace WinFormjs
 
 		public static void Setup(HTMLElement parent = null)
 		{
+			StyleController.Setup();
+
+
 			var keyCodes =  new List<int>(new int[] { 61, 107, 173, 109, 187, 189 });
 
 			Document.AddEventListener(EventType.KeyDown, (ev) =>
@@ -430,7 +433,7 @@ namespace WinFormjs
 			WindowHolder.Style.Position = Position.Absolute;
 			
 			WindowHolder.Style.Width = "100%";
-			WindowHolder.Style.Height = "-webkit-calc(100% - 40px)";
+			WindowHolder.Style.Height = StyleController.Calc(100, 40);
 			WindowHolder.Style.Top = "0";
 			WindowHolder.Style.Left = "0";
 			WindowHolder.Style.BackgroundColor = "cornflowerblue";
@@ -446,7 +449,7 @@ namespace WinFormjs
 			
 			TaskBar.Style.Width = "100%";
 			TaskBar.Style.Height = "40px";
-			TaskBar.Style.Top = "-webkit-calc(100% - 40px)";
+			TaskBar.Style.Top = StyleController.Calc(100, 40);
 			TaskBar.Style.Left = "0";
 			TaskBar.Style.ZIndex = int.MaxValue.ToString();
 
@@ -779,8 +782,8 @@ namespace WinFormjs
 
 				windowState = WindowState.Maximized;
 
-				Width = "-webkit-calc(100% - 5px)";
-				Height = "-webkit-calc(100% - 5px)";
+				Width = StyleController.Calc(100, 5);
+				Height = StyleController.Calc(100, 5);
 
 				Top = "0";
 				Left = "0";
@@ -802,7 +805,7 @@ namespace WinFormjs
 					butt.Style.BackgroundColor = "white";
 					butt.Style.Color = "black";
 
-					butt.Style.Left = "-webkit-calc(100% - 45px)";					
+					butt.Style.Left = StyleController.Calc(100, 45);
 					butt.Id = "Close";
 					butt.InnerHTML = "&#10006";
 					
@@ -862,7 +865,7 @@ namespace WinFormjs
 					break;
 				case FormButtonType.Maximize:
 					butt.Style.BackgroundColor = "white";
-					butt.Style.Left = "-webkit-calc(100% - 91px)";
+					butt.Style.Left = StyleController.Calc(100, 91);
 					butt.Style.Color = "black";
 					butt.Id = "Maximize";
 					butt.InnerHTML = "&#9633;";
@@ -887,7 +890,7 @@ namespace WinFormjs
 					break;
 				case FormButtonType.Minimize:
 					butt.Style.BackgroundColor = "white";
-					butt.Style.Left = "-webkit-calc(100% - 137px)";
+					butt.Style.Left = StyleController.Calc(100, 137);
 					butt.Style.Color = "black";
 					butt.Id = "Minimize";
 					butt.InnerHTML = "&#8213;";
@@ -1249,8 +1252,8 @@ namespace WinFormjs
             
 			Body.Id = "Body";
 			Body.Style.Top = "30px";
-			Body.Style.Height = "-webkit-calc(100% - 30px)"; // -webkit-calc(100% - 60px)
-            Body.Style.Width = "-webkit-calc(100% - 1px)"; // "100%";
+			Body.Style.Height = StyleController.Calc(100, 30);
+			Body.Style.Width = StyleController.Calc(100, 1);
             Body.Style.Position = Position.Absolute;
             Body.Style.BackgroundColor = Window_DefaultBackgroundColor;
             Body.Style.Overflow = Overflow.Hidden;
@@ -1271,8 +1274,8 @@ namespace WinFormjs
             });
 
             BodyOverLay.Style.Top = "31px";
-            BodyOverLay.Style.Height = "-webkit-calc(100% - 33px)"; // -webkit-calc(100% - 60px)
-            BodyOverLay.Style.Width = "-webkit-calc(100% - 4px)";
+			BodyOverLay.Style.Height = StyleController.Calc(100, 33);
+			BodyOverLay.Style.Width = StyleController.Calc(100, 4);
             BodyOverLay.Style.Left = "2px";
             BodyOverLay.Style.Position = Position.Absolute;
             BodyOverLay.Style.ZIndex = int.MaxValue.ToString();
@@ -1466,8 +1469,8 @@ namespace WinFormjs
         public void FillControlWithParent(HTMLElement element, int widthOffset = 8, int heightOffset = 9)
         {
             element.Style.Position = Position.Absolute;
-            element.Style.Width = "-webkit-calc(100% - " + widthOffset.ToString() + "px)";
-            element.Style.Height = "-webkit-calc(100% - " + heightOffset.ToString() + "px)";
+			element.Style.Width = StyleController.Calc(100, widthOffset);
+            element.Style.Height = StyleController.Calc(100, heightOffset);
 
             element.Style.Top = "1px";
             element.Style.Left = "1px";
@@ -1476,17 +1479,17 @@ namespace WinFormjs
         public void FillHorizontalControlWithParent(HTMLElement element, int widthOffset = 8)
         {
             element.Style.Position = Position.Absolute;
-            element.Style.Width = "-webkit-calc(100% - " + widthOffset.ToString() + "px)";            
-            
-            element.Style.Left = "1px";
+            element.Style.Width = StyleController.Calc(100, widthOffset);
+
+			element.Style.Left = "1px";
         }
 
         public void FillVerticalControlWithParent(HTMLElement element, int heightOffset = 9)
         {
             element.Style.Position = Position.Absolute;            
-            element.Style.Height = "-webkit-calc(100% - " + heightOffset.ToString() + "px)";
+            element.Style.Height = StyleController.Calc(100, heightOffset);
 
-            element.Style.Top = "1px";            
+			element.Style.Top = "1px";            
         }
     }
 }
