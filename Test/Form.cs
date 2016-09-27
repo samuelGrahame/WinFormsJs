@@ -315,7 +315,7 @@ namespace WinFormjs
 			butt.Style.Height = "40px";
 			butt.Style.Position = Position.Absolute;
 			butt.Style.FontSize = "12pt";
-			butt.Style.Background = IconRepository.IMAGE_WinIcon;
+			butt.Style.Background = IconRepository.WrapBase64(IconRepository.IMAGE_WinIcon);
 
 			butt.OnMouseUp = (ev) =>
 			{
@@ -325,7 +325,7 @@ namespace WinFormjs
 				ev.StopPropagation();
 				ev.PreventDefault();
 
-				butt.Style.Background = IconRepository.IMAGE_WinIcon;
+				butt.Style.Background = IconRepository.WrapBase64(IconRepository.IMAGE_WinIcon);
 			};
 
 			butt.OnMouseDown = (ev) =>
@@ -338,7 +338,7 @@ namespace WinFormjs
 				ev.StopPropagation();
 				ev.PreventDefault();
 
-				butt.Style.Background = IconRepository.IMAGE_WinIconDown;
+				butt.Style.Background = IconRepository.WrapBase64(IconRepository.IMAGE_WinIconDown);
 
 				ActiveForm = null;
 			};
@@ -350,11 +350,11 @@ namespace WinFormjs
 
 				if(Mouse_Down)
 				{
-					butt.Style.Background = IconRepository.IMAGE_WinIconDown;
+					butt.Style.Background = IconRepository.WrapBase64(IconRepository.IMAGE_WinIconDown);
 				}
 				else
 				{
-					butt.Style.Background = IconRepository.IMAGE_WinIconHover;
+					butt.Style.Background = IconRepository.WrapBase64(IconRepository.IMAGE_WinIconHover);
 				}				
 			};
 
@@ -363,7 +363,7 @@ namespace WinFormjs
 				if(MidleOfAction())
 					return;
 
-				butt.Style.Background = IconRepository.IMAGE_WinIcon;
+				butt.Style.Background = IconRepository.WrapBase64(IconRepository.IMAGE_WinIcon);
 			};
 
 			return butt;

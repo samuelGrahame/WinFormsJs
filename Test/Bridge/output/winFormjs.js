@@ -1420,8 +1420,7 @@
 
                 switch (WinFormjs.Form.moveAction) {
                     case WinFormjs.Form.MouseMoveAction.Move: 
-                        obj.css("top", Y);
-                        obj.css("left", X);
+                        obj.css("top", Y).css("left", X);
                         break;
                     case WinFormjs.Form.MouseMoveAction.TopLeftResize: 
                         X1 = parseInt(obj.css("left"));
@@ -1438,10 +1437,7 @@
                             Y = (Y - (((WinFormjs.Form.movingForm.getMinHeight() - H) | 0))) | 0;
                             H = WinFormjs.Form.movingForm.getMinHeight();
                         }
-                        obj.css("top", Y);
-                        obj.css("left", X);
-                        obj.css("width", W);
-                        obj.css("height", H);
+                        obj.css("left", X).css("top", Y).css("width", W).css("height", H);
                         break;
                     case WinFormjs.Form.MouseMoveAction.TopResize: 
                         Y1 = parseInt(obj.css("top"));
@@ -1451,8 +1447,7 @@
                             Y = (Y - (((WinFormjs.Form.movingForm.getMinHeight() - H) | 0))) | 0;
                             H = WinFormjs.Form.movingForm.getMinHeight();
                         }
-                        obj.css("top", Y);
-                        obj.css("height", H);
+                        obj.css("top", Y).css("height", H);
                         break;
                     case WinFormjs.Form.MouseMoveAction.TopRightResize: 
                         Y1 = parseInt(obj.css("top"));
@@ -1468,9 +1463,7 @@
                         if (W < WinFormjs.Form.movingForm.getMinWidth()) {
                             W = WinFormjs.Form.movingForm.getMinWidth();
                         }
-                        obj.css("top", Y);
-                        obj.css("height", H);
-                        obj.css("width", W);
+                        obj.css("top", Y).css("height", H).css("width", W);
                         break;
                     case WinFormjs.Form.MouseMoveAction.LeftResize: 
                         X1 = parseInt(obj.css("left"));
@@ -1497,9 +1490,7 @@
                         if (H < WinFormjs.Form.movingForm.getMinHeight()) {
                             H = WinFormjs.Form.movingForm.getMinHeight();
                         }
-                        obj.css("left", X);
-                        obj.css("width", W);
-                        obj.css("height", H);
+                        obj.css("left", X).css("width", W).css("height", H);
                         break;
                     case WinFormjs.Form.MouseMoveAction.BottomResize: 
                         Y1 = parseInt(obj.css("top"));
@@ -1532,8 +1523,7 @@
                         if (W < WinFormjs.Form.movingForm.getMinWidth()) {
                             W = WinFormjs.Form.movingForm.getMinWidth();
                         }
-                        obj.css("width", W);
-                        obj.css("height", H);
+                        obj.css("width", W).css("height", H);
                         break;
                     default: 
                         break;
@@ -1843,6 +1833,16 @@
             IMAGE_WinIcon: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACSSURBVFhH7dbRCYAgFIXhRnASN3ADJ3GSu4gbuIGD1SUlejCOBpLE+R4NOT/0UJtZDIMQBiEMQhiEMAj5b5C11nsfQhCRlFLOeT/Vx93eBDnndFuHY4w6rCdlu6lc6TccVHdumoeXcqsfgxAGIcNBs/GVIQxCGIQMB6m1Pq5Pvvz9mIpBCIMQBiEMQhiELBZkzAGoRY/1a8YOvQAAAABJRU5ErkJggg==')",
             IMAGE_WinIconHover: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACmSURBVFhH7dYxCoQwEIVhb5NasNBGZCstBUFkL7Dg9ttq6QG8gJ2FB/I2DkS2EOUlghjkfUwVCfODhXrKMQxCGIQwCGEQwiDkuUF+GEdp8arq7NOU7fDupu84y6yPjZ0JCpJMdsvi/NfLYjnRu3dHXzFnHbTZJ7N7+B99yxyDEAYh1kFX4ytDGIQwCLEOEm59XI/c+ftxKQYhDEIYhDAIYRDiWJBSC3edj/DGIv8/AAAAAElFTkSuQmCC')",
             IMAGE_WinIconDown: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAoCAIAAAA35e4mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACnSURBVFhHY5AZZGDUQYTAqIMIgVEHEQKjDiIERh1ECAxfBynrGGvbehv6JFnGVrmUznWvXRE27zoQQaWJBuQ4SN3UHmg30GLHvIlAi4EiELuxIogW4gHJDkKzD4iwCsIRRBfxYNRBhMCogwgBkh1EazAaZYTAqIMIgVEHEQIkOwgIBlfligsMZPODpmDUQYTAqIMIgVEHEQKjDiIERh1ECAwyB8nIAADHEJbDMY47rQAAAABJRU5ErkJggg==')",
+            /**
+             * #TODO This needs to link to regedit#
+             *
+             * @static
+             * @public
+             * @this WinFormjs.IconRepository
+             * @memberof WinFormjs.IconRepository
+             * @param   {string}    Name
+             * @return  {string}
+             */
             getIconByFileName: function (Name) {
                 if (Bridge.referenceEquals(Name, "cmd.exe")) {
                     return WinFormjs.IconRepository.IMAGE_CMD;
