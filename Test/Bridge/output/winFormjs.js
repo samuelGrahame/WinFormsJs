@@ -833,6 +833,9 @@
             },
             setup: function (parent) {
                 if (parent === void 0) { parent = null; }
+                WinFormjs.StyleController.setup();
+
+
                 var keyCodes = new (System.Collections.Generic.List$1(System.Int32))([61, 107, 173, 109, 187, 189]);
 
                 document.addEventListener("keydown", function (ev) {
@@ -855,7 +858,7 @@
                 WinFormjs.Form.getWindowHolder().style.position = "absolute";
 
                 WinFormjs.Form.getWindowHolder().style.width = "100%";
-                WinFormjs.Form.getWindowHolder().style.height = "-webkit-calc(100% - 40px)";
+                WinFormjs.Form.getWindowHolder().style.height = WinFormjs.StyleController.calc(100, 40);
                 WinFormjs.Form.getWindowHolder().style.top = "0";
                 WinFormjs.Form.getWindowHolder().style.left = "0";
                 WinFormjs.Form.getWindowHolder().style.backgroundColor = "cornflowerblue";
@@ -871,7 +874,7 @@
 
                 WinFormjs.Form.getTaskBar().style.width = "100%";
                 WinFormjs.Form.getTaskBar().style.height = "40px";
-                WinFormjs.Form.getTaskBar().style.top = "-webkit-calc(100% - 40px)";
+                WinFormjs.Form.getTaskBar().style.top = WinFormjs.StyleController.calc(100, 40);
                 WinFormjs.Form.getTaskBar().style.left = "0";
                 WinFormjs.Form.getTaskBar().style.zIndex = (2147483647).toString();
 
@@ -993,8 +996,8 @@
 
             this.getBody().id = "Body";
             this.getBody().style.top = "30px";
-            this.getBody().style.height = "-webkit-calc(100% - 30px)"; // -webkit-calc(100% - 60px)
-            this.getBody().style.width = "-webkit-calc(100% - 1px)"; // "100%";
+            this.getBody().style.height = WinFormjs.StyleController.calc(100, 30);
+            this.getBody().style.width = WinFormjs.StyleController.calc(100, 1);
             this.getBody().style.position = "absolute";
             this.getBody().style.backgroundColor = WinFormjs.Form.getWindow_DefaultBackgroundColor();
             this.getBody().style.overflow = "hidden";
@@ -1004,8 +1007,8 @@
             this.getBody().addEventListener("mousemove", Bridge.fn.bind(this, $_.WinFormjs.Form.f12));
 
             this.getBodyOverLay().style.top = "31px";
-            this.getBodyOverLay().style.height = "-webkit-calc(100% - 33px)"; // -webkit-calc(100% - 60px)
-            this.getBodyOverLay().style.width = "-webkit-calc(100% - 4px)";
+            this.getBodyOverLay().style.height = WinFormjs.StyleController.calc(100, 33);
+            this.getBodyOverLay().style.width = WinFormjs.StyleController.calc(100, 4);
             this.getBodyOverLay().style.left = "2px";
             this.getBodyOverLay().style.position = "absolute";
             this.getBodyOverLay().style.zIndex = (2147483647).toString();
@@ -1108,8 +1111,8 @@
 
                 this.setwindowState(WinFormjs.Form.WindowState.Maximized);
 
-                this.setWidth("-webkit-calc(100% - 5px)");
-                this.setHeight("-webkit-calc(100% - 5px)");
+                this.setWidth(WinFormjs.StyleController.calc(100, 5));
+                this.setHeight(WinFormjs.StyleController.calc(100, 5));
 
                 this.setTop("0");
                 this.setLeft("0");
@@ -1127,7 +1130,7 @@
                 case WinFormjs.Form.FormButtonType.Close: 
                     butt.style.backgroundColor = "white";
                     butt.style.color = "black";
-                    butt.style.left = "-webkit-calc(100% - 45px)";
+                    butt.style.left = WinFormjs.StyleController.calc(100, 45);
                     butt.id = "Close";
                     butt.innerHTML = "&#10006";
                     butt.onmousedown = Bridge.fn.bind(this, function (ev) {
@@ -1170,7 +1173,7 @@
                     break;
                 case WinFormjs.Form.FormButtonType.Maximize: 
                     butt.style.backgroundColor = "white";
-                    butt.style.left = "-webkit-calc(100% - 91px)";
+                    butt.style.left = WinFormjs.StyleController.calc(100, 91);
                     butt.style.color = "black";
                     butt.id = "Maximize";
                     butt.innerHTML = "&#9633;";
@@ -1193,7 +1196,7 @@
                     break;
                 case WinFormjs.Form.FormButtonType.Minimize: 
                     butt.style.backgroundColor = "white";
-                    butt.style.left = "-webkit-calc(100% - 137px)";
+                    butt.style.left = WinFormjs.StyleController.calc(100, 137);
                     butt.style.color = "black";
                     butt.id = "Minimize";
                     butt.innerHTML = "&#8213;";
@@ -1367,8 +1370,8 @@
             if (widthOffset === void 0) { widthOffset = 8; }
             if (heightOffset === void 0) { heightOffset = 9; }
             element.style.position = "absolute";
-            element.style.width = System.String.concat(System.String.concat("-webkit-calc(100% - ", widthOffset.toString()), "px)");
-            element.style.height = System.String.concat(System.String.concat("-webkit-calc(100% - ", heightOffset.toString()), "px)");
+            element.style.width = WinFormjs.StyleController.calc(100, widthOffset);
+            element.style.height = WinFormjs.StyleController.calc(100, heightOffset);
 
             element.style.top = "1px";
             element.style.left = "1px";
@@ -1376,14 +1379,14 @@
         fillHorizontalControlWithParent: function (element, widthOffset) {
             if (widthOffset === void 0) { widthOffset = 8; }
             element.style.position = "absolute";
-            element.style.width = System.String.concat(System.String.concat("-webkit-calc(100% - ", widthOffset.toString()), "px)");
+            element.style.width = WinFormjs.StyleController.calc(100, widthOffset);
 
             element.style.left = "1px";
         },
         fillVerticalControlWithParent: function (element, heightOffset) {
             if (heightOffset === void 0) { heightOffset = 9; }
             element.style.position = "absolute";
-            element.style.height = System.String.concat(System.String.concat("-webkit-calc(100% - ", heightOffset.toString()), "px)");
+            element.style.height = WinFormjs.StyleController.calc(100, heightOffset);
 
             element.style.top = "1px";
         }
@@ -2197,6 +2200,35 @@
             s.width = this.width;
             s.height = this.height;
             return s;
+        }
+    });
+
+    Bridge.define("WinFormjs.StyleController", {
+        statics: {
+            cSS_calc: "calc",
+            setup: function () {
+                if (Bridge.Browser.isChrome) {
+                    if (Bridge.Browser.chromeVersion < 26.0) {
+                        WinFormjs.StyleController.cSS_calc = "-webkit-calc";
+                    }
+                } else if (WinFormjs.StyleController.isFireFox()) {
+                    if (Bridge.Browser.firefoxVersion < 16.0) {
+                        WinFormjs.StyleController.cSS_calc = "-moz-calc";
+                    }
+                } else if (Bridge.Browser.isSafari) {
+                    if (Bridge.Browser.safariVersion < 7.0) {
+                        WinFormjs.StyleController.cSS_calc = "-webkit-calc";
+                    }
+                }
+            },
+            isFireFox: function () {
+                return Bridge.Browser.isFF10 || Bridge.Browser.isFF3_0 || Bridge.Browser.isFF3_5 || Bridge.Browser.isFF3_6 || Bridge.Browser.isFF4 || Bridge.Browser.isFF5;
+            },
+            calc: function (percent, value, isPixels, roundPercent) {
+                if (isPixels === void 0) { isPixels = true; }
+                if (roundPercent === void 0) { roundPercent = true; }
+                return System.String.format("{0}({1}% - {2}{3}", WinFormjs.StyleController.cSS_calc, roundPercent ? Bridge.Math.round(percent, 0, 6) : percent, value, isPixels ? "px" : "em");
+            }
         }
     });
 
