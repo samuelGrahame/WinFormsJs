@@ -46,12 +46,14 @@
     <Compile Include="FormFileExplorer.cs" />
     <Compile Include="Controls\PopupMenu.cs" />
     <Compile Include="FormNotePad.cs" />
+    <Compile Include="RunInterface\FormRunStart.cs" />
     <Compile Include="IconRepository.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Process.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rectange.cs" />
+    <Compile Include="RunInterface\ServerApplication.cs" />
     <Compile Include="Size.cs" />
     <Compile Include="StyleController.cs" />
   </ItemGroup>
