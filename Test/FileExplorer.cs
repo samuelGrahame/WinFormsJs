@@ -283,7 +283,13 @@ namespace WinFormjs
 
         public bool IsFile { get; set; }
 
-        public string Icon { get; set; } = string.Empty;
+        public string Icon { get; set; }
+
+		public FileExplorerNode()
+		{
+			Icon = string.Empty;
+		}
+
 
         public HTMLDivElement NodeBase { get; set; }
         private HTMLDivElement NodeImage;

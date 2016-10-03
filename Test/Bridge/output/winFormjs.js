@@ -111,9 +111,13 @@
                 FullPath: null,
                 nodeViewType: 0,
                 IsFile: false,
-                Icon: "",
+                Icon: null,
                 NodeBase: null
             }
+        },
+        ctor: function () {
+            this.$initialize();
+            this.setIcon("");
         },
         getNodeExplorerState: function () {
             return this.nodeState;
@@ -318,6 +322,884 @@
                 }
                 ev.stopPropagation();
             }
+        }
+    });
+
+    Bridge.define("WinFormjs.Drawing");
+
+    Bridge.define("WinFormjs.Drawing.Color", {
+        $kind: "struct",
+        statics: {
+            ctor: function () {
+                WinFormjs.Drawing.Color.empty = new WinFormjs.Drawing.Color.ctor();
+                WinFormjs.Drawing.Color.stateKnownColorValid = 1;
+                WinFormjs.Drawing.Color.stateARGBValueValid = 2;
+                WinFormjs.Drawing.Color.stateValueMask = WinFormjs.Drawing.Color.stateARGBValueValid;
+                WinFormjs.Drawing.Color.stateNameValid = 8;
+                WinFormjs.Drawing.Color.notDefinedValue = System.Int64(0);
+            },
+            stateKnownColorValid: 0,
+            stateARGBValueValid: 0,
+            stateValueMask: 0,
+            stateNameValid: 0,
+            notDefinedValue: System.Int64(0),
+            ARGBAlphaShift: 24,
+            ARGBRedShift: 16,
+            ARGBGreenShift: 8,
+            ARGBBlueShift: 0,
+            config: {
+                init: function () {
+                    this.empty = new WinFormjs.Drawing.Color();
+                }
+            },
+            getTransparent: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Transparent);
+            },
+            getAliceBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.AliceBlue);
+            },
+            getAntiqueWhite: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.AntiqueWhite);
+            },
+            getAqua: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Aqua);
+            },
+            getAquamarine: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Aquamarine);
+            },
+            getAzure: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Azure);
+            },
+            getBeige: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Beige);
+            },
+            getBisque: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Bisque);
+            },
+            getBlack: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Black);
+            },
+            getBlanchedAlmond: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.BlanchedAlmond);
+            },
+            getBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Blue);
+            },
+            getBlueViolet: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.BlueViolet);
+            },
+            getBrown: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Brown);
+            },
+            getBurlyWood: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.BurlyWood);
+            },
+            getCadetBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.CadetBlue);
+            },
+            getChartreuse: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Chartreuse);
+            },
+            getChocolate: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Chocolate);
+            },
+            getCoral: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Coral);
+            },
+            getCornflowerBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.CornflowerBlue);
+            },
+            getCornsilk: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Cornsilk);
+            },
+            getCrimson: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Crimson);
+            },
+            getCyan: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Cyan);
+            },
+            getDarkBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkBlue);
+            },
+            getDarkCyan: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkCyan);
+            },
+            getDarkGoldenrod: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkGoldenrod);
+            },
+            getDarkGray: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkGray);
+            },
+            getDarkGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkGreen);
+            },
+            getDarkKhaki: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkKhaki);
+            },
+            getDarkMagenta: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkMagenta);
+            },
+            getDarkOliveGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkOliveGreen);
+            },
+            getDarkOrange: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkOrange);
+            },
+            getDarkOrchid: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkOrchid);
+            },
+            getDarkRed: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkRed);
+            },
+            getDarkSalmon: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkSalmon);
+            },
+            getDarkSeaGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkSeaGreen);
+            },
+            getDarkSlateBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkSlateBlue);
+            },
+            getDarkSlateGray: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkSlateGray);
+            },
+            getDarkTurquoise: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkTurquoise);
+            },
+            getDarkViolet: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DarkViolet);
+            },
+            getDeepPink: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DeepPink);
+            },
+            getDeepSkyBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DeepSkyBlue);
+            },
+            getDimGray: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DimGray);
+            },
+            getDodgerBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.DodgerBlue);
+            },
+            getFirebrick: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Firebrick);
+            },
+            getFloralWhite: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.FloralWhite);
+            },
+            getForestGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.ForestGreen);
+            },
+            getFuchsia: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Fuchsia);
+            },
+            getGainsboro: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Gainsboro);
+            },
+            getGhostWhite: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.GhostWhite);
+            },
+            getGold: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Gold);
+            },
+            getGoldenrod: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Goldenrod);
+            },
+            getGray: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Gray);
+            },
+            getGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Green);
+            },
+            getGreenYellow: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.GreenYellow);
+            },
+            getHoneydew: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Honeydew);
+            },
+            getHotPink: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.HotPink);
+            },
+            getIndianRed: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.IndianRed);
+            },
+            getIndigo: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Indigo);
+            },
+            getIvory: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Ivory);
+            },
+            getKhaki: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Khaki);
+            },
+            getLavender: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Lavender);
+            },
+            getLavenderBlush: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LavenderBlush);
+            },
+            getLawnGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LawnGreen);
+            },
+            getLemonChiffon: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LemonChiffon);
+            },
+            getLightBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightBlue);
+            },
+            getLightCoral: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightCoral);
+            },
+            getLightCyan: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightCyan);
+            },
+            getLightGoldenrodYellow: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightGoldenrodYellow);
+            },
+            getLightGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightGreen);
+            },
+            getLightGray: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightGray);
+            },
+            getLightPink: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightPink);
+            },
+            getLightSalmon: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightSalmon);
+            },
+            getLightSeaGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightSeaGreen);
+            },
+            getLightSkyBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightSkyBlue);
+            },
+            getLightSlateGray: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightSlateGray);
+            },
+            getLightSteelBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightSteelBlue);
+            },
+            getLightYellow: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LightYellow);
+            },
+            getLime: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Lime);
+            },
+            getLimeGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.LimeGreen);
+            },
+            getLinen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Linen);
+            },
+            getMagenta: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Magenta);
+            },
+            getMaroon: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Maroon);
+            },
+            getMediumAquamarine: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.MediumAquamarine);
+            },
+            getMediumBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.MediumBlue);
+            },
+            getMediumOrchid: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.MediumOrchid);
+            },
+            getMediumPurple: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.MediumPurple);
+            },
+            getMediumSeaGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.MediumSeaGreen);
+            },
+            getMediumSlateBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.MediumSlateBlue);
+            },
+            getMediumSpringGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.MediumSpringGreen);
+            },
+            getMediumTurquoise: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.MediumTurquoise);
+            },
+            getMediumVioletRed: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.MediumVioletRed);
+            },
+            getMidnightBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.MidnightBlue);
+            },
+            getMintCream: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.MintCream);
+            },
+            getMistyRose: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.MistyRose);
+            },
+            getMoccasin: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Moccasin);
+            },
+            getNavajoWhite: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.NavajoWhite);
+            },
+            getNavy: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Navy);
+            },
+            getOldLace: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.OldLace);
+            },
+            getOlive: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Olive);
+            },
+            getOliveDrab: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.OliveDrab);
+            },
+            getOrange: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Orange);
+            },
+            getOrangeRed: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.OrangeRed);
+            },
+            getOrchid: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Orchid);
+            },
+            getPaleGoldenrod: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.PaleGoldenrod);
+            },
+            getPaleGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.PaleGreen);
+            },
+            getPaleTurquoise: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.PaleTurquoise);
+            },
+            getPaleVioletRed: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.PaleVioletRed);
+            },
+            getPapayaWhip: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.PapayaWhip);
+            },
+            getPeachPuff: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.PeachPuff);
+            },
+            getPeru: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Peru);
+            },
+            getPink: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Pink);
+            },
+            getPlum: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Plum);
+            },
+            getPowderBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.PowderBlue);
+            },
+            getPurple: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Purple);
+            },
+            getRed: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Red);
+            },
+            getRosyBrown: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.RosyBrown);
+            },
+            getRoyalBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.RoyalBlue);
+            },
+            getSaddleBrown: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.SaddleBrown);
+            },
+            getSalmon: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Salmon);
+            },
+            getSandyBrown: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.SandyBrown);
+            },
+            getSeaGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.SeaGreen);
+            },
+            getSeaShell: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.SeaShell);
+            },
+            getSienna: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Sienna);
+            },
+            getSilver: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Silver);
+            },
+            getSkyBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.SkyBlue);
+            },
+            getSlateBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.SlateBlue);
+            },
+            getSlateGray: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.SlateGray);
+            },
+            getSnow: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Snow);
+            },
+            getSpringGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.SpringGreen);
+            },
+            getSteelBlue: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.SteelBlue);
+            },
+            getTan: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Tan);
+            },
+            getTeal: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Teal);
+            },
+            getThistle: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Thistle);
+            },
+            getTomato: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Tomato);
+            },
+            getTurquoise: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Turquoise);
+            },
+            getViolet: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Violet);
+            },
+            getWheat: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Wheat);
+            },
+            getWhite: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.White);
+            },
+            getWhiteSmoke: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.WhiteSmoke);
+            },
+            getYellow: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.Yellow);
+            },
+            getYellowGreen: function () {
+                return new WinFormjs.Drawing.Color.$ctor2(WinFormjs.Drawing.KnownColor.YellowGreen);
+            },
+            checkByte: function (value, name) {
+                if ((value < 0) || (value > 255)) {
+                    var args = [name, value, 0, 255];
+                }
+            },
+            makeArgb: function (alpha, red, green, blue) {
+                return System.Int64.clip64(Bridge.Int.clipu64(((((red << 16) | (green << 8)) | blue) | (alpha << 24))).and(System.UInt64(System.Int64([-1,0]))));
+            },
+            fromArgb: function (argb) {
+                return new WinFormjs.Drawing.Color.$ctor1(System.Int64(argb).and((System.Int64([-1,0]))), WinFormjs.Drawing.Color.stateARGBValueValid, null, 0);
+            },
+            fromArgb$2: function (alpha, red, green, blue) {
+                WinFormjs.Drawing.Color.checkByte(alpha, "alpha");
+                WinFormjs.Drawing.Color.checkByte(red, "red");
+                WinFormjs.Drawing.Color.checkByte(green, "green");
+                WinFormjs.Drawing.Color.checkByte(blue, "blue");
+                return new WinFormjs.Drawing.Color.$ctor1(WinFormjs.Drawing.Color.makeArgb((alpha & 255), (red & 255), (green & 255), (blue & 255)), WinFormjs.Drawing.Color.stateARGBValueValid, null, 0);
+            },
+            fromArgb$3: function (alpha, baseColor) {
+                WinFormjs.Drawing.Color.checkByte(alpha, "alpha");
+                return new WinFormjs.Drawing.Color.$ctor1(WinFormjs.Drawing.Color.makeArgb((alpha & 255), baseColor.getR(), baseColor.getG(), baseColor.getB()), WinFormjs.Drawing.Color.stateARGBValueValid, null, 0);
+            },
+            fromArgb$1: function (red, green, blue) {
+                return WinFormjs.Drawing.Color.fromArgb$2(255, red, green, blue);
+            },
+            fromKnownColor: function (color) {
+                return new WinFormjs.Drawing.Color.$ctor2(color);
+            },
+            op_Equality: function (left, right) {
+                if (((left.value.ne(right.value)) || (left.state !== right.state)) || (left.knownColor !== right.knownColor)) {
+                    return false;
+                }
+                return ((Bridge.referenceEquals(left.name, right.name)) || (((left.name != null) && (right.name != null)) && System.String.equals(left.name, right.name)));
+            },
+            op_Inequality: function (left, right) {
+                return !(WinFormjs.Drawing.Color.op_Equality(left, right));
+            },
+            getDefaultValue: function () { return new WinFormjs.Drawing.Color(); }
+        },
+        name: null,
+        value: System.Int64(0),
+        knownColor: 0,
+        state: 0,
+        $ctor2: function (knownColor) {
+            this.$initialize();
+            this.value = System.Int64(0);
+            this.state = WinFormjs.Drawing.Color.stateKnownColorValid;
+            this.name = null;
+            this.knownColor = Bridge.Int.sxs(knownColor & 65535);
+        },
+        $ctor1: function (value, state, name, knownColor) {
+            this.$initialize();
+            this.value = value;
+            this.state = state;
+            this.name = name;
+            this.knownColor = Bridge.Int.sxs(knownColor & 65535);
+        },
+        ctor: function () {
+            this.$initialize();
+        },
+        getR: function () {
+            return System.Int64.clipu8((this.getValue().shr(16)).and(System.Int64(255)));
+        },
+        getG: function () {
+            return System.Int64.clipu8((this.getValue().shr(8)).and(System.Int64(255)));
+        },
+        getB: function () {
+            return System.Int64.clipu8(this.getValue().and(System.Int64(255)));
+        },
+        getA: function () {
+            return System.Int64.clipu8((this.getValue().shr(24)).and(System.Int64(255)));
+        },
+        getIsKnownColor: function () {
+            return ((this.state & WinFormjs.Drawing.Color.stateKnownColorValid) > 0);
+        },
+        getIsEmpty: function () {
+            return (this.state === 0);
+        },
+        getIsNamedColor: function () {
+            if ((this.state & WinFormjs.Drawing.Color.stateNameValid) === 0) {
+                return this.getIsKnownColor();
+            }
+            return true;
+        },
+        getIsSystemColor: function () {
+            if (!this.getIsKnownColor()) {
+                return false;
+            }
+            if (this.knownColor > 26) {
+                return (this.knownColor > 167);
+            }
+            return true;
+        },
+        getNameAndARGBValue: function () {
+            var args = [this.getName(), this.getA(), this.getR(), this.getG(), this.getB()];
+            return System.String.format.apply(System.String, ["{{Name={0}, ARGB=({1}, {2}, {3}, {4})}}"].concat(args));
+        },
+        getName: function () {
+            if ((this.state & WinFormjs.Drawing.Color.stateNameValid) !== 0) {
+                return this.name;
+            }
+            if (!this.getIsKnownColor()) {
+                return System.Convert.toStringInBase(this.value, 16, 11);
+            }
+
+            return this.knownColor.toString();
+        },
+        getValue: function () {
+            if ((this.state & WinFormjs.Drawing.Color.stateValueMask) !== 0) {
+                return this.value;
+            }
+            return WinFormjs.Drawing.Color.notDefinedValue;
+        },
+        getBrightness: function () {
+            var num = this.getR() / 255.0;
+            var num2 = this.getG() / 255.0;
+            var num3 = this.getB() / 255.0;
+            var num4 = num;
+            var num5 = num;
+            if (num2 > num4) {
+                num4 = num2;
+            }
+            if (num3 > num4) {
+                num4 = num3;
+            }
+            if (num2 < num5) {
+                num5 = num2;
+            }
+            if (num3 < num5) {
+                num5 = num3;
+            }
+            return ((num4 + num5) / 2.0);
+        },
+        getHue: function () {
+            if ((this.getR() === this.getG()) && (this.getG() === this.getB())) {
+                return 0.0;
+            }
+            var num = this.getR() / 255.0;
+            var num2 = this.getG() / 255.0;
+            var num3 = this.getB() / 255.0;
+            var num7 = 0.0;
+            var num4 = num;
+            var num5 = num;
+            if (num2 > num4) {
+                num4 = num2;
+            }
+            if (num3 > num4) {
+                num4 = num3;
+            }
+            if (num2 < num5) {
+                num5 = num2;
+            }
+            if (num3 < num5) {
+                num5 = num3;
+            }
+            var num6 = num4 - num5;
+            if (num === num4) {
+                num7 = (num2 - num3) / num6;
+            } else if (num2 === num4) {
+                num7 = 2.0 + ((num3 - num) / num6);
+            } else if (num3 === num4) {
+                num7 = 4.0 + ((num - num2) / num6);
+            }
+            num7 *= 60.0;
+            if (num7 < 0.0) {
+                num7 += 360.0;
+            }
+            return num7;
+        },
+        getSaturation: function () {
+            var num = this.getR() / 255.0;
+            var num2 = this.getG() / 255.0;
+            var num3 = this.getB() / 255.0;
+            var num7 = 0.0;
+            var num4 = num;
+            var num5 = num;
+            if (num2 > num4) {
+                num4 = num2;
+            }
+            if (num3 > num4) {
+                num4 = num3;
+            }
+            if (num2 < num5) {
+                num5 = num2;
+            }
+            if (num3 < num5) {
+                num5 = num3;
+            }
+            if (num4 === num5) {
+                return num7;
+            }
+            var num6 = (num4 + num5) / 2.0;
+            if (num6 <= 0.5) {
+                return ((num4 - num5) / (num4 + num5));
+            }
+            return ((num4 - num5) / ((2.0 - num4) - num5));
+        },
+        toArgb: function () {
+            return System.Int64.clip32(this.getValue());
+        },
+        toKnownColor: function () {
+            return this.knownColor;
+        },
+        toString: function () {
+            var builder = new System.Text.StringBuilder("", 32);
+            builder.append(Bridge.Reflection.getTypeName(Bridge.getType(this)));
+            builder.append(" [");
+            if ((this.state & WinFormjs.Drawing.Color.stateNameValid) !== 0) {
+                builder.append(this.getName());
+            } else if ((this.state & WinFormjs.Drawing.Color.stateKnownColorValid) !== 0) {
+                builder.append(this.getName());
+            } else if ((this.state & WinFormjs.Drawing.Color.stateValueMask) !== 0) {
+                builder.append("A=");
+                builder.append(this.getA());
+                builder.append(", R=");
+                builder.append(this.getR());
+                builder.append(", G=");
+                builder.append(this.getG());
+                builder.append(", B=");
+                builder.append(this.getB());
+            } else {
+                builder.append("Empty");
+            }
+            builder.append("]");
+            return builder.toString();
+        },
+        equals: function (obj) {
+            if (Bridge.is(obj, WinFormjs.Drawing.Color)) {
+                var color = System.Nullable.getValue(Bridge.cast(obj, WinFormjs.Drawing.Color));
+                if (((this.value.equals(color.value)) && (this.state === color.state)) && (this.knownColor === color.knownColor)) {
+                    return ((Bridge.referenceEquals(this.name, color.name)) || (((this.name != null) && (color.name != null)) && System.String.equals(this.name, this.name)));
+                }
+            }
+            return false;
+        },
+        getHashCode: function () {
+            return ((Bridge.getHashCode(this.value) ^ Bridge.getHashCode(this.state)) ^ Bridge.getHashCode(this.knownColor));
+        },
+        $clone: function (to) {
+            var s = to || new WinFormjs.Drawing.Color();
+            s.name = this.name;
+            s.value = this.value;
+            s.knownColor = this.knownColor;
+            s.state = this.state;
+            return s;
+        }
+    });
+
+    Bridge.define("WinFormjs.Drawing.KnownColor", {
+        $kind: "enum",
+        statics: {
+            ActiveBorder: 1,
+            ActiveCaption: 2,
+            ActiveCaptionText: 3,
+            AliceBlue: 28,
+            AntiqueWhite: 29,
+            AppWorkspace: 4,
+            Aqua: 30,
+            Aquamarine: 31,
+            Azure: 32,
+            Beige: 33,
+            Bisque: 34,
+            Black: 35,
+            BlanchedAlmond: 36,
+            Blue: 37,
+            BlueViolet: 38,
+            Brown: 39,
+            BurlyWood: 40,
+            ButtonFace: 168,
+            ButtonHighlight: 169,
+            ButtonShadow: 170,
+            CadetBlue: 41,
+            Chartreuse: 42,
+            Chocolate: 43,
+            Control: 5,
+            ControlDark: 6,
+            ControlDarkDark: 7,
+            ControlLight: 8,
+            ControlLightLight: 9,
+            ControlText: 10,
+            Coral: 44,
+            CornflowerBlue: 45,
+            Cornsilk: 46,
+            Crimson: 47,
+            Cyan: 48,
+            DarkBlue: 49,
+            DarkCyan: 50,
+            DarkGoldenrod: 51,
+            DarkGray: 52,
+            DarkGreen: 53,
+            DarkKhaki: 54,
+            DarkMagenta: 55,
+            DarkOliveGreen: 56,
+            DarkOrange: 57,
+            DarkOrchid: 58,
+            DarkRed: 59,
+            DarkSalmon: 60,
+            DarkSeaGreen: 61,
+            DarkSlateBlue: 62,
+            DarkSlateGray: 63,
+            DarkTurquoise: 64,
+            DarkViolet: 65,
+            DeepPink: 66,
+            DeepSkyBlue: 67,
+            Desktop: 11,
+            DimGray: 68,
+            DodgerBlue: 69,
+            Firebrick: 70,
+            FloralWhite: 71,
+            ForestGreen: 72,
+            Fuchsia: 73,
+            Gainsboro: 74,
+            GhostWhite: 75,
+            Gold: 76,
+            Goldenrod: 77,
+            GradientActiveCaption: 171,
+            GradientInactiveCaption: 172,
+            Gray: 78,
+            GrayText: 12,
+            Green: 79,
+            GreenYellow: 80,
+            Highlight: 13,
+            HighlightText: 14,
+            Honeydew: 81,
+            HotPink: 82,
+            HotTrack: 15,
+            InactiveBorder: 16,
+            InactiveCaption: 17,
+            InactiveCaptionText: 18,
+            IndianRed: 83,
+            Indigo: 84,
+            Info: 19,
+            InfoText: 20,
+            Ivory: 85,
+            Khaki: 86,
+            Lavender: 87,
+            LavenderBlush: 88,
+            LawnGreen: 89,
+            LemonChiffon: 90,
+            LightBlue: 91,
+            LightCoral: 92,
+            LightCyan: 93,
+            LightGoldenrodYellow: 94,
+            LightGray: 95,
+            LightGreen: 96,
+            LightPink: 97,
+            LightSalmon: 98,
+            LightSeaGreen: 99,
+            LightSkyBlue: 100,
+            LightSlateGray: 101,
+            LightSteelBlue: 102,
+            LightYellow: 103,
+            Lime: 104,
+            LimeGreen: 105,
+            Linen: 106,
+            Magenta: 107,
+            Maroon: 108,
+            MediumAquamarine: 109,
+            MediumBlue: 110,
+            MediumOrchid: 111,
+            MediumPurple: 112,
+            MediumSeaGreen: 113,
+            MediumSlateBlue: 114,
+            MediumSpringGreen: 115,
+            MediumTurquoise: 116,
+            MediumVioletRed: 117,
+            Menu: 21,
+            MenuBar: 173,
+            MenuHighlight: 174,
+            MenuText: 22,
+            MidnightBlue: 118,
+            MintCream: 119,
+            MistyRose: 120,
+            Moccasin: 121,
+            NavajoWhite: 122,
+            Navy: 123,
+            OldLace: 124,
+            Olive: 125,
+            OliveDrab: 126,
+            Orange: 127,
+            OrangeRed: 128,
+            Orchid: 129,
+            PaleGoldenrod: 130,
+            PaleGreen: 131,
+            PaleTurquoise: 132,
+            PaleVioletRed: 133,
+            PapayaWhip: 134,
+            PeachPuff: 135,
+            Peru: 136,
+            Pink: 137,
+            Plum: 138,
+            PowderBlue: 139,
+            Purple: 140,
+            Red: 141,
+            RosyBrown: 142,
+            RoyalBlue: 143,
+            SaddleBrown: 144,
+            Salmon: 145,
+            SandyBrown: 146,
+            ScrollBar: 23,
+            SeaGreen: 147,
+            SeaShell: 148,
+            Sienna: 149,
+            Silver: 150,
+            SkyBlue: 151,
+            SlateBlue: 152,
+            SlateGray: 153,
+            Snow: 154,
+            SpringGreen: 155,
+            SteelBlue: 156,
+            Tan: 157,
+            Teal: 158,
+            Thistle: 159,
+            Tomato: 160,
+            Transparent: 27,
+            Turquoise: 161,
+            Violet: 162,
+            Wheat: 163,
+            White: 164,
+            WhiteSmoke: 165,
+            Window: 24,
+            WindowFrame: 25,
+            WindowText: 26,
+            Yellow: 166,
+            YellowGreen: 167
         }
     });
 
@@ -1988,6 +2870,21 @@
         }
     });
 
+    Bridge.define("WinFormjs.Network", {
+        statics: {
+            post: function (uri, jsonFile, success, error) {
+                if (success === void 0) { success = null; }
+                if (error === void 0) { error = null; }
+                $.ajax({ url: uri, cache: false, success: success, error: error, data: jsonFile == null ? "" : JSON.stringify(jsonFile), dataType: "json", contentType: "application/json", type: "POST" });
+            },
+            get: function (uri, success, error) {
+                if (success === void 0) { success = null; }
+                if (error === void 0) { error = null; }
+                $.ajax({ url: uri, cache: false, type: "GET", success: success, error: error });
+            }
+        }
+    });
+
     Bridge.define("WinFormjs.NodeViewType", {
         $kind: "enum",
         statics: {
@@ -2258,6 +3155,14 @@
         y: 0,
         width: 0,
         height: 0,
+        $ctor2: function (location, size) {
+            this.$initialize();
+            this.x = location.x;
+            this.y = location.y;
+
+            this.width = size.width;
+            this.height = size.height;
+        },
         $ctor1: function (x, y, width, height) {
             this.$initialize();
             this.x = x;
@@ -2290,6 +3195,150 @@
             s.width = this.width;
             s.height = this.height;
             return s;
+        }
+    });
+
+    Bridge.define("WinFormjs.ServerApplication", {
+        statics: {
+            startFromURI: function (source) {
+                // Get Application from Source :D
+                WinFormjs.Network.get(source, $_.WinFormjs.ServerApplication.f1);
+            },
+            startFromJson: function (jsonData) {
+                var saf = Bridge.as(jsonData, WinFormjs.ServerApplicationFile);
+                if (saf == null) {
+                    return;
+                }
+
+
+
+            }
+        },
+        config: {
+            properties: {
+                URI: null
+            }
+        }
+    });
+
+    Bridge.ns("WinFormjs.ServerApplication", $_);
+
+    Bridge.apply($_.WinFormjs.ServerApplication, {
+        f1: function (data, str, obj) {
+            WinFormjs.ServerApplication.startFromJson(data);
+        }
+    });
+
+    Bridge.define("WinFormjs.ServerApplicationClassControl", {
+        config: {
+            properties: {
+                ServerControlTypeCode: 0,
+                Name: null,
+                Tag: null,
+                Size: null,
+                Location: null,
+                Text: null,
+                BackColor: null,
+                ForeColor: null
+            },
+            init: function () {
+                this.Size = new WinFormjs.Size();
+                this.Location = new WinFormjs.Point();
+                this.BackColor = new WinFormjs.Drawing.Color();
+                this.ForeColor = new WinFormjs.Drawing.Color();
+            }
+        },
+        getBounds: function () {
+            return new WinFormjs.Rectange.$ctor2(this.getLocation().$clone(), this.getSize().$clone());
+        },
+        setBounds: function (value) {
+            this.setSize(new WinFormjs.Size.$ctor1(value.width, value.height));
+            this.setLocation(new WinFormjs.Point.$ctor1(value.x, value.y));
+        }
+    });
+
+    Bridge.define("WinFormjs.ServerApplicationClassField", {
+        config: {
+            properties: {
+                Name: null,
+                Id: 0,
+                Value: null,
+                SACC: null
+            }
+        },
+        ctor: function () {
+            this.$initialize();
+            this.setSACC(null);
+        }
+    });
+
+    Bridge.define("WinFormjs.ServerApplicationFile", {
+        config: {
+            properties: {
+                Title: null
+            }
+        }
+    });
+
+    Bridge.define("WinFormjs.ServerControlTypes", {
+        $kind: "enum",
+        statics: {
+            Button: 0,
+            CheckBox: 1,
+            CheckListBox: 2,
+            ComboBox: 3,
+            DateTimePicker: 4,
+            Label: 5,
+            LinkLabel: 6,
+            ListBox: 7,
+            ListView: 8,
+            MaskedTextBox: 9,
+            MonthCalendar: 10,
+            NotifyIcon: 11,
+            NumericUpDown: 12,
+            PictureBox: 13,
+            ProgressBox: 14,
+            RadioButton: 15,
+            RichTextBox: 16,
+            TextBox: 17,
+            ToolTip: 18,
+            TreeView: 19,
+            WebBrowser: 20,
+            FlowLayoutPanel: 21,
+            GroupBox: 22,
+            Panel: 23,
+            SplitContainer: 24,
+            TabControl: 25,
+            TableLayoutPanel: 26,
+            ContextMenuStrip: 27,
+            MenuTrip: 28,
+            StatusStrip: 29,
+            ToolStrip: 30,
+            ToolStripContainer: 31,
+            Chart: 32,
+            BackgroundWoker: 33,
+            DirectoryEntry: 34,
+            DirectorySearcher: 35,
+            ErrorProvider: 36,
+            EventLog: 37,
+            FileSystemWatcher: 38,
+            HelpProvider: 39,
+            ImageList: 40,
+            MessageQueue: 41,
+            PerformanceCounter: 42,
+            Process: 43,
+            SerialPort: 44,
+            ServiceController: 45,
+            Timer: 46,
+            PageSetupDialog: 47,
+            PrintDialog: 48,
+            PrintDocument: 49,
+            ColorDialog: 50,
+            FolderBrowserDialog: 51,
+            FontDialog: 52,
+            OpenFileDialog: 53,
+            SafeFileDialog: 54,
+            Custom: 55
         }
     });
 
@@ -2754,6 +3803,46 @@
                 WinFormjs.File.writeAllText(this.getPath(), this.getNotePadContent().value);
             }
             WinFormjs.Form.prototype.onClosing.call(this);
+        }
+    });
+
+    Bridge.define("WinFormjs.FormRunStart", {
+        inherits: [WinFormjs.Form],
+        initialise: function () {
+            WinFormjs.Form.prototype.initialise.call(this);
+
+            this.setText("Run Interface");
+            this.setWidth("400px");
+            this.setHeight("100px");
+
+            var Input = document.createElement('input');
+            Input.style.position = "absolute";
+            Input.style.left = "5px";
+            Input.style.top = "5px";
+
+            this.fillHorizontalControlWithParent(Input, 5);
+
+            Input.onkeyup = function (ev) {
+                var kev = ev;
+                if (kev.keyCode === 13) {
+                    if (System.String.isNullOrWhiteSpace(Input.value)) {
+                        WinFormjs.ServerApplication.startFromURI(Input.value);
+                    }
+                    Input.value = "";
+                }
+            };
+
+
+            //FillHorizontalControlWithParent()
+
+
+
+            //this.Body.AppendChild()
+
+        },
+        onShowing: function () {
+
+            WinFormjs.Form.prototype.onShowing.call(this);
         }
     });
 

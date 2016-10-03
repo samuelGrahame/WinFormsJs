@@ -15,6 +15,15 @@ namespace WinFormjs
         public int Width;
         public int Height;
 
+		public Rectange(Point location, Size size)
+		{
+			X = location.X;
+			Y = location.Y;
+
+			Width = size.Width;
+			Height = size.Height;
+		}
+
         public static void SetBounds(out int x, out int y, out int w, out int h, jQuery obj)
         {
             x = Global.ParseInt(obj.Css("left"));
